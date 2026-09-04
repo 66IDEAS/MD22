@@ -48,13 +48,12 @@ enum MD22Error: LocalizedError, Sendable, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .unsupportedFile: "That item is not a Markdown file."
-        case .unavailableFile: "The file is no longer available."
-        case .unreadableFile: "The file could not be read."
-        case .invalidEncoding: "The file is not valid UTF-8 text."
-        case .rendererUnavailable: "The Markdown renderer is unavailable."
-        case .exportFailed: "The document could not be exported."
+        case .unsupportedFile: String(localized: "That item is not a Markdown file.")
+        case .unavailableFile: String(localized: "The file is no longer available.")
+        case .unreadableFile: String(localized: "The file could not be read.")
+        case .invalidEncoding: String(localized: "The file is not valid UTF-8 text.")
+        case .rendererUnavailable: String(localized: "The Markdown renderer is unavailable.")
+        case .exportFailed: String(localized: "The document could not be exported.")
         }
     }
 }
-

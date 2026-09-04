@@ -9,6 +9,8 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(minWidth: 760, minHeight: 520)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("MD22 welcome")
     }
 }
 

@@ -5,6 +5,7 @@ import Observation
 final class AppEnvironment {
     let fileAccess: any FileAccessing
     let platform: any PlatformIntegrating
+    let accessibility = AccessibilityPreferences()
 
     init(
         fileAccess: any FileAccessing = FileAccessService(),
@@ -14,4 +15,3 @@ final class AppEnvironment {
         self.platform = platform
     }
 }
-

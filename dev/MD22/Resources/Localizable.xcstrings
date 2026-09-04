@@ -1,0 +1,52 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "A focused Markdown reader" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "A focused Markdown reader" } }
+      }
+    },
+    "MD22" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "MD22" } }
+      }
+    },
+    "MD22 welcome" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "MD22 welcome" } }
+      }
+    },
+    "That item is not a Markdown file." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "That item is not a Markdown file." } }
+      }
+    },
+    "The document could not be exported." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The document could not be exported." } }
+      }
+    },
+    "The file could not be read." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The file could not be read." } }
+      }
+    },
+    "The file is no longer available." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The file is no longer available." } }
+      }
+    },
+    "The file is not valid UTF-8 text." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The file is not valid UTF-8 text." } }
+      }
+    },
+    "The Markdown renderer is unavailable." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The Markdown renderer is unavailable." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
+
