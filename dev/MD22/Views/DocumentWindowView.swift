@@ -7,6 +7,7 @@ struct DocumentWindowView: View {
     @State private var inspectorPresented = true
     @State private var searchPresented = false
     @State private var isDropTargeted = false
+    @State private var historySelection: String?
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -16,7 +17,10 @@ struct DocumentWindowView: View {
     var body: some View {
         VStack(spacing: 0) {
             NavigationSplitView(columnVisibility: $columnVisibility) {
-                HistorySidebarView()
+                HistorySidebarView(
+                    history: environment.history,
+                    selection: $historySelection
+                )
             } detail: {
                 documentContent
             }
