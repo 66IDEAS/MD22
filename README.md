@@ -21,6 +21,11 @@ xcodebuild -project MD22.xcodeproj -scheme MD22 \
 The generated app is at
 `dev/DerivedData/Build/Products/Debug/MD22.app`.
 
+Developer ID archive, notarization, DMG, and Gatekeeper verification commands
+are documented in [Direct Distribution](docs/DISTRIBUTION.md). Release scripts
+refuse to overwrite artifacts and keep all signing credentials outside the
+repository.
+
 ## Project layout
 
 - `dev/MD22`: native application source and bundled resources

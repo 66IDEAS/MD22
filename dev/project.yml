@@ -81,6 +81,12 @@ targets:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
           ENABLE_TESTABILITY: true
           DEAD_CODE_STRIPPING: false
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Developer ID Application
+          ENABLE_HARDENED_RUNTIME: true
+          OTHER_CODE_SIGN_FLAGS: --timestamp
+          DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
     scheme:
       testTargets:
         - MD22Tests
