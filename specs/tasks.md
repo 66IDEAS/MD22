@@ -12,7 +12,7 @@ Requirement IDs use these prefixes:
 
 ### Foundation and Repository
 
-- [ ] **T001 — Create the native macOS application foundation** (`ARCH-1`): Establish MD22 as a native Apple-platform application while keeping platform-independent rendering concepts reusable.
+- [x] **T001 — Create the native macOS application foundation** (`ARCH-1`): Establish MD22 as a native Apple-platform application while keeping platform-independent rendering concepts reusable.
 - [ ] **T002 — Adopt the macOS 26 platform generation** (`ARCH-4`): Set macOS 26 as the minimum and use current SwiftUI, Observation, windowing, inspector, command, WebKit, and Liquid Glass capabilities.
 - [ ] **T003 — Configure Apple-silicon-only builds** (`ARCH-9`): Build and distribute only the `arm64` architecture.
 - [ ] **T004 — Establish MIT licensing and notices** (`ARCH-6`): Add the MIT license and a policy for preserving compatible third-party attributions across source and distributed artifacts.

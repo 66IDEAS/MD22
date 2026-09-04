@@ -1,0 +1,12 @@
+.DS_Store
+dev/.build/
+dev/DerivedData/
+dev/build/
+dev/MD22.xcodeproj/
+dev/MD22.xcworkspace/
+dev/Resources/Renderer/generated/
+*.xcresult
+*.dSYM
+*.dmg
+*.zip
+
