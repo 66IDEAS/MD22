@@ -73,4 +73,25 @@ struct PersistenceTests {
         #expect(repository.pinnedRecords.count == 1)
         #expect(repository.recentRecords.isEmpty)
     }
+
+    @Test("Pinned entries keep manual order and unavailable state")
+    func pinOrderAndAvailability() throws {
+        let persistence = try PersistenceController(isStoredInMemoryOnly: true)
+        let repository = HistoryRepository(container: persistence.container)
+        for name in ["first.md", "second.md", "third.md"] {
+            let url = URL(fileURLWithPath: "/tmp/\(name)")
+            try repository.recordOpen(DocumentSnapshot(url: url, markdown: "", modificationDate: nil, fileIdentifier: nil))
+        }
+        for record in repository.recentRecords {
+            try repository.setPinned(true, for: record)
+        }
+        let originalFirstPath = try #require(repository.pinnedRecords.first).canonicalPath
+        try repository.reorderPinned(fromOffsets: IndexSet(integer: 0), toOffset: repository.pinnedRecords.count)
+        #expect(repository.pinnedRecords.last?.canonicalPath == originalFirstPath)
+
+        try repository.markUnavailable(path: originalFirstPath)
+        let unavailable = try #require(repository.pinnedRecords.first { $0.canonicalPath == originalFirstPath })
+        #expect(unavailable.isPinned)
+        #expect(!unavailable.isAvailable)
+    }
 }

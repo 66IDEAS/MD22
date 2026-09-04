@@ -51,7 +51,9 @@ struct HistorySidebarView: View {
     }
 
     private func historyRow(_ record: HistoryRecord) -> some View {
-        HistoryRow(record: record)
+        HistoryRow(record: record) {
+            perform { try history.setPinned(!record.isPinned, for: record) }
+        }
             .tag(record.canonicalPath)
             .contextMenu {
                 Button("Open") { onOpen(record) }
@@ -121,6 +123,8 @@ struct HistorySidebarView: View {
 
 private struct HistoryRow: View {
     let record: HistoryRecord
+    let onTogglePin: () -> Void
+    @State private var isHovering = false
 
     var body: some View {
         HStack(spacing: 8) {
@@ -140,13 +144,17 @@ private struct HistoryRow: View {
             }
 
             Spacer(minLength: 0)
-            if record.isPinned {
-                Image(systemName: "pin.fill")
+            Button(action: onTogglePin) {
+                Image(systemName: record.isPinned ? "pin.fill" : "pin")
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
             }
+            .buttonStyle(.plain)
+            .foregroundStyle(record.isPinned ? Color.accentColor : Color.secondary)
+            .opacity(record.isPinned || isHovering ? 1 : 0)
+            .help(record.isPinned ? "Unpin" : "Pin")
+            .accessibilityLabel(record.isPinned ? "Unpin \(record.displayName)" : "Pin \(record.displayName)")
         }
+        .onHover { isHovering = $0 }
         .help(record.canonicalPath)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityDescription)
