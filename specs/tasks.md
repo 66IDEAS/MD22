@@ -13,7 +13,7 @@ Requirement IDs use these prefixes:
 ### Foundation and Repository
 
 - [x] **T001 — Create the native macOS application foundation** (`ARCH-1`): Establish MD22 as a native Apple-platform application while keeping platform-independent rendering concepts reusable.
-- [ ] **T002 — Adopt the macOS 26 platform generation** (`ARCH-4`): Set macOS 26 as the minimum and use current SwiftUI, Observation, windowing, inspector, command, WebKit, and Liquid Glass capabilities.
+- [x] **T002 — Adopt the macOS 26 platform generation** (`ARCH-4`): Set macOS 26 as the minimum and use current SwiftUI, Observation, windowing, inspector, command, WebKit, and Liquid Glass capabilities.
 - [ ] **T003 — Configure Apple-silicon-only builds** (`ARCH-9`): Build and distribute only the `arm64` architecture.
 - [ ] **T004 — Establish MIT licensing and notices** (`ARCH-6`): Add the MIT license and a policy for preserving compatible third-party attributions across source and distributed artifacts.
 - [ ] **T005 — Integrate the fixed MD22 brand assets** (`UX-21`): Add the supplied icon and logo without redesign, recoloring, or theme-driven reinterpretation.
@@ -119,3 +119,10 @@ Requirement IDs use these prefixes:
 - [ ] **T072 — Build phase-two theme-pack management** (`UX-23`): Add a focused Themes settings pane with compact previews, attribution, native import and removal, and clear validation feedback.
 - [ ] **T073 — Add Finder Quick Look previews** (`FR-25`): Render Markdown in Finder without modifying it and preserve the system path into the full application.
 - [ ] **T074 — Build the phase-two Quick Look experience** (`UX-24`): Provide fast, chrome-free, system-matched Light or Dark previews with rich content adapted to the constrained surface.
+
+## Resolved Implementation Issues
+
+- [x] **E001 — Resolve generated test-module collisions**: Assign explicit, distinct product and module names to the unit-test and UI-test bundles so Xcode can build both in one scheme.
+- [x] **E002 — Enable app-module testability in Debug builds**: Explicitly enable testability and unoptimized Swift compilation for Debug because generated target settings did not inherit those flags.
+- [x] **E003 — Preserve testable app symbols**: Disable dead-code stripping for Debug app builds so hosted tests can link internal symbols that are intentionally not referenced by the executable.
+- [x] **E004 — Link hosted tests against the app**: Set the unit-test bundle loader explicitly so internal MD22 symbols resolve against its test host under generated Xcode 26 projects.

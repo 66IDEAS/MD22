@@ -7,5 +7,10 @@ struct MD22FoundationTests {
     func testTargetLoads() {
         #expect(true)
     }
-}
 
+    @Test("The current platform meets the macOS 26 baseline")
+    func platformBaseline() {
+        #expect(PlatformRequirements.minimumMacOS.majorVersion == 26)
+        #expect(PlatformRequirements.isSupported)
+    }
+}
