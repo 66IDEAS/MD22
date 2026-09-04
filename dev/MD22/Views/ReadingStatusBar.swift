@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ReadingStatusBar: View {
     let session: DocumentSession
+    @Environment(AppEnvironment.self) private var environment
 
     var body: some View {
         HStack(spacing: 14) {
@@ -17,9 +18,17 @@ struct ReadingStatusBar: View {
             Text(session.snapshot?.url.lastPathComponent ?? "No document")
                 .foregroundStyle(.secondary)
             Divider().frame(height: 12)
-            Button("Light", systemImage: "circle.lefthalf.filled") {}
-                .buttonStyle(.borderless)
-                .disabled(true)
+            Menu {
+                Picker("Document Theme", selection: displayThemeBinding) {
+                    ForEach(DisplayTheme.allCases) { theme in
+                        Text(theme.title).tag(theme)
+                    }
+                }
+            } label: {
+                Label(environment.preferences.displayTheme.title, systemImage: "paintpalette")
+            }
+            .menuStyle(.borderlessButton)
+            .help("Choose Document Theme")
         }
         .font(.caption)
         .padding(.horizontal, 12)
@@ -27,5 +36,12 @@ struct ReadingStatusBar: View {
         .background(.bar)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Reading status")
+    }
+
+    private var displayThemeBinding: Binding<DisplayTheme> {
+        Binding(
+            get: { environment.preferences.displayTheme },
+            set: { environment.preferences.displayTheme = $0 }
+        )
     }
 }

@@ -30,7 +30,7 @@ final class WebDocumentRenderer: DocumentRendering {
         renderError = nil
         debugMessage = nil
         do {
-            let document = try RendererHTMLBuilder.build(snapshot: snapshot)
+            let document = try RendererHTMLBuilder.build(snapshot: snapshot, themeID: themeID)
             for try await _ in page.load(html: document.html, baseURL: document.baseURL) {}
             for _ in 0..<500 {
                 try Task.checkCancellation()
@@ -113,6 +113,14 @@ final class WebDocumentRenderer: DocumentRendering {
             wordCount: state["wordCount"] as? Int ?? 0,
             linkDestination: state["linkDestination"] as? String,
             selectedText: state["selectedText"] as? String ?? ""
+        )
+    }
+
+    func applyTheme(_ themeID: String) async {
+        _ = try? await page.callJavaScript(
+            "document.documentElement.dataset.theme = arguments.themeID",
+            arguments: ["themeID": themeID],
+            contentWorld: .page
         )
     }
 }

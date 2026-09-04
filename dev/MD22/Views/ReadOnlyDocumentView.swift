@@ -30,7 +30,7 @@ struct ReadOnlyDocumentView: View {
         }
         .task(id: snapshot) {
             do {
-                try await renderer.render(snapshot: snapshot, themeID: "light")
+                try await renderer.render(snapshot: snapshot, themeID: environment.preferences.displayTheme.rawValue)
                 await renderer.restore(session.readingLocation)
                 if let headingID = session.navigationTargetHeadingID {
                     await renderer.navigate(to: headingID)
@@ -49,6 +49,9 @@ struct ReadOnlyDocumentView: View {
         .onChange(of: renderer.pendingNavigationURL) { _, _ in
             guard let destination = renderer.consumePendingNavigation() else { return }
             handleNavigation(destination)
+        }
+        .onChange(of: environment.preferences.displayTheme) { _, theme in
+            Task { await renderer.applyTheme(theme.rawValue) }
         }
     }
 

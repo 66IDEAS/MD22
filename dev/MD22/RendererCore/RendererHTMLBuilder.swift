@@ -11,6 +11,7 @@ enum RendererHTMLBuilder {
 
     static func build(
         snapshot: DocumentSnapshot,
+        themeID: String = DisplayTheme.light.rawValue,
         themeCSS: String = "",
         mermaidTheme: String = "neutral",
         reduceMotion: Bool = false,
@@ -19,6 +20,7 @@ enum RendererHTMLBuilder {
         RenderedDocument(
             html: try makeHTML(
                 snapshot: snapshot,
+                themeID: themeID,
                 themeCSS: themeCSS,
                 mermaidTheme: mermaidTheme,
                 reduceMotion: reduceMotion,
@@ -31,6 +33,7 @@ enum RendererHTMLBuilder {
 
     static func makeHTML(
         snapshot: DocumentSnapshot,
+        themeID: String = DisplayTheme.light.rawValue,
         themeCSS: String = "",
         mermaidTheme: String = "neutral",
         reduceMotion: Bool = false,
@@ -45,6 +48,7 @@ enum RendererHTMLBuilder {
         let bootstrap: [String: Any] = [
             "markdown": snapshot.markdown,
             "documentURL": snapshot.url.absoluteString,
+            "themeID": themeID,
             "mermaidTheme": mermaidTheme,
             "reduceMotion": reduceMotion,
             "missingReferences": LocalReferenceScanner.missingReferences(
@@ -61,7 +65,7 @@ enum RendererHTMLBuilder {
 
         return """
         <!doctype html>
-        <html lang="en" data-theme="light">
+        <html lang="en" data-theme="\(escaped(themeID))">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width,initial-scale=1">
