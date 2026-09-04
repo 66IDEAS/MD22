@@ -6,6 +6,7 @@ import Observation
 final class DocumentSession {
     private let fileAccess: any FileAccessing
     private let history: HistoryRepository
+    private let bookmarks: BookmarkRepository
     private var loadTask: Task<Void, Never>?
     private var loadingIndicatorTask: Task<Void, Never>?
     private var refreshTask: Task<Void, Never>?
@@ -29,6 +30,7 @@ final class DocumentSession {
     init(environment: AppEnvironment) {
         fileAccess = environment.fileAccess
         history = environment.history
+        bookmarks = environment.bookmarks
     }
 
     var title: String? { snapshot?.url.lastPathComponent }
@@ -69,6 +71,7 @@ final class DocumentSession {
                 self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
                 _ = try self.history.recordOpen(loaded)
                 self.readingLocation = try targetLocation ?? self.history.readingLocation(for: loaded.url)
+                try self.bookmarks.reconcile(snapshot: loaded, analysis: self.analysis ?? DocumentAnalysis(headings: [], wordCount: 0, estimatedReadingMinutes: 1))
                 self.isLoading = false
                 self.showsLoadingIndicator = false
                 self.loadingIndicatorTask?.cancel()
@@ -184,6 +187,7 @@ final class DocumentSession {
             snapshot = loaded
             analysis = MarkdownAnalysis.analyze(loaded.markdown)
             _ = try history.recordOpen(loaded)
+            try bookmarks.reconcile(snapshot: loaded, analysis: analysis ?? DocumentAnalysis(headings: [], wordCount: 0, estimatedReadingMinutes: 1))
             showTransientMessage(String(localized: "Refreshed"))
         } catch is CancellationError {
             return
@@ -199,5 +203,50 @@ final class DocumentSession {
         try? history.markUnavailable(path: oldURL.standardizedFileURL.path)
         open(newURL, recordsNavigation: false)
         showTransientMessage(String(localized: "The file moved. Its new location is open."))
+    }
+
+    @discardableResult
+    func bookmarkCurrentHeading() throws -> BookmarkRecord {
+        guard let snapshot,
+              let headingID = readingLocation.headingID,
+              let heading = analysis?.headings.first(where: { $0.id == headingID }) else {
+            return try bookmarkCurrentPosition()
+        }
+        return try bookmarks.add(
+            url: snapshot.url,
+            kind: .heading,
+            headingID: headingID,
+            title: heading.title,
+            excerpt: nil,
+            location: readingLocation
+        )
+    }
+
+    @discardableResult
+    func bookmarkSelection() throws -> BookmarkRecord {
+        let excerpt = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let snapshot, !excerpt.isEmpty else { return try bookmarkCurrentPosition() }
+        return try bookmarks.add(
+            url: snapshot.url,
+            kind: .passage,
+            headingID: readingLocation.headingID,
+            title: excerpt,
+            excerpt: excerpt,
+            location: readingLocation
+        )
+    }
+
+    @discardableResult
+    func bookmarkCurrentPosition() throws -> BookmarkRecord {
+        guard let snapshot else { throw MD22Error.unavailableFile }
+        let heading = readingLocation.headingID.flatMap { id in analysis?.headings.first { $0.id == id }?.title }
+        return try bookmarks.add(
+            url: snapshot.url,
+            kind: .position,
+            headingID: readingLocation.headingID,
+            title: heading ?? "Position \(Int(readingLocation.progress * 100))%",
+            excerpt: nil,
+            location: readingLocation
+        )
     }
 }

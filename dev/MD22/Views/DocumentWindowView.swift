@@ -30,7 +30,11 @@ struct DocumentWindowView: View {
                 documentContent
             }
             .inspector(isPresented: $inspectorPresented) {
-                DocumentInspectorView(session: session, renderer: renderer)
+                DocumentInspectorView(
+                    session: session,
+                    renderer: renderer,
+                    onOpenBookmark: openBookmark
+                )
             }
 
             Divider()
@@ -52,7 +56,11 @@ struct DocumentWindowView: View {
         .onChange(of: environment.router.pendingRoute?.id, initial: true) { _, _ in
             guard let route = environment.router.pendingRoute,
                   route.disposition == .currentWindow else { return }
-            session.open(route.url, targetHeadingID: route.headingID)
+            session.open(
+                route.url,
+                targetHeadingID: route.headingID,
+                targetLocation: route.location
+            )
         }
         .task {
             guard !didAttemptRestoration else { return }
@@ -142,6 +150,30 @@ struct DocumentWindowView: View {
             return
         }
         environment.router.reveal(url)
+    }
+
+    private func openBookmark(_ bookmark: BookmarkRecord) {
+        let url = URL(fileURLWithPath: bookmark.canonicalPath)
+        guard FileManager.default.isReadableFile(atPath: url.path) else {
+            session.showTransientMessage(MD22Error.unavailableFile.localizedDescription)
+            return
+        }
+        var destination = url
+        if let headingID = bookmark.headingID,
+           var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            components.fragment = headingID
+            destination = components.url ?? url
+        }
+        do {
+            try environment.router.route(
+                destination,
+                source: .bookmark,
+                bookmarkID: bookmark.id,
+                location: bookmark.location
+            )
+        } catch {
+            session.showTransientMessage(error.localizedDescription)
+        }
     }
 
     @ViewBuilder

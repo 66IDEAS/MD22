@@ -94,4 +94,25 @@ struct PersistenceTests {
         #expect(unavailable.isPinned)
         #expect(!unavailable.isAvailable)
     }
+
+    @Test("Bookmarks survive history removal and invalid targets reconcile")
+    func bookmarks() throws {
+        let persistence = try PersistenceController(isStoredInMemoryOnly: true)
+        let history = HistoryRepository(container: persistence.container)
+        let bookmarks = BookmarkRepository(container: persistence.container)
+        let file = FileManager.default.temporaryDirectory.appending(path: "Bookmark-\(UUID()).md")
+        try "# Kept\n\nSelected passage".write(to: file, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: file) }
+        let snapshot = DocumentSnapshot(url: file, markdown: "# Kept\n\nSelected passage", modificationDate: nil, fileIdentifier: nil)
+        let location = ReadingLocation(headingID: "kept", progress: 0.4, verticalOffset: 100)
+        try history.recordOpen(snapshot)
+        _ = try bookmarks.add(url: file, kind: .heading, headingID: "kept", title: "Kept", excerpt: nil, location: location)
+        _ = try bookmarks.add(url: file, kind: .passage, headingID: "kept", title: "Selected passage", excerpt: "Selected passage", location: location)
+        try history.remove(try #require(history.recentRecords.first))
+        #expect(bookmarks.records.count == 2)
+
+        let changed = DocumentSnapshot(url: file, markdown: "# Changed", modificationDate: nil, fileIdentifier: nil)
+        try bookmarks.reconcile(snapshot: changed, analysis: MarkdownAnalysis.analyze(changed.markdown))
+        #expect(bookmarks.records.isEmpty)
+    }
 }

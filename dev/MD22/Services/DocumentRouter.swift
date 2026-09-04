@@ -24,6 +24,7 @@ struct DocumentRoute: Identifiable, Sendable {
     let disposition: DocumentOpenDisposition
     let bookmarkID: UUID?
     let headingID: String?
+    let location: ReadingLocation?
 }
 
 @MainActor
@@ -52,7 +53,8 @@ final class DocumentRouter {
         _ url: URL,
         source: DocumentRouteSource,
         disposition: DocumentOpenDisposition = .currentWindow,
-        bookmarkID: UUID? = nil
+        bookmarkID: UUID? = nil,
+        location: ReadingLocation? = nil
     ) throws {
         let headingID = url.fragment
         var components = URLComponents(url: url.standardizedFileURL, resolvingAgainstBaseURL: false)
@@ -64,7 +66,8 @@ final class DocumentRouter {
             source: source,
             disposition: disposition,
             bookmarkID: bookmarkID,
-            headingID: headingID
+            headingID: headingID,
+            location: location
         )
     }
 

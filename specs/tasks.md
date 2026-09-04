@@ -76,7 +76,7 @@ Requirement IDs use these prefixes:
 
 - [x] **T045 — Implement the heading outline** (`FR-13`): Build the right-panel outline hierarchy, heading navigation, current-section tracking, collapse behavior, and refresh updates.
 - [x] **T046 — Build the quiet Outline and Bookmarks inspector** (`UX-7`): Implement its segmented tabs, restrained outline tracking, compact bookmark rows, scope filter, contextual actions, and accessible unavailable states.
-- [ ] **T047 — Implement document bookmarks** (`FR-19`): Support heading, passage, and position bookmarks; current and all-file scopes; retained metadata; target restoration; and removal of invalidated targets without changing source.
+- [x] **T047 — Implement document bookmarks** (`FR-19`): Support heading, passage, and position bookmarks; current and all-file scopes; retained metadata; target restoration; and removal of invalidated targets without changing source.
 - [ ] **T048 — Implement immediate contextual bookmarking** (`UX-11`): Add margin, selection, menu, keyboard, confirmation, and direct-removal interactions without modal naming or forced tab changes.
 - [ ] **T049 — Implement in-document search** (`FR-12`): Search only the displayed document, highlight all matches, report active and total counts, and support previous, next, and standard keyboard interaction.
 - [ ] **T050 — Build the compact toolbar search experience** (`UX-10`): Expand search in place, use accessible theme-aware highlights, preserve orientation, show section context and empty results, and restore focus on close.
