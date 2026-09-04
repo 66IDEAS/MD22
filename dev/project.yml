@@ -26,6 +26,8 @@ targets:
     platform: macOS
     sources:
       - path: MD22
+      - path: ../specs/md22.icon
+        buildPhase: resources
     info:
       path: MD22/Info.plist
       properties:
@@ -44,7 +46,7 @@ targets:
       base:
         PRODUCT_NAME: MD22
         INFOPLIST_KEY_CFBundleDisplayName: MD22
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME: md22
       configs:
         Debug:
           SWIFT_OPTIMIZATION_LEVEL: -Onone
