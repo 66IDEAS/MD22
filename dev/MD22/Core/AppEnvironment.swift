@@ -18,6 +18,6 @@ final class AppEnvironment {
         self.fileAccess = fileAccess
         self.platform = platform
         router = DocumentRouter(platform: platform)
-        self.persistence = persistence ?? (try! PersistenceController())
+        self.persistence = persistence ?? PersistenceController.openRecovering()
     }
 }

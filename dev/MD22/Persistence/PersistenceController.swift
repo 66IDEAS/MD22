@@ -7,11 +7,7 @@ final class PersistenceController {
     let storeURL: URL?
 
     init(isStoredInMemoryOnly: Bool = false, storeDirectory: URL? = nil) throws {
-        let schema = Schema([
-            HistoryRecord.self,
-            ReadingStateRecord.self,
-            BookmarkRecord.self
-        ])
+        let schema = Schema(versionedSchema: MD22SchemaV1.self)
 
         if isStoredInMemoryOnly {
             storeURL = nil
@@ -22,7 +18,8 @@ final class PersistenceController {
 
         let directory = try storeDirectory ?? Self.applicationSupportDirectory()
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let url = directory.appending(path: "Metadata.store")
+        _ = try StoreRecovery.prepareBackupIfNeeded(in: directory)
+        let url = directory.appending(path: StoreRecovery.storeName)
         storeURL = url
         let configuration = ModelConfiguration(
             "MD22Metadata",
@@ -31,7 +28,27 @@ final class PersistenceController {
             allowsSave: true,
             cloudKitDatabase: .none
         )
-        container = try ModelContainer(for: schema, configurations: [configuration])
+        container = try ModelContainer(
+            for: schema,
+            migrationPlan: MD22MigrationPlan.self,
+            configurations: [configuration]
+        )
+        try StoreRecovery.writeCurrentVersion(in: directory)
+    }
+
+    static func openRecovering(storeDirectory: URL? = nil) -> PersistenceController {
+        let directory = try? storeDirectory ?? applicationSupportDirectory()
+        do {
+            return try PersistenceController(storeDirectory: directory)
+        } catch {
+            if let directory {
+                _ = try? StoreRecovery.preserveDamagedStore(in: directory)
+                if let recovered = try? PersistenceController(storeDirectory: directory) {
+                    return recovered
+                }
+            }
+            return try! PersistenceController(isStoredInMemoryOnly: true)
+        }
     }
 
     static func applicationSupportDirectory() throws -> URL {
@@ -44,4 +61,3 @@ final class PersistenceController {
         return root.appending(path: "MD22", directoryHint: .isDirectory)
     }
 }
-
