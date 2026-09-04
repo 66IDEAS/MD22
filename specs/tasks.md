@@ -38,7 +38,7 @@ Requirement IDs use these prefixes:
 
 ### Persistence, History, and Pins
 
-- [ ] **T021 — Implement application-scoped local persistence** (`ARCH-11`): Store structured metadata in SwiftData, simple preferences in app defaults, no project sidecars, and resilient file identity through bookmarks and stable identifiers.
+- [x] **T021 — Implement application-scoped local persistence** (`ARCH-11`): Store structured metadata in SwiftData, simple preferences in app defaults, no project sidecars, and resilient file identity through bookmarks and stable identifiers.
 - [ ] **T022 — Add versioned persistence migration and recovery** (`ARCH-18`): Define schema versions, tested migrations, pre-migration backups, damaged-store preservation, and safe recovery.
 - [ ] **T023 — Implement persistent history management** (`FR-2`): Maintain unique recency-ordered entries, removal and clearing rules, retained reading data and bookmarks, pins, and unavailable-file states.
 - [ ] **T024 — Build the scan-first history sidebar** (`UX-5`): Present Pinned and Recent sections, two-line identity, native selection, accessible unavailable states, contextual actions, reordering, and restrained clearing controls.
@@ -128,3 +128,4 @@ Requirement IDs use these prefixes:
 - [x] **E004 — Link hosted tests against the app**: Set the unit-test bundle loader explicitly so internal MD22 symbols resolve against its test host under generated Xcode 26 projects.
 - [x] **E005 — Correct the container renderer pin**: Replace the unpublished `markdown-it-container` 4.0.1 reference with the verified 4.0.0 release before producing the dependency lockfile.
 - [x] **E006 — Resolve Markdown UTTypes dynamically**: Build accepted content types from registered Markdown filename extensions because the macOS 26 SDK does not expose a static `UTType.markdown` member.
+- [x] **E007 — Import Foundation in persistence tests**: Add the explicit Foundation dependency required for filesystem URL construction under Swift 6's stricter module imports.
