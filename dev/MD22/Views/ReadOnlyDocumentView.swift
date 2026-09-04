@@ -6,6 +6,7 @@ struct ReadOnlyDocumentView: View {
     let session: DocumentSession
     let renderer: WebDocumentRenderer
     @Environment(AppEnvironment.self) private var environment
+    @State private var bookmarkControlsVisible = false
 
     var body: some View {
         ZStack {
@@ -28,7 +29,30 @@ struct ReadOnlyDocumentView: View {
                     .controlSize(.small)
                     .accessibilityLabel("Rendering Markdown")
             }
+
+            VStack {
+                HStack {
+                    Spacer()
+                    Menu {
+                        Button("Bookmark Selection") { addBookmark(.passage) }
+                            .disabled(session.selectedText.isEmpty)
+                        Button("Bookmark Current Heading") { addBookmark(.heading) }
+                            .disabled(session.readingLocation.headingID == nil)
+                        Button("Bookmark Reading Position") { addBookmark(.position) }
+                    } label: {
+                        Image(systemName: "bookmark")
+                            .accessibilityLabel("Add Bookmark")
+                    }
+                    .menuStyle(.borderlessButton)
+                    .padding(10)
+                    .glassEffect(.regular, in: .circle)
+                    .opacity(bookmarkControlsVisible ? 1 : 0.28)
+                    .help("Add Bookmark")
+                }
+                Spacer()
+            }
         }
+        .onHover { bookmarkControlsVisible = $0 }
         .task(id: snapshot) {
             do {
                 try await renderer.render(snapshot: snapshot, themeID: environment.preferences.displayTheme.rawValue)
@@ -75,7 +99,17 @@ struct ReadOnlyDocumentView: View {
     }
 
     private func handleNavigation(_ destination: URL) {
-        if destination.isFileURL,
+        if destination.scheme == "md22-action", destination.host == "bookmark" {
+            let headingID = URLComponents(url: destination, resolvingAgainstBaseURL: false)?
+                .queryItems?.first(where: { $0.name == "heading" })?.value
+            guard let headingID else { return }
+            do {
+                _ = try session.bookmarkHeading(headingID)
+                session.showTransientMessage("Bookmark added")
+            } catch {
+                session.showTransientMessage(error.localizedDescription)
+            }
+        } else if destination.isFileURL,
            destination.standardizedFileURL.path == snapshot.url.standardizedFileURL.path,
            let fragment = destination.fragment {
             Task { await renderer.navigate(to: fragment) }
@@ -91,6 +125,19 @@ struct ReadOnlyDocumentView: View {
             }
         } else {
             environment.platform.openExternally(destination)
+        }
+    }
+
+    private func addBookmark(_ kind: BookmarkKind) {
+        do {
+            switch kind {
+            case .heading: _ = try session.bookmarkCurrentHeading()
+            case .passage: _ = try session.bookmarkSelection()
+            case .position: _ = try session.bookmarkCurrentPosition()
+            }
+            session.showTransientMessage("Bookmark added")
+        } catch {
+            session.showTransientMessage(error.localizedDescription)
         }
     }
 }

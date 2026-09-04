@@ -154,6 +154,15 @@ root.querySelectorAll("table, pre.mermaid, .katex-display").forEach((element) =>
 });
 
 const headings = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")];
+headings.forEach((heading) => {
+  const action = document.createElement("a");
+  action.className = "bookmark-heading";
+  action.href = `md22-action://bookmark?heading=${encodeURIComponent(heading.id)}`;
+  action.textContent = "☆";
+  action.title = `Bookmark ${heading.textContent}`;
+  action.setAttribute("aria-label", `Bookmark heading ${heading.textContent}`);
+  heading.append(action);
+});
 state.wordCount = (root.textContent.match(/[\p{Letter}\p{Number}]+/gu) || []).length;
 
 const updateLocation = () => {

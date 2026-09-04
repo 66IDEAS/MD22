@@ -6,5 +6,5 @@ extension Notification.Name {
     static let md22NavigateBack = Notification.Name("MD22.navigateBack")
     static let md22NavigateForward = Notification.Name("MD22.navigateForward")
     static let md22ToggleSearch = Notification.Name("MD22.toggleSearch")
+    static let md22AddBookmark = Notification.Name("MD22.addBookmark")
 }
-

@@ -10,5 +10,13 @@ struct MD22App: App {
                 .environment(environment)
         }
         .defaultSize(width: 1_240, height: 800)
+        .commands {
+            CommandGroup(after: .saveItem) {
+                Button("Add Bookmark") {
+                    NotificationCenter.default.post(name: .md22AddBookmark, object: nil)
+                }
+                .keyboardShortcut("d", modifiers: .command)
+            }
+        }
     }
 }

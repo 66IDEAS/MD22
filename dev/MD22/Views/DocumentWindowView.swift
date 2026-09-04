@@ -96,6 +96,18 @@ struct DocumentWindowView: View {
         .onReceive(NotificationCenter.default.publisher(for: .md22NavigateForward)) { _ in
             session.navigateForward()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .md22AddBookmark)) { _ in
+            do {
+                if !session.selectedText.isEmpty {
+                    _ = try session.bookmarkSelection()
+                } else {
+                    _ = try session.bookmarkCurrentHeading()
+                }
+                session.showTransientMessage("Bookmark added")
+            } catch {
+                session.showTransientMessage(error.localizedDescription)
+            }
+        }
         .onDisappear { session.cancel() }
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = DocumentDropHandler.firstMarkdownURL(in: urls) else {

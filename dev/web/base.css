@@ -26,6 +26,11 @@ body { overflow-wrap: break-word; overscroll-behavior: none; }
 #document-root > :first-child { margin-top: 0; }
 ::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
 h1, h2, h3, h4, h5, h6 { font-family: ui-sans-serif, -apple-system, sans-serif; line-height: 1.2; scroll-margin-top: 52px; text-wrap: balance; }
+h1, h2, h3, h4, h5, h6 { position: relative; }
+.bookmark-heading { position: absolute; inset-inline-start: -1.65em; color: var(--muted); text-decoration: none; opacity: 0; font: .75em ui-sans-serif, sans-serif; text-shadow: none; transition: opacity .15s; }
+h1:hover > .bookmark-heading, h2:hover > .bookmark-heading, h3:hover > .bookmark-heading,
+h4:hover > .bookmark-heading, h5:hover > .bookmark-heading, h6:hover > .bookmark-heading,
+.bookmark-heading:focus-visible { opacity: 1; }
 h1 { font-size: 2.35em; margin: 0 0 1em; }
 h2 { font-size: 1.65em; margin-top: 2.25em; border-bottom: 1px solid var(--line); padding-bottom: .3em; }
 h3 { font-size: 1.28em; margin-top: 1.8em; }

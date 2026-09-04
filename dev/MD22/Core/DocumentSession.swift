@@ -223,6 +223,27 @@ final class DocumentSession {
     }
 
     @discardableResult
+    func bookmarkHeading(_ headingID: String) throws -> BookmarkRecord {
+        guard let snapshot,
+              let heading = analysis?.headings.first(where: { $0.id == headingID }) else {
+            throw MD22Error.unavailableFile
+        }
+        let location = ReadingLocation(
+            headingID: headingID,
+            progress: readingLocation.progress,
+            verticalOffset: readingLocation.verticalOffset
+        )
+        return try bookmarks.add(
+            url: snapshot.url,
+            kind: .heading,
+            headingID: headingID,
+            title: heading.title,
+            excerpt: nil,
+            location: location
+        )
+    }
+
+    @discardableResult
     func bookmarkSelection() throws -> BookmarkRecord {
         let excerpt = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let snapshot, !excerpt.isEmpty else { return try bookmarkCurrentPosition() }
