@@ -26,6 +26,18 @@ are documented in [Direct Distribution](docs/DISTRIBUTION.md). Release scripts
 refuse to overwrite artifacts and keep all signing credentials outside the
 repository.
 
+Run the same dependency, renderer, native unit, UI, Release-build, and
+architecture checks used by GitHub Actions with:
+
+```sh
+dev/scripts/ci.zsh
+```
+
+Version tags are built by the protected release environment into signed and
+notarized Apple-silicon DMGs, signed Sparkle updates, SPDX SBOMs, checksums, and
+GitHub attestations. Repository protection and secret setup are documented in
+[Dependency and Release Supply Chain](docs/SUPPLY_CHAIN.md).
+
 ## Project layout
 
 - `dev/MD22`: native application source and bundled resources

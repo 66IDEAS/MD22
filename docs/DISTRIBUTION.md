@@ -63,3 +63,42 @@ open a Markdown file from Finder, confirm project-relative images and links,
 export adjacent HTML and PDF files, exercise VoiceOver and all keyboard
 commands, and check automatic plus manual update discovery against a staged
 signed appcast.
+
+## Automated GitHub release
+
+Create a protected GitHub environment named `release`. Limit deployment to
+protected version tags, require a maintainer approval, prevent self-review, and
+store these environment secrets:
+
+- `MD22_DEVELOPER_ID_CERTIFICATE_BASE64`: base64 of the exported Developer ID
+  Application certificate and private key in PKCS #12 format
+- `MD22_DEVELOPER_ID_CERTIFICATE_PASSWORD`: password for that PKCS #12 file
+- `MD22_SIGNING_IDENTITY`: complete Keychain identity, including team suffix
+- `MD22_TEAM_ID`: Apple Developer team identifier
+- `MD22_NOTARY_KEY_BASE64`: base64 of the App Store Connect API `.p8` key
+- `MD22_NOTARY_KEY_ID`: API key identifier
+- `MD22_NOTARY_ISSUER_ID`: App Store Connect issuer identifier
+- `MD22_SPARKLE_PRIVATE_KEY_BASE64`: base64 of the private EdDSA key file that
+  matches the public key in the application Info.plist
+- `MD22_RELEASE_ADMIN_READ_TOKEN`: fine-grained repository token scoped only
+  to MD22 with Administration read permission, used to fail closed unless
+  release immutability is enabled
+
+Secrets must be base64-encoded as files, not copied as unencoded multiline
+values. Do not make them repository-level secrets: the `release` environment is
+the security boundary that keeps them out of verification and pull-request jobs.
+
+Enable GitHub release immutability and the protected `main` branch as described
+in [Dependency and Release Supply Chain](SUPPLY_CHAIN.md). After CI succeeds,
+create and push a version tag whose commit is on `main`:
+
+```sh
+git tag -a v1.0.0 -m 'MD22 1.0.0'
+git push origin v1.0.0
+```
+
+The release workflow uses its run number as `CFBundleVersion`, publishes the
+DMG, Sparkle ZIP, signed `appcast.xml`, SPDX SBOM, and checksums together, and
+attests them through GitHub's artifact-attestation service. It refuses an
+existing release and verifies immutability plus every uploaded asset after
+publication.

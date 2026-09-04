@@ -109,7 +109,7 @@ Requirement IDs use these prefixes:
 - [x] **T065 — Establish responsiveness and cancellation budgets** (`ARCH-23`): Add small, 1 MB, 10 MB, and rich-content performance fixtures; measure critical flows; cancel obsolete work; and prevent main-actor blocking.
 - [x] **T066 — Build the layered automated test suite** (`ARCH-16`): Cover units, integrations, UI flows, fixtures, conformance, semantic output, theme and export regression, migrations, lifecycle, multiwindow, accessibility, and performance.
 - [x] **T067 — Configure direct signed and notarized distribution** (`ARCH-5`): Enable Developer ID signing and Hardened Runtime, omit App Sandbox, notarize releases, and verify expected adjacent-file access.
-- [ ] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
+- [x] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
 
 ## Phase 2
 
@@ -163,3 +163,7 @@ Requirement IDs use these prefixes:
 - [x] **E039 — Restore the generated Debug compilation condition**: Declare the standard `DEBUG` Swift condition explicitly so test-only launch fixtures remain excluded from releases and available to the UI suite.
 - [x] **E040 — Use Xcode's supported generic macOS archive destination**: Select the generic macOS destination and enforce Apple silicon through the target `ARCHS` setting because Xcode rejects an architecture qualifier on `Any Mac`.
 - [x] **E041 — Export archives through Xcode's Developer ID distribution path**: Run `xcodebuild -exportArchive` with committed export policy so Sparkle helpers and the final application receive Xcode's complete distribution-signing treatment.
+- [x] **E042 — Verify Sparkle's signed-feed trailer**: Validate the signed appcast's trailing EdDSA signature block in addition to each update archive signature because Sparkle stores the feed signature in a dedicated XML comment.
+- [x] **E043 — Constrain incomplete dependency license metadata**: Tie the reviewed MIT license for `khroma` to its exact locked version because the distributed package includes the license text but omits its metadata field.
+- [x] **E044 — Declare custom workflow shells explicitly**: Use GitHub Actions' `zsh {0}` custom-shell form so inline release scripts retain zsh semantics and pass workflow validation.
+- [x] **E045 — Preflight immutability with least privilege**: Query GitHub's administration-read immutable-release endpoint with a narrowly scoped protected token because the ordinary workflow token cannot receive that permission, while retaining the short-lived workflow token for publication.

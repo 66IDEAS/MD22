@@ -23,6 +23,7 @@ xcodebuild -quiet \
     -scheme MD22 \
     -configuration Debug \
     -derivedDataPath "$derived_data" \
+    -onlyUsePackageVersionsFromResolvedFile \
     CODE_SIGNING_ALLOWED=NO \
     build-for-testing
 
@@ -40,6 +41,7 @@ xcodebuild -quiet \
     -scheme MD22 \
     -configuration Debug \
     -derivedDataPath "$derived_data" \
+    -onlyUsePackageVersionsFromResolvedFile \
     -only-testing:MD22UITests \
     test-without-building \
     "$@"

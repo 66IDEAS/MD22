@@ -7,8 +7,8 @@
   "type": "module",
   "scripts": {
     "build:renderer": "node scripts/build-renderer.mjs",
-    "audit:dependencies": "npm audit --omit=dev --audit-level=high",
-    "sbom": "npm sbom --sbom-format=cyclonedx > build/md22-npm.cdx.json"
+    "audit:dependencies": "node scripts/audit-dependencies.mjs && npm audit --audit-level=high",
+    "sbom": "node scripts/generate-sbom.mjs"
   },
   "dependencies": {
     "dompurify": "3.4.14",
