@@ -7,6 +7,8 @@ final class DocumentSession {
     private let fileAccess: any FileAccessing
     private let history: HistoryRepository
     private var loadTask: Task<Void, Never>?
+    private var refreshTask: Task<Void, Never>?
+    private var filePresenter: DocumentFilePresenter?
     private var generation = 0
 
     private(set) var snapshot: DocumentSnapshot?
@@ -47,6 +49,7 @@ final class DocumentSession {
                 self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
                 _ = try self.history.recordOpen(loaded)
                 self.isLoading = false
+                self.monitor(loaded.url)
             } catch is CancellationError {
                 return
             } catch {
@@ -73,6 +76,20 @@ final class DocumentSession {
         generation += 1
         loadTask?.cancel()
         loadTask = nil
+        refreshTask?.cancel()
+        refreshTask = nil
+        filePresenter?.invalidate()
+        filePresenter = nil
+    }
+
+    func refreshAfterExternalChange(debounce: Duration = .milliseconds(280)) {
+        guard snapshot != nil else { return }
+        refreshTask?.cancel()
+        refreshTask = Task { [weak self] in
+            try? await Task.sleep(for: debounce)
+            guard !Task.isCancelled else { return }
+            await self?.reloadCurrentSnapshot()
+        }
     }
 
     func showTransientMessage(_ message: String) {
@@ -82,5 +99,49 @@ final class DocumentSession {
             guard self?.transientMessage == message else { return }
             self?.transientMessage = nil
         }
+    }
+
+    private func monitor(_ url: URL) {
+        guard filePresenter?.presentedItemURL != url.standardizedFileURL else { return }
+        filePresenter?.invalidate()
+        filePresenter = DocumentFilePresenter(
+            url: url,
+            changeHandler: { [weak self] in
+                Task { @MainActor in self?.refreshAfterExternalChange() }
+            },
+            moveHandler: { [weak self] newURL in
+                Task { @MainActor in self?.handleMove(to: newURL) }
+            }
+        )
+    }
+
+    private func reloadCurrentSnapshot() async {
+        guard let url = snapshot?.url else { return }
+        generation += 1
+        let requestedGeneration = generation
+        do {
+            guard await fileAccess.isAvailable(url) else { throw MD22Error.unavailableFile }
+            let loaded = try await fileAccess.read(url)
+            try Task.checkCancellation()
+            guard requestedGeneration == generation else { return }
+            guard loaded != snapshot else { return }
+            snapshot = loaded
+            analysis = MarkdownAnalysis.analyze(loaded.markdown)
+            _ = try history.recordOpen(loaded)
+            showTransientMessage(String(localized: "Refreshed"))
+        } catch is CancellationError {
+            return
+        } catch {
+            guard requestedGeneration == generation else { return }
+            try? history.markUnavailable(path: url.standardizedFileURL.path)
+            showTransientMessage(MD22Error.unavailableFile.localizedDescription)
+        }
+    }
+
+    private func handleMove(to newURL: URL) {
+        guard let oldURL = snapshot?.url else { return }
+        try? history.markUnavailable(path: oldURL.standardizedFileURL.path)
+        open(newURL, recordsNavigation: false)
+        showTransientMessage(String(localized: "The file moved. Its new location is open."))
     }
 }
