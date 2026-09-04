@@ -1,6 +1,21 @@
 import Foundation
 
 enum MarkdownAnalysis {
+    /// Runs analysis away from actor executors and propagates cancellation to obsolete work.
+    static func analyzeAsync(_ markdown: String) async throws -> DocumentAnalysis {
+        let work = Task.detached(priority: .userInitiated) {
+            try Task.checkCancellation()
+            let result = analyze(markdown)
+            try Task.checkCancellation()
+            return result
+        }
+        return try await withTaskCancellationHandler {
+            try await work.value
+        } onCancel: {
+            work.cancel()
+        }
+    }
+
     static func analyze(_ markdown: String) -> DocumentAnalysis {
         var headings: [Heading] = []
         var slugCounts: [String: Int] = [:]
@@ -53,4 +68,3 @@ enum MarkdownAnalysis {
         return (line[marksRange].count, String(line[titleRange]))
     }
 }
-

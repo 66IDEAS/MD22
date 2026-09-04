@@ -106,7 +106,7 @@ Requirement IDs use these prefixes:
 
 ### Quality, Performance, and Delivery
 
-- [ ] **T065 — Establish responsiveness and cancellation budgets** (`ARCH-23`): Add small, 1 MB, 10 MB, and rich-content performance fixtures; measure critical flows; cancel obsolete work; and prevent main-actor blocking.
+- [x] **T065 — Establish responsiveness and cancellation budgets** (`ARCH-23`): Add small, 1 MB, 10 MB, and rich-content performance fixtures; measure critical flows; cancel obsolete work; and prevent main-actor blocking.
 - [ ] **T066 — Build the layered automated test suite** (`ARCH-16`): Cover units, integrations, UI flows, fixtures, conformance, semantic output, theme and export regression, migrations, lifecycle, multiwindow, accessibility, and performance.
 - [ ] **T067 — Configure direct signed and notarized distribution** (`ARCH-5`): Enable Developer ID signing and Hardened Runtime, omit App Sandbox, notarize releases, and verify expected adjacent-file access.
 - [ ] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.

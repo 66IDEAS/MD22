@@ -80,6 +80,7 @@ final class DocumentSession {
         loadTask = Task { [weak self, fileAccess] in
             do {
                 let loaded = try await fileAccess.read(url)
+                let loadedAnalysis = try await MarkdownAnalysis.analyzeAsync(loaded.markdown)
                 try Task.checkCancellation()
                 guard let self, requestedGeneration == self.generation else { return }
                 if recordsNavigation, let previousURL, previousURL != loaded.url {
@@ -87,7 +88,7 @@ final class DocumentSession {
                     self.navigationForwardStack.removeAll()
                 }
                 self.snapshot = loaded
-                self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
+                self.analysis = loadedAnalysis
                 MD22Log.lifecycle.notice("Document open completed; bytes=\(loaded.markdown.utf8.count, privacy: .public)")
                 MD22Log.record(category: "lifecycle", code: "document.open.completed")
                 _ = try self.history.recordOpen(loaded)
@@ -221,11 +222,12 @@ final class DocumentSession {
         do {
             guard await fileAccess.isAvailable(url) else { throw MD22Error.unavailableFile }
             let loaded = try await fileAccess.read(url)
+            let loadedAnalysis = try await MarkdownAnalysis.analyzeAsync(loaded.markdown)
             try Task.checkCancellation()
             guard requestedGeneration == generation else { return }
             guard loaded != snapshot else { return }
             snapshot = loaded
-            analysis = MarkdownAnalysis.analyze(loaded.markdown)
+            analysis = loadedAnalysis
             MD22Log.lifecycle.notice("External document refresh completed")
             MD22Log.record(category: "lifecycle", code: "document.refresh.completed")
             _ = try history.recordOpen(loaded)
