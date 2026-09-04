@@ -20,6 +20,7 @@ struct DocumentWindowView: View {
     @State private var isDropTargeted = false
     @State private var historySelection: String?
     @State private var didAttemptRestoration = false
+    @FocusState private var focusedRegion: WindowFocusRegion?
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -47,6 +48,9 @@ struct DocumentWindowView: View {
                     onReveal: revealHistoryRecord
                 )
                 .navigationSplitViewColumnWidth(min: 190, ideal: 245, max: 360)
+                .focusable()
+                .focused($focusedRegion, equals: .history)
+                .focusSection()
             } detail: {
                 documentContent
                     .contentShape(Rectangle())
@@ -54,6 +58,7 @@ struct DocumentWindowView: View {
                         TapGesture().onEnded { dismissTemporaryPanelsIfNeeded() }
                     )
                     .onExitCommand(perform: dismissTemporaryPanelsIfNeeded)
+                    .focusSection()
             }
             .inspector(isPresented: $inspectorPresented) {
                 DocumentInspectorView(
@@ -62,12 +67,18 @@ struct DocumentWindowView: View {
                     onOpenBookmark: openBookmark
                 )
                 .inspectorColumnWidth(min: 230, ideal: 285, max: 420)
+                .focusable()
+                .focused($focusedRegion, equals: .inspector)
+                .focusSection()
             }
 
             if statusBarPresented {
                 Divider()
                 ReadingStatusBar(session: session)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .focusable()
+                    .focused($focusedRegion, equals: .statusBar)
+                    .focusSection()
             }
         }
         .frame(minWidth: 760, minHeight: 520)
@@ -203,7 +214,7 @@ struct DocumentWindowView: View {
     }
 
     private var windowInteractionView: some View {
-        layoutCommandView
+        focusCommandView
         .onDisappear { session.cancel() }
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = DocumentDropHandler.firstMarkdownURL(in: urls) else {
@@ -220,6 +231,26 @@ struct DocumentWindowView: View {
         } isTargeted: { isTargeted in
             isDropTargeted = isTargeted
         }
+    }
+
+    private var focusCommandView: some View {
+        layoutCommandView
+            .onReceive(NotificationCenter.default.publisher(for: .md22FocusHistory)) { _ in
+                guard columnVisibility != .detailOnly else { return }
+                focusedRegion = .history
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .md22FocusDocument)) { _ in
+                focusedRegion = nil
+                Task { await renderer.focusDocument() }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .md22FocusInspector)) { _ in
+                guard inspectorPresented else { return }
+                focusedRegion = .inspector
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .md22FocusStatusBar)) { _ in
+                guard statusBarPresented else { return }
+                focusedRegion = .statusBar
+            }
     }
 
     private func openHistoryRecord(_ record: HistoryRecord) {
@@ -372,11 +403,7 @@ struct DocumentWindowView: View {
             ReadOnlyDocumentView(snapshot: snapshot, session: session, renderer: renderer)
                 .overlay(alignment: .top) {
                     if session.showsLoadingIndicator {
-                        ProgressView()
-                            .controlSize(.small)
-                            .padding(8)
-                            .glassEffect(.regular, in: .circle)
-                            .accessibilityLabel("Loading document")
+                        loadingIndicator
                     }
                 }
         } else if let errorMessage = session.errorMessage {
@@ -389,10 +416,31 @@ struct DocumentWindowView: View {
             WelcomeView(isDropTargeted: isDropTargeted)
         }
     }
+
+    @ViewBuilder
+    private var loadingIndicator: some View {
+        let indicator = ProgressView()
+            .controlSize(.small)
+            .padding(8)
+            .accessibilityLabel("Loading document")
+        if environment.accessibility.reduceTransparency {
+            indicator
+                .background(Color(nsColor: .windowBackgroundColor), in: Circle())
+                .overlay(Circle().stroke(Color.secondary.opacity(0.45)))
+        } else {
+            indicator.glassEffect(.regular, in: .circle)
+        }
+    }
 }
 
 private struct SavedWindowLayout {
     let historyVisible: Bool
     let inspectorVisible: Bool
     let statusBarVisible: Bool
+}
+
+private enum WindowFocusRegion: Hashable {
+    case history
+    case inspector
+    case statusBar
 }

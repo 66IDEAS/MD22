@@ -125,6 +125,7 @@ private struct HistoryRow: View {
     let record: HistoryRecord
     let onTogglePin: () -> Void
     @State private var isHovering = false
+    @FocusState private var pinFocused: Bool
 
     var body: some View {
         HStack(spacing: 8) {
@@ -149,8 +150,9 @@ private struct HistoryRow: View {
                     .font(.caption)
             }
             .buttonStyle(.plain)
+            .focused($pinFocused)
             .foregroundStyle(record.isPinned ? Color.accentColor : Color.secondary)
-            .opacity(record.isPinned || isHovering ? 1 : 0)
+            .opacity(record.isPinned || isHovering || pinFocused ? 1 : 0)
             .help(record.isPinned ? "Unpin" : "Pin")
             .accessibilityLabel(record.isPinned ? "Unpin \(record.displayName)" : "Pin \(record.displayName)")
         }
@@ -158,6 +160,7 @@ private struct HistoryRow: View {
         .help(record.canonicalPath)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityDescription)
+        .accessibilityValue(record.isPinned ? "Pinned" : "Not pinned")
     }
 
     private var abbreviatedParentPath: String {

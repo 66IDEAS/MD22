@@ -7,6 +7,7 @@ struct ReadOnlyDocumentView: View {
     let renderer: WebDocumentRenderer
     @Environment(AppEnvironment.self) private var environment
     @State private var bookmarkControlsVisible = false
+    @FocusState private var bookmarkControlFocused: Bool
 
     var body: some View {
         ZStack {
@@ -33,21 +34,7 @@ struct ReadOnlyDocumentView: View {
             VStack {
                 HStack {
                     Spacer()
-                    Menu {
-                        Button("Bookmark Selection") { addBookmark(.passage) }
-                            .disabled(session.selectedText.isEmpty)
-                        Button("Bookmark Current Heading") { addBookmark(.heading) }
-                            .disabled(session.readingLocation.headingID == nil)
-                        Button("Bookmark Reading Position") { addBookmark(.position) }
-                    } label: {
-                        Image(systemName: "bookmark")
-                            .accessibilityLabel("Add Bookmark")
-                    }
-                    .menuStyle(.borderlessButton)
-                    .padding(10)
-                    .glassEffect(.regular, in: .circle)
-                    .opacity(bookmarkControlsVisible ? 1 : 0.28)
-                    .help("Add Bookmark")
+                    bookmarkControl
                 }
                 Spacer()
             }
@@ -87,6 +74,36 @@ struct ReadOnlyDocumentView: View {
         }
         .onChange(of: environment.accessibility.increaseContrast) { _, _ in
             Task { await applyReadingSettings() }
+        }
+    }
+
+    private var bookmarkMenu: some View {
+        Menu {
+            Button("Bookmark Selection") { addBookmark(.passage) }
+                .disabled(session.selectedText.isEmpty)
+            Button("Bookmark Current Heading") { addBookmark(.heading) }
+                .disabled(session.readingLocation.headingID == nil)
+            Button("Bookmark Reading Position") { addBookmark(.position) }
+        } label: {
+            Image(systemName: "bookmark")
+                .accessibilityLabel("Add Bookmark")
+        }
+        .menuStyle(.borderlessButton)
+        .padding(10)
+        .focused($bookmarkControlFocused)
+        .opacity(bookmarkControlsVisible || bookmarkControlFocused ? 1 : 0.28)
+        .help("Add Bookmark (Command-D)")
+    }
+
+    @ViewBuilder
+    private var bookmarkControl: some View {
+        if environment.accessibility.reduceTransparency {
+            bookmarkMenu
+                .background(Color(nsColor: .windowBackgroundColor), in: Circle())
+                .overlay(Circle().stroke(Color.secondary.opacity(0.45)))
+        } else {
+            bookmarkMenu
+                .glassEffect(.regular, in: .circle)
         }
     }
 

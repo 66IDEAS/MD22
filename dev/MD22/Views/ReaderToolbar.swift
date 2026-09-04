@@ -26,21 +26,21 @@ struct ReaderToolbar: ToolbarContent {
                 onToggleHistory()
             }
             .labelStyle(.iconOnly)
-            .help("Show or hide History")
+            .help("Show or hide History (Option-Command-1)")
 
             Button("Back", systemImage: "chevron.left") {
                 NotificationCenter.default.post(name: .md22NavigateBack, object: nil)
             }
             .labelStyle(.iconOnly)
             .disabled(!canNavigateBack)
-            .help("Go Back")
+            .help("Go Back (Command-[)")
 
             Button("Forward", systemImage: "chevron.right") {
                 NotificationCenter.default.post(name: .md22NavigateForward, object: nil)
             }
             .labelStyle(.iconOnly)
             .disabled(!canNavigateForward)
-            .help("Go Forward")
+            .help("Go Forward (Command-])")
         }
 
         ToolbarItem(placement: .principal) {
@@ -80,14 +80,14 @@ struct ReaderToolbar: ToolbarContent {
                 }
                 .labelStyle(.iconOnly)
                 .keyboardShortcut("f", modifiers: .command)
-                .help("Find in Document")
+                .help("Find in Document (Command-F)")
             }
 
             Button("Toggle Inspector", systemImage: "sidebar.right") {
                 onToggleInspector()
             }
             .labelStyle(.iconOnly)
-            .help("Show or hide Outline and Bookmarks")
+            .help("Show or hide Outline and Bookmarks (Option-Command-2)")
 
             Menu("Reading Layout", systemImage: "rectangle.3.group") {
                 Button(statusBarPresented ? "Hide Status Bar" : "Show Status Bar") {

@@ -147,6 +147,7 @@ private struct BookmarkRow: View {
             }
         }
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityDescription)
     }
 
     private var isAvailable: Bool { FileManager.default.isReadableFile(atPath: record.canonicalPath) }
@@ -156,6 +157,17 @@ private struct BookmarkRow: View {
         case .passage: "quote.opening"
         case .position: "bookmark"
         }
+    }
+
+    private var accessibilityDescription: String {
+        let kindDescription: String
+        switch record.kind {
+        case .heading: kindDescription = "Heading bookmark"
+        case .passage: kindDescription = "Passage bookmark"
+        case .position: kindDescription = "Reading position bookmark"
+        }
+        let availability = isAvailable ? "available" : "unavailable"
+        return "\(kindDescription), \(record.title), \(record.fileDisplayName), \(availability)"
     }
 }
 

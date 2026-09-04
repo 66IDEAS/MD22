@@ -6,6 +6,7 @@ import Observation
 final class AccessibilityPreferences {
     private(set) var reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
     private(set) var increaseContrast = NSWorkspace.shared.accessibilityDisplayShouldIncreaseContrast
+    private(set) var reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
     private var observer: NSObjectProtocol?
 
     init(notificationCenter: NotificationCenter = .default) {
@@ -23,6 +24,6 @@ final class AccessibilityPreferences {
     private func refresh() {
         reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         increaseContrast = NSWorkspace.shared.accessibilityDisplayShouldIncreaseContrast
+        reduceTransparency = NSWorkspace.shared.accessibilityDisplayShouldReduceTransparency
     }
 }
-

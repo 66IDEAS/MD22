@@ -11,7 +11,7 @@ struct ReadingStatusBar: View {
                 Rectangle()
                     .fill(Color.accentColor)
                     .frame(width: geometry.size.width * session.readingLocation.progress)
-                    .animation(.smooth(duration: 0.18), value: session.readingLocation.progress)
+                    .animation(environment.accessibility.reduceMotion ? nil : .smooth(duration: 0.18), value: session.readingLocation.progress)
             }
             .frame(height: 2)
             .background(Color.secondary.opacity(0.14))
@@ -68,6 +68,7 @@ struct ReadingStatusBar: View {
         .background(.bar)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Reading status, \(session.progressPercentage) percent")
+        .accessibilityValue(accessibilitySummary)
     }
 
     @ViewBuilder
@@ -100,5 +101,11 @@ struct ReadingStatusBar: View {
             get: { environment.preferences.displayTheme },
             set: { environment.preferences.displayTheme = $0 }
         )
+    }
+
+    private var accessibilitySummary: String {
+        guard let analysis = session.analysis else { return "No document" }
+        let section = session.currentSection.map { ", current section \($0)" } ?? ""
+        return "\(analysis.wordCount) words, \(analysis.estimatedReadingMinutes) minute read\(section)"
     }
 }
