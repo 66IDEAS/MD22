@@ -93,4 +93,11 @@ final class WebDocumentRenderer: DocumentRendering {
         defer { pendingNavigationURL = nil }
         return pendingNavigationURL
     }
+
+    func semanticHTML() async -> String? {
+        try? await page.callJavaScript(
+            "return document.querySelector('#document-root')?.innerHTML",
+            contentWorld: .page
+        ) as? String
+    }
 }

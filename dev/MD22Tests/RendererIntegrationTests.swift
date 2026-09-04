@@ -56,4 +56,47 @@ struct RendererIntegrationTests {
         #expect(artifact.html.contains("MD22 md22-renderer-1"))
         #expect(artifact.baseURL == snapshot.url.deletingLastPathComponent())
     }
+
+    @Test("Rich Markdown constructs produce sanitized semantic HTML")
+    func richMarkdown() async throws {
+        let markdown = """
+        # Rich
+
+        - [x] Read-only task
+
+        | Feature | Works |
+        | --- | --- |
+        | Table | Yes |
+
+        ```swift
+        let answer = 42
+        ```
+
+        Formula: $x^2$.[^1]
+
+        [^1]: A footnote.
+
+        > [!NOTE] Local
+        > A callout.
+
+        <script>window.evil = true</script>
+        """
+        let snapshot = DocumentSnapshot(
+            url: URL(fileURLWithPath: "/tmp/Rich.md"),
+            markdown: markdown,
+            modificationDate: nil,
+            fileIdentifier: nil
+        )
+        let renderer = WebDocumentRenderer()
+        try await renderer.render(snapshot: snapshot, themeID: "light")
+        let html = try #require(await renderer.semanticHTML())
+
+        #expect(html.contains("task-list-item"))
+        #expect(html.contains("<table>"))
+        #expect(html.contains("language-swift"))
+        #expect(html.contains("class=\"katex\""))
+        #expect(html.contains("footnote"))
+        #expect(html.contains("callout-note"))
+        #expect(!html.contains("<script"))
+    }
 }

@@ -23,6 +23,12 @@ await build({
   target: ["safari26"]
 });
 
+for (const generatedName of ["renderer-entry.js", "mermaid-entry.js", "base.css"]) {
+  const generatedPath = resolve(output, generatedName);
+  const generated = await readFile(generatedPath, "utf8");
+  await writeFile(generatedPath, generated.replace(/[ \t]+$/gm, ""));
+}
+
 const licenses = [
   ["markdown-it", "LICENSE"], ["markdown-it-anchor", "LICENSE"],
   ["markdown-it-container", "LICENSE"], ["markdown-it-footnote", "LICENSE"],

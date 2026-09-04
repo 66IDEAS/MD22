@@ -79,12 +79,20 @@ const state = {
 
 const root = document.querySelector("#document-root");
 const bootstrap = window.__MD22_BOOTSTRAP__;
+const normalizeCallouts = (markdown) => markdown.replace(
+  /^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*([^\n]*)\n((?:>[^\n]*(?:\n|$))*)/gim,
+  (_, rawKind, title, body) => {
+    const kind = rawKind.toLowerCase();
+    const content = body.replace(/^>\s?/gm, "");
+    return `::: ${kind}${title ? ` ${title.trim()}` : ""}\n${content}\n:::\n`;
+  }
+);
 slugCounts.clear();
-const dirtyHTML = md.render(bootstrap.markdown);
+const dirtyHTML = md.render(normalizeCallouts(bootstrap.markdown));
 root.innerHTML = DOMPurify.sanitize(dirtyHTML, {
   USE_PROFILES: { html: true },
   ADD_ATTR: ["class", "id", "target", "rel", "aria-label", "checked", "disabled"],
-  FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "input", "button"],
+  FORBID_TAGS: ["script", "style", "iframe", "object", "embed", "form", "button"],
   FORBID_ATTR: ["style", "srcset"]
 });
 
