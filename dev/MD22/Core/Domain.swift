@@ -19,7 +19,7 @@ struct DocumentAnalysis: Sendable, Equatable {
     let estimatedReadingMinutes: Int
 }
 
-struct ReadingLocation: Sendable, Codable, Equatable {
+struct ReadingLocation: Sendable, Codable, Equatable, Hashable {
     var headingID: String?
     var progress: Double
     var verticalOffset: Double

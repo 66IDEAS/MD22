@@ -2,6 +2,8 @@ import SwiftUI
 
 struct DocumentWindowView: View {
     let environment: AppEnvironment
+    let initialRequest: DocumentWindowRequest?
+    @Environment(\.openWindow) private var openWindow
     @State private var session: DocumentSession
     @State private var renderer: WebDocumentRenderer
     @State private var columnVisibility = NavigationSplitViewVisibility.all
@@ -22,8 +24,9 @@ struct DocumentWindowView: View {
     @State private var didAttemptRestoration = false
     @FocusState private var focusedRegion: WindowFocusRegion?
 
-    init(environment: AppEnvironment) {
+    init(environment: AppEnvironment, initialRequest: DocumentWindowRequest? = nil) {
         self.environment = environment
+        self.initialRequest = initialRequest
         _session = State(initialValue: DocumentSession(environment: environment))
         _renderer = State(initialValue: WebDocumentRenderer())
         _columnVisibility = State(initialValue: environment.preferences.showsHistory ? .all : .detailOnly)
@@ -45,9 +48,9 @@ struct DocumentWindowView: View {
                     history: environment.history,
                     selection: $historySelection,
                     onOpen: openHistoryRecord,
+                    onOpenInNewWindow: openHistoryRecordInNewWindow,
                     onReveal: revealHistoryRecord
                 )
-                .navigationSplitViewColumnWidth(min: 190, ideal: 245, max: 360)
                 .focusable()
                 .focused($focusedRegion, equals: .history)
                 .focusSection()
@@ -64,9 +67,9 @@ struct DocumentWindowView: View {
                 DocumentInspectorView(
                     session: session,
                     renderer: renderer,
-                    onOpenBookmark: openBookmark
+                    onOpenBookmark: openBookmark,
+                    onOpenBookmarkInNewWindow: openBookmarkInNewWindow
                 )
-                .inspectorColumnWidth(min: 230, ideal: 285, max: 420)
                 .focusable()
                 .focused($focusedRegion, equals: .inspector)
                 .focusSection()
@@ -117,22 +120,16 @@ struct DocumentWindowView: View {
 
     private var documentRoutingView: some View {
         windowChromeView
-        .onChange(of: environment.router.pendingRoute?.id, initial: true) { _, _ in
-            guard let route = environment.router.pendingRoute,
-                  route.disposition == .currentWindow else { return }
-            session.open(
-                route.url,
-                targetHeadingID: route.headingID,
-                targetLocation: route.location
-            )
-        }
-        .task {
+        .task(id: initialRequest?.id) {
             guard !didAttemptRestoration else { return }
             didAttemptRestoration = true
-            guard environment.router.pendingRoute == nil,
-                  let url = environment.history.lastDocumentURL else { return }
+            if let initialRequest {
+                openRequest(initialRequest)
+                return
+            }
+            guard let url = environment.history.lastDocumentURL else { return }
             if await environment.fileAccess.isAvailable(url) {
-                try? environment.router.route(url, source: .restoration)
+                openCurrent(url, source: .restoration)
             } else {
                 try? environment.history.markUnavailable(path: url.standardizedFileURL.path)
             }
@@ -155,7 +152,7 @@ struct DocumentWindowView: View {
         .onReceive(NotificationCenter.default.publisher(for: .md22OpenDocument)) { _ in
             Task { @MainActor in
                 guard let url = await environment.router.chooseMarkdownFile() else { return }
-                try? environment.router.route(url, source: .openPanel)
+                openCurrent(url, source: .openPanel)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22NavigateBack)) { _ in
@@ -215,19 +212,17 @@ struct DocumentWindowView: View {
 
     private var windowInteractionView: some View {
         focusCommandView
+        .onOpenURL { url in
+            openCurrent(url, source: .finder)
+        }
         .onDisappear { session.cancel() }
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = DocumentDropHandler.firstMarkdownURL(in: urls) else {
                 session.showTransientMessage(MD22Error.unsupportedFile.localizedDescription)
                 return false
             }
-            do {
-                try environment.router.route(url, source: .drop)
-                return true
-            } catch {
-                session.showTransientMessage(error.localizedDescription)
-                return false
-            }
+            openCurrent(url, source: .drop)
+            return true
         } isTargeted: { isTargeted in
             isDropTargeted = isTargeted
         }
@@ -262,11 +257,7 @@ struct DocumentWindowView: View {
             return
         }
         guard session.snapshot?.url.standardizedFileURL != url.standardizedFileURL else { return }
-        do {
-            try environment.router.route(url, source: .history)
-        } catch {
-            session.showTransientMessage(error.localizedDescription)
-        }
+        openCurrent(url, source: .history)
     }
 
     private func revealHistoryRecord(_ record: HistoryRecord) {
@@ -292,16 +283,107 @@ struct DocumentWindowView: View {
             components.fragment = headingID
             destination = components.url ?? url
         }
+        openCurrent(
+            destination,
+            source: .bookmark,
+            bookmarkID: bookmark.id,
+            location: bookmark.location,
+            usesFragment: bookmark.kind == .heading
+        )
+    }
+
+    private func openHistoryRecordInNewWindow(_ record: HistoryRecord) {
+        guard record.isAvailable,
+              let url = environment.history.resolvedURL(for: record),
+              FileManager.default.isReadableFile(atPath: url.path) else {
+            try? environment.history.markUnavailable(path: record.canonicalPath)
+            session.showTransientMessage(MD22Error.unavailableFile.localizedDescription)
+            return
+        }
+        openNewWindow(url, source: .history)
+    }
+
+    private func openBookmarkInNewWindow(_ bookmark: BookmarkRecord) {
+        let url = URL(fileURLWithPath: bookmark.canonicalPath)
+        guard FileManager.default.isReadableFile(atPath: url.path) else {
+            session.showTransientMessage(MD22Error.unavailableFile.localizedDescription)
+            return
+        }
+        openNewWindow(
+            url,
+            source: .bookmark,
+            bookmarkID: bookmark.id,
+            headingID: bookmark.kind == .heading ? bookmark.headingID : nil,
+            location: bookmark.location
+        )
+    }
+
+    private func openNewWindow(
+        _ url: URL,
+        source: DocumentRouteSource,
+        bookmarkID: UUID? = nil,
+        headingID: String? = nil,
+        location: ReadingLocation? = nil
+    ) {
         do {
-            try environment.router.route(
+            var destination = url
+            if let headingID,
+               var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                components.fragment = headingID
+                destination = components.url ?? url
+            }
+            let route = try environment.router.route(
                 destination,
-                source: .bookmark,
-                bookmarkID: bookmark.id,
-                location: bookmark.location
+                source: source,
+                disposition: .newWindow,
+                bookmarkID: bookmarkID,
+                location: location
             )
+            openWindow(value: DocumentWindowRequest(route: route))
         } catch {
             session.showTransientMessage(error.localizedDescription)
         }
+    }
+
+    private func openCurrent(
+        _ url: URL,
+        source: DocumentRouteSource,
+        bookmarkID: UUID? = nil,
+        location: ReadingLocation? = nil,
+        usesFragment: Bool = true
+    ) {
+        do {
+            var destination = url
+            if !usesFragment, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                components.fragment = nil
+                destination = components.url ?? url
+            }
+            let route = try environment.router.route(
+                destination,
+                source: source,
+                bookmarkID: bookmarkID,
+                location: location
+            )
+            openRoute(route)
+        } catch {
+            session.showTransientMessage(error.localizedDescription)
+        }
+    }
+
+    private func openRequest(_ request: DocumentWindowRequest) {
+        session.open(
+            request.url,
+            targetHeadingID: request.headingID,
+            targetLocation: request.location
+        )
+    }
+
+    private func openRoute(_ route: DocumentRoute) {
+        session.open(
+            route.url,
+            targetHeadingID: route.headingID,
+            targetLocation: route.location
+        )
     }
 
     private func previousSearchResult() {

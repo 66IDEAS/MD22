@@ -2,7 +2,7 @@ import AppKit
 import Observation
 import UniformTypeIdentifiers
 
-enum DocumentRouteSource: String, Sendable {
+enum DocumentRouteSource: String, Sendable, Codable, Hashable {
     case openPanel
     case finder
     case drop
@@ -27,6 +27,26 @@ struct DocumentRoute: Identifiable, Sendable {
     let location: ReadingLocation?
 }
 
+struct DocumentWindowRequest: Identifiable, Sendable, Codable, Hashable {
+    let id: UUID
+    let path: String
+    let source: DocumentRouteSource
+    let bookmarkID: UUID?
+    let headingID: String?
+    let location: ReadingLocation?
+
+    init(route: DocumentRoute) {
+        id = route.id
+        path = route.url.standardizedFileURL.path
+        source = route.source
+        bookmarkID = route.bookmarkID
+        headingID = route.headingID
+        location = route.location
+    }
+
+    var url: URL { URL(fileURLWithPath: path) }
+}
+
 @MainActor
 @Observable
 final class DocumentRouter {
@@ -49,19 +69,20 @@ final class DocumentRouter {
         return types.isEmpty ? [.plainText] : types
     }
 
+    @discardableResult
     func route(
         _ url: URL,
         source: DocumentRouteSource,
         disposition: DocumentOpenDisposition = .currentWindow,
         bookmarkID: UUID? = nil,
         location: ReadingLocation? = nil
-    ) throws {
+    ) throws -> DocumentRoute {
         let headingID = url.fragment
         var components = URLComponents(url: url.standardizedFileURL, resolvingAgainstBaseURL: false)
         components?.fragment = nil
         let canonicalURL = components?.url ?? url.standardizedFileURL
         guard Self.accepts(canonicalURL) else { throw MD22Error.unsupportedFile }
-        pendingRoute = DocumentRoute(
+        let route = DocumentRoute(
             url: canonicalURL,
             source: source,
             disposition: disposition,
@@ -69,6 +90,8 @@ final class DocumentRouter {
             headingID: headingID,
             location: location
         )
+        pendingRoute = route
+        return route
     }
 
     func chooseMarkdownFile() async -> URL? {

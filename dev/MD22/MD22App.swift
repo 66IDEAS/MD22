@@ -5,8 +5,8 @@ struct MD22App: App {
     @State private var environment = AppEnvironment()
 
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        WindowGroup(for: DocumentWindowRequest.self) { request in
+            ContentView(initialRequest: request.wrappedValue)
                 .environment(environment)
         }
         .defaultSize(width: 1_240, height: 800)

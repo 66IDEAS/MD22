@@ -135,11 +135,10 @@ struct ReadOnlyDocumentView: View {
                 session.showTransientMessage("The linked Markdown file is unavailable.")
                 return
             }
-            do {
-                try environment.router.route(destination, source: .link)
-            } catch {
-                session.showTransientMessage(error.localizedDescription)
-            }
+            let headingID = destination.fragment
+            var components = URLComponents(url: destination.standardizedFileURL, resolvingAgainstBaseURL: false)
+            components?.fragment = nil
+            session.open(components?.url ?? destination.standardizedFileURL, targetHeadingID: headingID)
         } else {
             environment.platform.openExternally(destination)
         }
