@@ -32,6 +32,7 @@ struct ReadOnlyDocumentView: View {
         .task(id: snapshot) {
             do {
                 try await renderer.render(snapshot: snapshot, themeID: environment.preferences.displayTheme.rawValue)
+                await applyReadingSettings()
                 await renderer.restore(session.readingLocation)
                 if let headingID = session.navigationTargetHeadingID {
                     await renderer.navigate(to: headingID)
@@ -54,6 +55,23 @@ struct ReadOnlyDocumentView: View {
         .onChange(of: environment.preferences.displayTheme) { _, theme in
             Task { await renderer.applyTheme(theme.rawValue) }
         }
+        .onChange(of: environment.preferences.readingSettings) { _, _ in
+            Task { await applyReadingSettings() }
+        }
+        .onChange(of: environment.accessibility.reduceMotion) { _, _ in
+            Task { await applyReadingSettings() }
+        }
+        .onChange(of: environment.accessibility.increaseContrast) { _, _ in
+            Task { await applyReadingSettings() }
+        }
+    }
+
+    private func applyReadingSettings() async {
+        await renderer.applyReadingSettings(
+            environment.preferences.readingSettings,
+            systemReduceMotion: environment.accessibility.reduceMotion,
+            systemHighContrast: environment.accessibility.increaseContrast
+        )
     }
 
     private func handleNavigation(_ destination: URL) {

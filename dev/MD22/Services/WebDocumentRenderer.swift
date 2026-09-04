@@ -123,4 +123,26 @@ final class WebDocumentRenderer: DocumentRendering {
             contentWorld: .page
         )
     }
+
+    func applyReadingSettings(_ settings: ReadingSettings, systemReduceMotion: Bool, systemHighContrast: Bool) async {
+        let normalized = settings.normalized
+        _ = try? await page.callJavaScript(
+            """
+            const root = document.documentElement;
+            root.style.setProperty('--font-scale', String(arguments.fontScale));
+            root.style.setProperty('--line-height', String(arguments.lineSpacing));
+            root.style.setProperty('--content-width', `${arguments.contentWidth}px`);
+            root.dataset.reduceMotion = arguments.reduceMotion ? 'true' : 'false';
+            root.dataset.highContrast = arguments.highContrast ? 'true' : 'false';
+            """,
+            arguments: [
+                "fontScale": normalized.fontScale,
+                "lineSpacing": normalized.lineSpacing,
+                "contentWidth": normalized.contentWidth,
+                "reduceMotion": normalized.reduceMotion || systemReduceMotion,
+                "highContrast": normalized.highContrast || systemHighContrast
+            ],
+            contentWorld: .page
+        )
+    }
 }

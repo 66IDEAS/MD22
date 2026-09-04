@@ -46,12 +46,39 @@ enum DisplayTheme: String, CaseIterable, Identifiable, Sendable, Codable {
     }
 }
 
+struct ReadingSettings: Codable, Sendable, Equatable {
+    var fontScale: Double
+    var lineSpacing: Double
+    var contentWidth: Double
+    var highContrast: Bool
+    var reduceMotion: Bool
+
+    static let `default` = ReadingSettings(
+        fontScale: 1,
+        lineSpacing: 1.68,
+        contentWidth: 760,
+        highContrast: false,
+        reduceMotion: false
+    )
+
+    var normalized: ReadingSettings {
+        ReadingSettings(
+            fontScale: min(max(fontScale, 0.8), 1.6),
+            lineSpacing: min(max(lineSpacing, 1.25), 2.2),
+            contentWidth: min(max(contentWidth, 520), 1_080),
+            highContrast: highContrast,
+            reduceMotion: reduceMotion
+        )
+    }
+}
+
 @MainActor
 @Observable
 final class PreferencesStore {
     private enum Key {
         static let appAppearance = "appAppearance"
         static let displayTheme = "displayTheme"
+        static let readingSettings = "readingSettings"
     }
 
     private let defaults: UserDefaults
@@ -64,9 +91,27 @@ final class PreferencesStore {
         didSet { defaults.set(displayTheme.rawValue, forKey: Key.displayTheme) }
     }
 
+    var readingSettings: ReadingSettings {
+        didSet {
+            if let data = try? JSONEncoder().encode(readingSettings.normalized) {
+                defaults.set(data, forKey: Key.readingSettings)
+            }
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         appAppearance = AppAppearance(rawValue: defaults.string(forKey: Key.appAppearance) ?? "") ?? .system
         displayTheme = DisplayTheme(rawValue: defaults.string(forKey: Key.displayTheme) ?? "") ?? .light
+        if let data = defaults.data(forKey: Key.readingSettings),
+           let decoded = try? JSONDecoder().decode(ReadingSettings.self, from: data) {
+            readingSettings = decoded.normalized
+        } else {
+            readingSettings = .default
+        }
+    }
+
+    func resetReadingSettings() {
+        readingSettings = .default
     }
 }
