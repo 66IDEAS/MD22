@@ -20,7 +20,7 @@ Requirement IDs use these prefixes:
 - [x] **T006 — Organize the open-source repository** (`ARCH-2`): Make source, build configuration, rendering assets, dependency versions, and replaceable boundaries suitable for public development.
 - [x] **T007 — Create modular concurrency-safe boundaries** (`ARCH-12`): Separate file access, rendering, persistence, export, updates, and platform integration behind protocols and actor-isolated services.
 - [x] **T008 — Prepare the renderer for app-extension reuse** (`ARCH-19`): Keep parsing, semantic HTML, themes, resource mapping, and bookmark-location logic independent of the main app and persistence store.
-- [ ] **T009 — Establish Apple-platform conformance criteria** (`ARCH-3`): Define implementation checks for macOS conventions, accessibility, privacy, security, menus, windows, signing, and notarization.
+- [x] **T009 — Establish Apple-platform conformance criteria** (`ARCH-3`): Define implementation checks for macOS conventions, accessibility, privacy, security, menus, windows, signing, and notarization.
 - [ ] **T010 — Add dependency and release supply-chain controls** (`ARCH-17`): Commit lockfiles, enable dependency monitoring, enforce license and vulnerability policy, and prepare SBOM, checksums, provenance, and immutable releases.
 - [ ] **T011 — Establish accessibility and localization foundations** (`ARCH-22`): Use semantic native and HTML structures, honor system accessibility settings, and externalize all strings through String Catalogs.
 - [ ] **T012 — Apply the native Liquid Glass visual language** (`UX-1`): Style the application shell, controls, sidebars, selection, spacing, and motion according to current macOS conventions.
