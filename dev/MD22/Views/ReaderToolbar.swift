@@ -5,6 +5,9 @@ struct ReaderToolbar: ToolbarContent {
     @Binding var inspectorPresented: Bool
     @Binding var searchPresented: Bool
     @Binding var searchQuery: String
+    @Binding var statusBarPresented: Bool
+    var isDistractionFree = false
+    var onToggleDistractionFree: () -> Void = {}
     var searchState = DocumentSearchState()
     var onPreviousSearchResult: () -> Void = {}
     var onNextSearchResult: () -> Void = {}
@@ -82,6 +85,18 @@ struct ReaderToolbar: ToolbarContent {
             }
             .labelStyle(.iconOnly)
             .help("Show or hide Outline and Bookmarks")
+
+            Menu("Reading Layout", systemImage: "rectangle.3.group") {
+                Button(statusBarPresented ? "Hide Status Bar" : "Show Status Bar") {
+                    statusBarPresented.toggle()
+                }
+                Divider()
+                Button(isDistractionFree ? "Exit Distraction-Free Reading" : "Distraction-Free Reading") {
+                    onToggleDistractionFree()
+                }
+            }
+            .labelStyle(.iconOnly)
+            .help("Reading Layout")
         }
     }
 }

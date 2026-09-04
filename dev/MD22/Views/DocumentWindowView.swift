@@ -6,6 +6,9 @@ struct DocumentWindowView: View {
     @State private var renderer: WebDocumentRenderer
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var inspectorPresented = true
+    @State private var statusBarPresented = true
+    @State private var isDistractionFree = false
+    @State private var layoutBeforeDistractionFree: SavedWindowLayout?
     @State private var searchPresented = false
     @State private var searchQuery = ""
     @State private var searchState = DocumentSearchState()
@@ -18,9 +21,16 @@ struct DocumentWindowView: View {
         self.environment = environment
         _session = State(initialValue: DocumentSession(environment: environment))
         _renderer = State(initialValue: WebDocumentRenderer())
+        _columnVisibility = State(initialValue: environment.preferences.showsHistory ? .all : .detailOnly)
+        _inspectorPresented = State(initialValue: environment.preferences.showsInspector)
+        _statusBarPresented = State(initialValue: environment.preferences.showsStatusBar)
     }
 
     var body: some View {
+        windowInteractionView
+    }
+
+    private var windowChromeView: some View {
         VStack(spacing: 0) {
             NavigationSplitView(columnVisibility: $columnVisibility) {
                 HistorySidebarView(
@@ -40,8 +50,11 @@ struct DocumentWindowView: View {
                 )
             }
 
-            Divider()
-            ReadingStatusBar(session: session)
+            if statusBarPresented {
+                Divider()
+                ReadingStatusBar(session: session)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .frame(minWidth: 760, minHeight: 520)
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
@@ -51,6 +64,9 @@ struct DocumentWindowView: View {
                 inspectorPresented: $inspectorPresented,
                 searchPresented: $searchPresented,
                 searchQuery: $searchQuery,
+                statusBarPresented: $statusBarPresented,
+                isDistractionFree: isDistractionFree,
+                onToggleDistractionFree: toggleDistractionFree,
                 searchState: searchState,
                 onPreviousSearchResult: previousSearchResult,
                 onNextSearchResult: nextSearchResult,
@@ -61,6 +77,10 @@ struct DocumentWindowView: View {
                 canExport: session.snapshot != nil
             )
         }
+    }
+
+    private var documentRoutingView: some View {
+        windowChromeView
         .onChange(of: environment.router.pendingRoute?.id, initial: true) { _, _ in
             guard let route = environment.router.pendingRoute,
                   route.disposition == .currentWindow else { return }
@@ -92,6 +112,10 @@ struct DocumentWindowView: View {
                 historySelection = url.standardizedFileURL.path
             }
         }
+    }
+
+    private var commandHandlingView: some View {
+        documentRoutingView
         .onReceive(NotificationCenter.default.publisher(for: .md22OpenDocument)) { _ in
             Task { @MainActor in
                 guard let url = await environment.router.chooseMarkdownFile() else { return }
@@ -119,6 +143,10 @@ struct DocumentWindowView: View {
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleSearch)) { _ in
             searchPresented = true
         }
+    }
+
+    private var searchAndPreferenceView: some View {
+        commandHandlingView
         .onChange(of: searchQuery) { _, query in
             searchTask?.cancel()
             searchTask = Task {
@@ -131,6 +159,38 @@ struct DocumentWindowView: View {
             searchQuery = ""
             searchState = DocumentSearchState()
         }
+        .onChange(of: columnVisibility) { _, visibility in
+            guard !isDistractionFree else { return }
+            environment.preferences.showsHistory = visibility != .detailOnly
+        }
+        .onChange(of: inspectorPresented) { _, visible in
+            guard !isDistractionFree else { return }
+            environment.preferences.showsInspector = visible
+        }
+        .onChange(of: statusBarPresented) { _, visible in
+            guard !isDistractionFree else { return }
+            environment.preferences.showsStatusBar = visible
+        }
+    }
+
+    private var layoutCommandView: some View {
+        searchAndPreferenceView
+        .onReceive(NotificationCenter.default.publisher(for: .md22ToggleHistory)) { _ in
+            columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .md22ToggleInspector)) { _ in
+            inspectorPresented.toggle()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .md22ToggleStatusBar)) { _ in
+            statusBarPresented.toggle()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .md22ToggleDistractionFree)) { _ in
+            toggleDistractionFree()
+        }
+    }
+
+    private var windowInteractionView: some View {
+        layoutCommandView
         .onDisappear { session.cancel() }
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = DocumentDropHandler.firstMarkdownURL(in: urls) else {
@@ -219,6 +279,30 @@ struct DocumentWindowView: View {
         }
     }
 
+    private func toggleDistractionFree() {
+        withAnimation(environment.accessibility.reduceMotion ? nil : .smooth(duration: 0.22)) {
+            if isDistractionFree {
+                if let saved = layoutBeforeDistractionFree {
+                    columnVisibility = saved.historyVisible ? .all : .detailOnly
+                    inspectorPresented = saved.inspectorVisible
+                    statusBarPresented = saved.statusBarVisible
+                }
+                layoutBeforeDistractionFree = nil
+                isDistractionFree = false
+            } else {
+                layoutBeforeDistractionFree = SavedWindowLayout(
+                    historyVisible: columnVisibility != .detailOnly,
+                    inspectorVisible: inspectorPresented,
+                    statusBarVisible: statusBarPresented
+                )
+                isDistractionFree = true
+                columnVisibility = .detailOnly
+                inspectorPresented = false
+                statusBarPresented = false
+            }
+        }
+    }
+
     @ViewBuilder
     private var documentContent: some View {
         if let snapshot = session.snapshot {
@@ -242,4 +326,10 @@ struct DocumentWindowView: View {
             WelcomeView(isDropTargeted: isDropTargeted)
         }
     }
+}
+
+private struct SavedWindowLayout {
+    let historyVisible: Bool
+    let inspectorVisible: Bool
+    let statusBarVisible: Bool
 }

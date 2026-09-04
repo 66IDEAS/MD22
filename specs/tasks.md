@@ -85,7 +85,7 @@ Requirement IDs use these prefixes:
 
 ### Layout, Accessibility, and Multiple Windows
 
-- [ ] **T053 — Implement controllable reading layout** (`FR-18`): Show all support regions on first launch, allow independent visibility, add distraction-free reading, expand content, and persist subsequent choices.
+- [x] **T053 — Implement controllable reading layout** (`FR-18`): Show all support regions on first launch, allow independent visibility, add distraction-free reading, expand content, and persist subsequent choices.
 - [ ] **T054 — Implement responsive panels and distraction-free mode** (`UX-16`): Support native resizing, transitions, narrow-window overlays, restoration, per-window layouts, and standard full-screen toolbar behavior.
 - [ ] **T055 — Complete keyboard and assistive access** (`UX-17`): Implement predictable region focus, standard reading and list keys, visible focus affordances, VoiceOver semantics, shortcut discovery, and accessibility-setting adaptations.
 - [ ] **T056 — Open history entries and bookmarks in new windows** (`FR-22`): Preserve the originating window, restore files or bookmark targets, permit duplicate-file windows, and re-add retained bookmark files to history.
@@ -143,3 +143,5 @@ Requirement IDs use these prefixes:
 - [x] **E019 — Align duplicate heading anchors across native and web renderers**: Use the same zero-based duplicate suffix progression so outline, links, bookmarks, reading state, and rendered headings share stable identifiers.
 - [x] **E020 — Decode JavaScript numbers and preserve heading labels**: Bridge numeric search state through `NSNumber` and exclude contextual bookmark glyphs from semantic outline and search-section titles.
 - [x] **E021 — Address WebPage arguments by their declared names**: Use the macOS 26 JavaScript bridge's named parameters directly so theme, reading, navigation, restoration, and search commands execute correctly.
+- [x] **E022 — Split the document-window modifier graph**: Break the large SwiftUI modifier expression into smaller typed view stages so Swift 6 can type-check the complete window lifecycle deterministically.
+- [x] **E023 — Use the declared renderer verification path**: Run renderer integration tests through the Xcode test target because the asset package intentionally exposes build and audit scripts rather than an npm test script.

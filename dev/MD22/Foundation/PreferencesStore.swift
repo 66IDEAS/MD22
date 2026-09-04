@@ -79,6 +79,9 @@ final class PreferencesStore {
         static let appAppearance = "appAppearance"
         static let displayTheme = "displayTheme"
         static let readingSettings = "readingSettings"
+        static let showsHistory = "showsHistory"
+        static let showsInspector = "showsInspector"
+        static let showsStatusBar = "showsStatusBar"
     }
 
     private let defaults: UserDefaults
@@ -99,6 +102,16 @@ final class PreferencesStore {
         }
     }
 
+    var showsHistory: Bool {
+        didSet { defaults.set(showsHistory, forKey: Key.showsHistory) }
+    }
+    var showsInspector: Bool {
+        didSet { defaults.set(showsInspector, forKey: Key.showsInspector) }
+    }
+    var showsStatusBar: Bool {
+        didSet { defaults.set(showsStatusBar, forKey: Key.showsStatusBar) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         appAppearance = AppAppearance(rawValue: defaults.string(forKey: Key.appAppearance) ?? "") ?? .system
@@ -109,6 +122,9 @@ final class PreferencesStore {
         } else {
             readingSettings = .default
         }
+        showsHistory = defaults.object(forKey: Key.showsHistory) as? Bool ?? true
+        showsInspector = defaults.object(forKey: Key.showsInspector) as? Bool ?? true
+        showsStatusBar = defaults.object(forKey: Key.showsStatusBar) as? Bool ?? true
     }
 
     func resetReadingSettings() {

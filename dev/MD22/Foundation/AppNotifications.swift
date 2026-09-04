@@ -7,4 +7,8 @@ extension Notification.Name {
     static let md22NavigateForward = Notification.Name("MD22.navigateForward")
     static let md22ToggleSearch = Notification.Name("MD22.toggleSearch")
     static let md22AddBookmark = Notification.Name("MD22.addBookmark")
+    static let md22ToggleHistory = Notification.Name("MD22.toggleHistory")
+    static let md22ToggleInspector = Notification.Name("MD22.toggleInspector")
+    static let md22ToggleStatusBar = Notification.Name("MD22.toggleStatusBar")
+    static let md22ToggleDistractionFree = Notification.Name("MD22.toggleDistractionFree")
 }

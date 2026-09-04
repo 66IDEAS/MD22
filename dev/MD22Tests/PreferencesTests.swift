@@ -28,5 +28,13 @@ struct PreferencesTests {
 
         restored.resetReadingSettings()
         #expect(restored.readingSettings == .default)
+
+        preferences.showsHistory = false
+        preferences.showsInspector = false
+        preferences.showsStatusBar = false
+        let layoutRestored = PreferencesStore(defaults: defaults)
+        #expect(!layoutRestored.showsHistory)
+        #expect(!layoutRestored.showsInspector)
+        #expect(!layoutRestored.showsStatusBar)
     }
 }

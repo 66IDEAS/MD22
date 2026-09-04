@@ -17,6 +17,25 @@ struct MD22App: App {
                 }
                 .keyboardShortcut("d", modifiers: .command)
             }
+            CommandMenu("Reading") {
+                Button("Toggle History") {
+                    NotificationCenter.default.post(name: .md22ToggleHistory, object: nil)
+                }
+                .keyboardShortcut("1", modifiers: [.command, .option])
+                Button("Toggle Inspector") {
+                    NotificationCenter.default.post(name: .md22ToggleInspector, object: nil)
+                }
+                .keyboardShortcut("2", modifiers: [.command, .option])
+                Button("Toggle Status Bar") {
+                    NotificationCenter.default.post(name: .md22ToggleStatusBar, object: nil)
+                }
+                .keyboardShortcut("3", modifiers: [.command, .option])
+                Divider()
+                Button("Distraction-Free Reading") {
+                    NotificationCenter.default.post(name: .md22ToggleDistractionFree, object: nil)
+                }
+                .keyboardShortcut("d", modifiers: [.command, .control])
+            }
         }
     }
 }
