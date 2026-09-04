@@ -147,17 +147,6 @@ struct DocumentWindowView: View {
         } isTargeted: { isTargeted in
             isDropTargeted = isTargeted
         }
-        .overlay(alignment: .top) {
-            if let message = session.transientMessage {
-                Text(message)
-                    .font(.callout)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .glassEffect(.regular, in: .capsule)
-                    .padding(.top, 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
     }
 
     private func openHistoryRecord(_ record: HistoryRecord) {

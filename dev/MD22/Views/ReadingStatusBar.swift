@@ -6,59 +6,93 @@ struct ReadingStatusBar: View {
     @State private var readingPopoverPresented = false
 
     var body: some View {
-        HStack(spacing: 14) {
-            if let destination = session.hoveredLinkDestination {
-                Label(destination, systemImage: "link")
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .help(destination)
-            } else {
-                Text(session.currentSection ?? session.title ?? "Ready")
-                    .lineLimit(1)
+        VStack(spacing: 0) {
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(Color.accentColor)
+                    .frame(width: geometry.size.width * session.readingLocation.progress)
+                    .animation(.smooth(duration: 0.18), value: session.readingLocation.progress)
             }
-            Spacer(minLength: 12)
-            if let analysis = session.analysis {
-                Text("\(session.progressPercentage)%")
-                    .monospacedDigit()
-                    .accessibilityLabel("Reading progress \(session.progressPercentage) percent")
-                Divider().frame(height: 12)
-                Text("\(analysis.wordCount.formatted()) words")
-                    .foregroundStyle(.secondary)
-                Divider().frame(height: 12)
-                Text("\(analysis.estimatedReadingMinutes) min read")
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("No document")
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 12)
-            Menu {
-                Picker("Document Theme", selection: displayThemeBinding) {
-                    ForEach(DisplayTheme.allCases) { theme in
-                        Text(theme.title).tag(theme)
+            .frame(height: 2)
+            .background(Color.secondary.opacity(0.14))
+            .accessibilityHidden(true)
+
+            HStack(spacing: 14) {
+                if let destination = session.hoveredLinkDestination {
+                    Label(destination, systemImage: "link")
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help(destination)
+                } else {
+                    Text(session.currentSection ?? session.title ?? "Ready")
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 12)
+                if let message = session.transientMessage {
+                    Text(message)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .transition(.opacity)
+                } else {
+                    ViewThatFits(in: .horizontal) {
+                        fullMetrics
+                        compactMetrics
                     }
                 }
-            } label: {
-                Label(environment.preferences.displayTheme.title, systemImage: "paintpalette")
+                Spacer(minLength: 12)
+                Menu {
+                    Picker("Document Theme", selection: displayThemeBinding) {
+                        ForEach(DisplayTheme.allCases) { theme in
+                            Text(theme.title).tag(theme)
+                        }
+                    }
+                } label: {
+                    Label(environment.preferences.displayTheme.title, systemImage: "paintpalette")
+                }
+                .menuStyle(.borderlessButton)
+                .help("Choose Document Theme")
+                Button("Reading Appearance", systemImage: "textformat.size") {
+                    readingPopoverPresented.toggle()
+                }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.borderless)
+                .help("Reading Appearance")
+                .popover(isPresented: $readingPopoverPresented, arrowEdge: .bottom) {
+                    ReadingAppearancePopover(preferences: environment.preferences)
+                }
             }
-            .menuStyle(.borderlessButton)
-            .help("Choose Document Theme")
-            Button("Reading Appearance", systemImage: "textformat.size") {
-                readingPopoverPresented.toggle()
-            }
-            .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
-            .help("Reading Appearance")
-            .popover(isPresented: $readingPopoverPresented, arrowEdge: .bottom) {
-                ReadingAppearancePopover(preferences: environment.preferences)
-            }
+            .padding(.horizontal, 12)
+            .frame(height: 28)
         }
         .font(.caption)
-        .padding(.horizontal, 12)
-        .frame(height: 28)
         .background(.bar)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Reading status")
+        .accessibilityLabel("Reading status, \(session.progressPercentage) percent")
+    }
+
+    @ViewBuilder
+    private var fullMetrics: some View {
+        if let analysis = session.analysis {
+            HStack(spacing: 10) {
+                progressLabel
+                Divider().frame(height: 12)
+                Text("\(analysis.wordCount.formatted()) words").foregroundStyle(.secondary)
+                Divider().frame(height: 12)
+                Text("\(analysis.estimatedReadingMinutes) min read").foregroundStyle(.secondary)
+            }
+        } else {
+            Text("No document").foregroundStyle(.secondary)
+        }
+    }
+
+    private var compactMetrics: some View {
+        progressLabel
+    }
+
+    private var progressLabel: some View {
+        Text("\(session.progressPercentage)%")
+            .monospacedDigit()
+            .accessibilityLabel("Reading progress \(session.progressPercentage) percent")
     }
 
     private var displayThemeBinding: Binding<DisplayTheme> {

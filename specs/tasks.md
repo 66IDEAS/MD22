@@ -81,7 +81,7 @@ Requirement IDs use these prefixes:
 - [x] **T049 — Implement in-document search** (`FR-12`): Search only the displayed document, highlight all matches, report active and total counts, and support previous, next, and standard keyboard interaction.
 - [x] **T050 — Build the compact toolbar search experience** (`UX-10`): Expand search in place, use accessible theme-aware highlights, preserve orientation, show section context and empty results, and restore focus on close.
 - [x] **T051 — Compute and present reading status** (`FR-14`): Show and update progress, current section, word count, and estimated reading time in the bottom status bar.
-- [ ] **T052 — Build the quiet status-bar hierarchy** (`UX-8`): Add its progress track, information layout, theme and reading controls, temporary messages, responsive collapse, and keyboard access.
+- [x] **T052 — Build the quiet status-bar hierarchy** (`UX-8`): Add its progress track, information layout, theme and reading controls, temporary messages, responsive collapse, and keyboard access.
 
 ### Layout, Accessibility, and Multiple Windows
 
