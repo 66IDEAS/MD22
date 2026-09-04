@@ -29,7 +29,7 @@ Requirement IDs use these prefixes:
 
 ### Application Shell and File Opening
 
-- [ ] **T015 — Build the focused unified toolbar** (`UX-4`): Implement the approved leading navigation, central Open and Export, trailing search and inspector, contextual actions, menus, and keyboard discoverability.
+- [x] **T015 — Build the focused unified toolbar** (`UX-4`): Implement the approved leading navigation, central Open and Export, trailing search and inspector, contextual actions, menus, and keyboard discoverability.
 - [ ] **T016 — Centralize native file and window routing** (`ARCH-21`): Route UTType registration, Finder and Open With events, drops, commands, links, history, bookmarks, new windows, Finder reveal, and external URLs through shared services.
 - [ ] **T017 — Support direct Markdown opening** (`FR-9`): Implement Open, file association, double-click, Open With, history insertion, and standard keyboard access without importing files.
 - [ ] **T018 — Support drag-and-drop viewing** (`FR-1`): Accept valid Markdown drops, render them, add them to history, and reject invalid drops without disrupting the current document.
