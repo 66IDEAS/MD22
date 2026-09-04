@@ -7,6 +7,7 @@ final class DocumentSession {
     private let fileAccess: any FileAccessing
     private let history: HistoryRepository
     private var loadTask: Task<Void, Never>?
+    private var loadingIndicatorTask: Task<Void, Never>?
     private var refreshTask: Task<Void, Never>?
     private var filePresenter: DocumentFilePresenter?
     private var generation = 0
@@ -14,6 +15,7 @@ final class DocumentSession {
     private(set) var snapshot: DocumentSnapshot?
     private(set) var analysis: DocumentAnalysis?
     private(set) var isLoading = false
+    private(set) var showsLoadingIndicator = false
     private(set) var errorMessage: String?
     private(set) var transientMessage: String?
     private(set) var navigationBackStack: [URL] = []
@@ -35,6 +37,13 @@ final class DocumentSession {
         let previousURL = snapshot?.url
         errorMessage = nil
         isLoading = true
+        showsLoadingIndicator = false
+        loadingIndicatorTask?.cancel()
+        loadingIndicatorTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(180))
+            guard !Task.isCancelled, self?.isLoading == true else { return }
+            self?.showsLoadingIndicator = true
+        }
 
         loadTask = Task { [weak self, fileAccess] in
             do {
@@ -49,13 +58,21 @@ final class DocumentSession {
                 self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
                 _ = try self.history.recordOpen(loaded)
                 self.isLoading = false
+                self.showsLoadingIndicator = false
+                self.loadingIndicatorTask?.cancel()
                 self.monitor(loaded.url)
             } catch is CancellationError {
                 return
             } catch {
                 guard let self, requestedGeneration == self.generation else { return }
                 self.isLoading = false
-                self.errorMessage = error.localizedDescription
+                self.showsLoadingIndicator = false
+                self.loadingIndicatorTask?.cancel()
+                if self.snapshot == nil {
+                    self.errorMessage = error.localizedDescription
+                } else {
+                    self.showTransientMessage(error.localizedDescription)
+                }
             }
         }
     }
@@ -76,6 +93,9 @@ final class DocumentSession {
         generation += 1
         loadTask?.cancel()
         loadTask = nil
+        loadingIndicatorTask?.cancel()
+        loadingIndicatorTask = nil
+        showsLoadingIndicator = false
         refreshTask?.cancel()
         refreshTask = nil
         filePresenter?.invalidate()

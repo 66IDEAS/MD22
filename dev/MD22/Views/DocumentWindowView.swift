@@ -135,7 +135,13 @@ struct DocumentWindowView: View {
         if let snapshot = session.snapshot {
             ReadOnlyDocumentView(snapshot: snapshot)
                 .overlay(alignment: .top) {
-                    if session.isLoading { ProgressView().controlSize(.small).padding(8) }
+                    if session.showsLoadingIndicator {
+                        ProgressView()
+                            .controlSize(.small)
+                            .padding(8)
+                            .glassEffect(.regular, in: .circle)
+                            .accessibilityLabel("Loading document")
+                    }
                 }
         } else if let errorMessage = session.errorMessage {
             ContentUnavailableView(
