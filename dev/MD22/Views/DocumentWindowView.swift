@@ -7,6 +7,10 @@ struct DocumentWindowView: View {
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var inspectorPresented = true
     @State private var statusBarPresented = true
+    @State private var preferredHistoryVisible = true
+    @State private var preferredInspectorVisible = true
+    @State private var preferredStatusBarVisible = true
+    @State private var windowWidth: CGFloat = 1_240
     @State private var isDistractionFree = false
     @State private var layoutBeforeDistractionFree: SavedWindowLayout?
     @State private var searchPresented = false
@@ -24,6 +28,9 @@ struct DocumentWindowView: View {
         _columnVisibility = State(initialValue: environment.preferences.showsHistory ? .all : .detailOnly)
         _inspectorPresented = State(initialValue: environment.preferences.showsInspector)
         _statusBarPresented = State(initialValue: environment.preferences.showsStatusBar)
+        _preferredHistoryVisible = State(initialValue: environment.preferences.showsHistory)
+        _preferredInspectorVisible = State(initialValue: environment.preferences.showsInspector)
+        _preferredStatusBarVisible = State(initialValue: environment.preferences.showsStatusBar)
     }
 
     var body: some View {
@@ -39,8 +46,14 @@ struct DocumentWindowView: View {
                     onOpen: openHistoryRecord,
                     onReveal: revealHistoryRecord
                 )
+                .navigationSplitViewColumnWidth(min: 190, ideal: 245, max: 360)
             } detail: {
                 documentContent
+                    .contentShape(Rectangle())
+                    .simultaneousGesture(
+                        TapGesture().onEnded { dismissTemporaryPanelsIfNeeded() }
+                    )
+                    .onExitCommand(perform: dismissTemporaryPanelsIfNeeded)
             }
             .inspector(isPresented: $inspectorPresented) {
                 DocumentInspectorView(
@@ -48,6 +61,7 @@ struct DocumentWindowView: View {
                     renderer: renderer,
                     onOpenBookmark: openBookmark
                 )
+                .inspectorColumnWidth(min: 230, ideal: 285, max: 420)
             }
 
             if statusBarPresented {
@@ -66,6 +80,9 @@ struct DocumentWindowView: View {
                 searchQuery: $searchQuery,
                 statusBarPresented: $statusBarPresented,
                 isDistractionFree: isDistractionFree,
+                onToggleHistory: toggleHistory,
+                onToggleInspector: toggleInspector,
+                onToggleStatusBar: toggleStatusBar,
                 onToggleDistractionFree: toggleDistractionFree,
                 searchState: searchState,
                 onPreviousSearchResult: previousSearchResult,
@@ -76,6 +93,14 @@ struct DocumentWindowView: View {
                 canNavigateForward: session.canNavigateForward,
                 canExport: session.snapshot != nil
             )
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { oldWidth, newWidth in
+            windowWidth = newWidth
+            if oldWidth < Self.overlayThreshold, newWidth >= Self.overlayThreshold {
+                restorePreferredPanelVisibility()
+            }
         }
     }
 
@@ -159,30 +184,18 @@ struct DocumentWindowView: View {
             searchQuery = ""
             searchState = DocumentSearchState()
         }
-        .onChange(of: columnVisibility) { _, visibility in
-            guard !isDistractionFree else { return }
-            environment.preferences.showsHistory = visibility != .detailOnly
-        }
-        .onChange(of: inspectorPresented) { _, visible in
-            guard !isDistractionFree else { return }
-            environment.preferences.showsInspector = visible
-        }
-        .onChange(of: statusBarPresented) { _, visible in
-            guard !isDistractionFree else { return }
-            environment.preferences.showsStatusBar = visible
-        }
     }
 
     private var layoutCommandView: some View {
         searchAndPreferenceView
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleHistory)) { _ in
-            columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
+            toggleHistory()
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleInspector)) { _ in
-            inspectorPresented.toggle()
+            toggleInspector()
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleStatusBar)) { _ in
-            statusBarPresented.toggle()
+            toggleStatusBar()
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleDistractionFree)) { _ in
             toggleDistractionFree()
@@ -302,6 +315,56 @@ struct DocumentWindowView: View {
             }
         }
     }
+
+    private func toggleHistory() {
+        let visible = columnVisibility == .detailOnly
+        preferredHistoryVisible = visible
+        environment.preferences.showsHistory = visible
+        withAnimation(layoutAnimation) {
+            columnVisibility = visible ? .all : .detailOnly
+        }
+    }
+
+    private func toggleInspector() {
+        let visible = !inspectorPresented
+        preferredInspectorVisible = visible
+        environment.preferences.showsInspector = visible
+        withAnimation(layoutAnimation) {
+            inspectorPresented = visible
+        }
+    }
+
+    private func toggleStatusBar() {
+        let visible = !statusBarPresented
+        preferredStatusBarVisible = visible
+        environment.preferences.showsStatusBar = visible
+        withAnimation(layoutAnimation) {
+            statusBarPresented = visible
+        }
+    }
+
+    private func dismissTemporaryPanelsIfNeeded() {
+        guard windowWidth < Self.overlayThreshold else { return }
+        withAnimation(layoutAnimation) {
+            columnVisibility = .detailOnly
+            inspectorPresented = false
+        }
+    }
+
+    private func restorePreferredPanelVisibility() {
+        guard !isDistractionFree else { return }
+        withAnimation(layoutAnimation) {
+            columnVisibility = preferredHistoryVisible ? .all : .detailOnly
+            inspectorPresented = preferredInspectorVisible
+            statusBarPresented = preferredStatusBarVisible
+        }
+    }
+
+    private var layoutAnimation: Animation? {
+        environment.accessibility.reduceMotion ? nil : .smooth(duration: 0.2)
+    }
+
+    private static let overlayThreshold: CGFloat = 960
 
     @ViewBuilder
     private var documentContent: some View {

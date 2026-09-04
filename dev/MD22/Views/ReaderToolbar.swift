@@ -7,6 +7,9 @@ struct ReaderToolbar: ToolbarContent {
     @Binding var searchQuery: String
     @Binding var statusBarPresented: Bool
     var isDistractionFree = false
+    var onToggleHistory: () -> Void = {}
+    var onToggleInspector: () -> Void = {}
+    var onToggleStatusBar: () -> Void = {}
     var onToggleDistractionFree: () -> Void = {}
     var searchState = DocumentSearchState()
     var onPreviousSearchResult: () -> Void = {}
@@ -20,7 +23,7 @@ struct ReaderToolbar: ToolbarContent {
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .navigation) {
             Button("Toggle History", systemImage: "sidebar.left") {
-                columnVisibility = columnVisibility == .detailOnly ? .all : .detailOnly
+                onToggleHistory()
             }
             .labelStyle(.iconOnly)
             .help("Show or hide History")
@@ -81,14 +84,14 @@ struct ReaderToolbar: ToolbarContent {
             }
 
             Button("Toggle Inspector", systemImage: "sidebar.right") {
-                inspectorPresented.toggle()
+                onToggleInspector()
             }
             .labelStyle(.iconOnly)
             .help("Show or hide Outline and Bookmarks")
 
             Menu("Reading Layout", systemImage: "rectangle.3.group") {
                 Button(statusBarPresented ? "Hide Status Bar" : "Show Status Bar") {
-                    statusBarPresented.toggle()
+                    onToggleStatusBar()
                 }
                 Divider()
                 Button(isDistractionFree ? "Exit Distraction-Free Reading" : "Distraction-Free Reading") {
