@@ -7,6 +7,7 @@ final class AppEnvironment {
     let platform: any PlatformIntegrating
     let router: DocumentRouter
     let persistence: PersistenceController
+    let history: HistoryRepository
     let accessibility = AccessibilityPreferences()
     let preferences = PreferencesStore()
 
@@ -19,5 +20,6 @@ final class AppEnvironment {
         self.platform = platform
         router = DocumentRouter(platform: platform)
         self.persistence = persistence ?? PersistenceController.openRecovering()
+        history = HistoryRepository(container: self.persistence.container)
     }
 }

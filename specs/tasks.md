@@ -40,7 +40,7 @@ Requirement IDs use these prefixes:
 
 - [x] **T021 — Implement application-scoped local persistence** (`ARCH-11`): Store structured metadata in SwiftData, simple preferences in app defaults, no project sidecars, and resilient file identity through bookmarks and stable identifiers.
 - [x] **T022 — Add versioned persistence migration and recovery** (`ARCH-18`): Define schema versions, tested migrations, pre-migration backups, damaged-store preservation, and safe recovery.
-- [ ] **T023 — Implement persistent history management** (`FR-2`): Maintain unique recency-ordered entries, removal and clearing rules, retained reading data and bookmarks, pins, and unavailable-file states.
+- [x] **T023 — Implement persistent history management** (`FR-2`): Maintain unique recency-ordered entries, removal and clearing rules, retained reading data and bookmarks, pins, and unavailable-file states.
 - [ ] **T024 — Build the scan-first history sidebar** (`UX-5`): Present Pinned and Recent sections, two-line identity, native selection, accessible unavailable states, contextual actions, reordering, and restrained clearing controls.
 - [ ] **T025 — Implement history selection behavior** (`FR-3`): Display selected available files, identify selection clearly, and leave the current document intact when an unavailable entry is chosen.
 - [ ] **T026 — Implement pinned history entries** (`FR-20`): Add direct pinning, pinned-first ordering, manual reordering, persistence, unavailable states, and preservation during history clearing.
