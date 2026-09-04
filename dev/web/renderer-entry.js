@@ -155,6 +155,7 @@ root.querySelectorAll("table, pre.mermaid, .katex-display").forEach((element) =>
 
 const headings = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")];
 headings.forEach((heading) => {
+  heading.dataset.title = heading.textContent;
   const action = document.createElement("a");
   action.className = "bookmark-heading";
   action.href = `md22-action://bookmark?heading=${encodeURIComponent(heading.id)}`;
@@ -245,7 +246,7 @@ const activateSearch = (index) => {
   const mark = marks[state.activeSearchIndex];
   mark.classList.add("active");
   mark.scrollIntoView({ block: "center", behavior: bootstrap.reduceMotion ? "instant" : "smooth" });
-  state.activeSearchSection = headings.filter((heading) => heading.offsetTop <= mark.offsetTop).at(-1)?.textContent || "";
+  state.activeSearchSection = headings.filter((heading) => heading.offsetTop <= mark.offsetTop).at(-1)?.dataset.title || "";
   return state;
 };
 
@@ -254,7 +255,7 @@ window.MD22 = Object.freeze({
   headings: () => headings.map((heading) => ({
     id: heading.id,
     level: Number(heading.tagName.slice(1)),
-    title: heading.textContent
+    title: heading.dataset.title || heading.textContent
   })),
   navigateTo: (id, emphasize = true) => {
     const target = document.getElementById(id);
