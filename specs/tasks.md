@@ -15,7 +15,7 @@ Requirement IDs use these prefixes:
 - [x] **T001 — Create the native macOS application foundation** (`ARCH-1`): Establish MD22 as a native Apple-platform application while keeping platform-independent rendering concepts reusable.
 - [x] **T002 — Adopt the macOS 26 platform generation** (`ARCH-4`): Set macOS 26 as the minimum and use current SwiftUI, Observation, windowing, inspector, command, WebKit, and Liquid Glass capabilities.
 - [x] **T003 — Configure Apple-silicon-only builds** (`ARCH-9`): Build and distribute only the `arm64` architecture.
-- [ ] **T004 — Establish MIT licensing and notices** (`ARCH-6`): Add the MIT license and a policy for preserving compatible third-party attributions across source and distributed artifacts.
+- [x] **T004 — Establish MIT licensing and notices** (`ARCH-6`): Add the MIT license and a policy for preserving compatible third-party attributions across source and distributed artifacts.
 - [ ] **T005 — Integrate the fixed MD22 brand assets** (`UX-21`): Add the supplied icon and logo without redesign, recoloring, or theme-driven reinterpretation.
 - [ ] **T006 — Organize the open-source repository** (`ARCH-2`): Make source, build configuration, rendering assets, dependency versions, and replaceable boundaries suitable for public development.
 - [ ] **T007 — Create modular concurrency-safe boundaries** (`ARCH-12`): Separate file access, rendering, persistence, export, updates, and platform integration behind protocols and actor-isolated services.

@@ -28,6 +28,16 @@ targets:
       - path: MD22
     info:
       path: MD22/Info.plist
+      properties:
+        CFBundleDisplayName: MD22
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        LSArchitecturePriority:
+          - arm64
+        NSHighResolutionCapable: true
+        NSSupportsAutomaticGraphicsSwitching: true
+        NSHumanReadableCopyright: Copyright © 2026 Alexander Ilg. Released under the MIT License.
     entitlements:
       path: MD22/MD22.entitlements
     settings:
