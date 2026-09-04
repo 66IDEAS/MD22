@@ -78,7 +78,7 @@ Requirement IDs use these prefixes:
 - [x] **T046 — Build the quiet Outline and Bookmarks inspector** (`UX-7`): Implement its segmented tabs, restrained outline tracking, compact bookmark rows, scope filter, contextual actions, and accessible unavailable states.
 - [x] **T047 — Implement document bookmarks** (`FR-19`): Support heading, passage, and position bookmarks; current and all-file scopes; retained metadata; target restoration; and removal of invalidated targets without changing source.
 - [x] **T048 — Implement immediate contextual bookmarking** (`UX-11`): Add margin, selection, menu, keyboard, confirmation, and direct-removal interactions without modal naming or forced tab changes.
-- [ ] **T049 — Implement in-document search** (`FR-12`): Search only the displayed document, highlight all matches, report active and total counts, and support previous, next, and standard keyboard interaction.
+- [x] **T049 — Implement in-document search** (`FR-12`): Search only the displayed document, highlight all matches, report active and total counts, and support previous, next, and standard keyboard interaction.
 - [ ] **T050 — Build the compact toolbar search experience** (`UX-10`): Expand search in place, use accessible theme-aware highlights, preserve orientation, show section context and empty results, and restore focus on close.
 - [ ] **T051 — Compute and present reading status** (`FR-14`): Show and update progress, current section, word count, and estimated reading time in the bottom status bar.
 - [ ] **T052 — Build the quiet status-bar hierarchy** (`UX-8`): Add its progress track, information layout, theme and reading controls, temporary messages, responsive collapse, and keyboard access.
@@ -141,3 +141,5 @@ Requirement IDs use these prefixes:
 - [x] **E017 — Preserve fragments on project-relative links**: Resolve local paths independently from percent-encoded heading fragments so cross-document anchor navigation retains its target.
 - [x] **E018 — Isolate defaults in concurrent session tests**: Inject per-test defaults suites so parallel document sessions cannot race over the application-level restoration key.
 - [x] **E019 — Align duplicate heading anchors across native and web renderers**: Use the same zero-based duplicate suffix progression so outline, links, bookmarks, reading state, and rendered headings share stable identifiers.
+- [x] **E020 — Decode JavaScript numbers and preserve heading labels**: Bridge numeric search state through `NSNumber` and exclude contextual bookmark glyphs from semantic outline and search-section titles.
+- [x] **E021 — Address WebPage arguments by their declared names**: Use the macOS 26 JavaScript bridge's named parameters directly so theme, reading, navigation, restoration, and search commands execute correctly.

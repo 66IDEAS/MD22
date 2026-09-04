@@ -39,6 +39,13 @@ struct RendererViewState: Sendable, Equatable {
     let selectedText: String
 }
 
+struct DocumentSearchState: Sendable, Equatable {
+    var query = ""
+    var activeIndex = -1
+    var matchCount = 0
+    var section = ""
+}
+
 enum BookmarkKind: String, Sendable, Codable, CaseIterable {
     case heading
     case passage

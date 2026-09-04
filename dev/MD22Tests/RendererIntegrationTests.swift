@@ -101,4 +101,24 @@ struct RendererIntegrationTests {
         #expect(!html.contains("<script"))
         #expect(html.contains("wide-lane"))
     }
+
+    @Test("Document search highlights every match and navigates results")
+    func search() async throws {
+        let snapshot = DocumentSnapshot(
+            url: URL(fileURLWithPath: "/tmp/Search.md"),
+            markdown: "# First\nNeedle here.\n\n## Second\nAnother needle.",
+            modificationDate: nil,
+            fileIdentifier: nil
+        )
+        let renderer = WebDocumentRenderer()
+        try await renderer.render(snapshot: snapshot, themeID: "light")
+        let initial = await renderer.search("needle")
+        #expect(initial.matchCount == 2)
+        #expect(initial.activeIndex == 0)
+        let next = await renderer.nextSearchResult(query: "needle")
+        #expect(next.activeIndex == 1)
+        let previous = await renderer.previousSearchResult(query: "needle")
+        #expect(previous.activeIndex == 0)
+        await renderer.clearSearch()
+    }
 }

@@ -63,7 +63,7 @@ final class WebDocumentRenderer: DocumentRendering {
 
     func navigate(to headingID: String) async {
         _ = try? await page.callJavaScript(
-            "window.MD22?.navigateTo(arguments.id)",
+            "window.MD22?.navigateTo(id)",
             arguments: ["id": headingID],
             contentWorld: .page
         )
@@ -73,7 +73,7 @@ final class WebDocumentRenderer: DocumentRendering {
         guard let data = try? JSONEncoder().encode(location),
               let json = String(data: data, encoding: .utf8) else { return }
         _ = try? await page.callJavaScript(
-            "window.MD22?.restore(JSON.parse(arguments.location))",
+            "window.MD22?.restore(JSON.parse(location))",
             arguments: ["location": json],
             contentWorld: .page
         )
@@ -110,7 +110,7 @@ final class WebDocumentRenderer: DocumentRendering {
                 progress: state["progress"] as? Double ?? 0,
                 verticalOffset: state["verticalOffset"] as? Double ?? 0
             ),
-            wordCount: state["wordCount"] as? Int ?? 0,
+            wordCount: (state["wordCount"] as? NSNumber)?.intValue ?? 0,
             linkDestination: state["linkDestination"] as? String,
             selectedText: state["selectedText"] as? String ?? ""
         )
@@ -118,7 +118,7 @@ final class WebDocumentRenderer: DocumentRendering {
 
     func applyTheme(_ themeID: String) async {
         _ = try? await page.callJavaScript(
-            "document.documentElement.dataset.theme = arguments.themeID",
+            "document.documentElement.dataset.theme = themeID",
             arguments: ["themeID": themeID],
             contentWorld: .page
         )
@@ -129,11 +129,11 @@ final class WebDocumentRenderer: DocumentRendering {
         _ = try? await page.callJavaScript(
             """
             const root = document.documentElement;
-            root.style.setProperty('--font-scale', String(arguments.fontScale));
-            root.style.setProperty('--line-height', String(arguments.lineSpacing));
-            root.style.setProperty('--content-width', `${arguments.contentWidth}px`);
-            root.dataset.reduceMotion = arguments.reduceMotion ? 'true' : 'false';
-            root.dataset.highContrast = arguments.highContrast ? 'true' : 'false';
+            root.style.setProperty('--font-scale', String(fontScale));
+            root.style.setProperty('--line-height', String(lineSpacing));
+            root.style.setProperty('--content-width', `${contentWidth}px`);
+            root.dataset.reduceMotion = reduceMotion ? 'true' : 'false';
+            root.dataset.highContrast = highContrast ? 'true' : 'false';
             """,
             arguments: [
                 "fontScale": normalized.fontScale,
@@ -143,6 +143,39 @@ final class WebDocumentRenderer: DocumentRendering {
                 "highContrast": normalized.highContrast || systemHighContrast
             ],
             contentWorld: .page
+        )
+    }
+
+    func search(_ query: String) async -> DocumentSearchState {
+        let result = try? await page.callJavaScript(
+            "return window.MD22?.search(query)",
+            arguments: ["query": query],
+            contentWorld: .page
+        )
+        return Self.searchState(from: result, query: query)
+    }
+
+    func nextSearchResult(query: String) async -> DocumentSearchState {
+        let result = try? await page.callJavaScript("return window.MD22?.nextSearch()", contentWorld: .page)
+        return Self.searchState(from: result, query: query)
+    }
+
+    func previousSearchResult(query: String) async -> DocumentSearchState {
+        let result = try? await page.callJavaScript("return window.MD22?.previousSearch()", contentWorld: .page)
+        return Self.searchState(from: result, query: query)
+    }
+
+    func clearSearch() async {
+        _ = try? await page.callJavaScript("window.MD22?.clearSearch()", contentWorld: .page)
+    }
+
+    private static func searchState(from result: Any?, query: String) -> DocumentSearchState {
+        guard let state = result as? [String: Any] else { return DocumentSearchState(query: query) }
+        return DocumentSearchState(
+            query: query,
+            activeIndex: (state["activeSearchIndex"] as? NSNumber)?.intValue ?? -1,
+            matchCount: (state["searchCount"] as? NSNumber)?.intValue ?? 0,
+            section: state["activeSearchSection"] as? String ?? ""
         )
     }
 }
