@@ -1,0 +1,57 @@
+@import "katex/dist/katex.min.css";
+@import "highlight.js/styles/github.css";
+
+:root {
+  color-scheme: light dark;
+  --font-scale: 1;
+  --line-height: 1.68;
+  --content-width: 760px;
+  --page: #f7f3e9;
+  --ink: #25231f;
+  --muted: #69645b;
+  --accent: #28658c;
+  --line: color-mix(in srgb, var(--ink) 18%, transparent);
+  --code: color-mix(in srgb, var(--page) 78%, var(--ink));
+  font: calc(17px * var(--font-scale))/var(--line-height) ui-serif, Georgia, serif;
+  background: var(--page);
+  color: var(--ink);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--page); }
+body { overflow-wrap: break-word; }
+#document-root { width: min(var(--content-width), calc(100% - 72px)); margin: 0 auto; padding: 64px 0 38vh; }
+h1, h2, h3, h4, h5, h6 { font-family: ui-sans-serif, -apple-system, sans-serif; line-height: 1.2; scroll-margin-top: 52px; text-wrap: balance; }
+h1 { font-size: 2.35em; margin: 0 0 1em; }
+h2 { font-size: 1.65em; margin-top: 2.25em; border-bottom: 1px solid var(--line); padding-bottom: .3em; }
+h3 { font-size: 1.28em; margin-top: 1.8em; }
+p, ul, ol, blockquote, table, pre, .katex-display, .callout { margin-block: 1.15em; }
+a { color: var(--accent); text-decoration-thickness: .08em; text-underline-offset: .18em; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+a.external-link::after { content: " ↗"; font: .75em ui-sans-serif, sans-serif; }
+img, svg { display: block; max-width: 100%; height: auto; margin: 1.6em auto; }
+blockquote { border-inline-start: 3px solid var(--accent); color: var(--muted); margin-inline: 0; padding-inline: 1.2em; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 3em 0; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; }
+:not(pre) > code { background: var(--code); border-radius: .3em; padding: .12em .35em; }
+.code-block { position: relative; background: var(--code); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; padding: 2.5em 1.1em 1em; }
+.code-block code { display: block; min-width: max-content; background: transparent; }
+.code-language { position: absolute; inset: .65em auto auto 1.1em; color: var(--muted); font: 600 .7em ui-sans-serif, sans-serif; text-transform: uppercase; }
+.copy-code { position: absolute; inset: .45em .55em auto auto; opacity: 0; transition: opacity .15s; }
+.code-block:hover .copy-code, .copy-code:focus-visible { opacity: 1; }
+.table-wrap, table { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .93em; }
+th, td { border-bottom: 1px solid var(--line); padding: .6em .75em; text-align: start; }
+th { font-family: ui-sans-serif, sans-serif; background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.task-list-item { list-style: none; }
+.task-list-item input { appearance: none; width: 1em; height: 1em; border: 1.5px solid var(--muted); border-radius: 3px; margin-inline: -1.4em .45em; vertical-align: -.1em; }
+.task-list-item input:checked { background: var(--accent); box-shadow: inset 0 0 0 3px var(--page); }
+.callout { border: 1px solid var(--accent); border-inline-start-width: 4px; border-radius: 8px; padding: .85em 1em; background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.callout-title { font: 700 .86em ui-sans-serif, sans-serif; text-transform: uppercase; letter-spacing: .04em; }
+.missing-resource, .rich-error { display: block; padding: 1em; border: 1px dashed var(--muted); color: var(--muted); border-radius: 8px; font: .86em ui-sans-serif, sans-serif; }
+mark.search-match { background: #ffe26a; color: #111; border-radius: 2px; }
+mark.search-match.active { background: #ff9f0a; outline: 2px solid currentColor; outline-offset: 1px; }
+.arrival-target { animation: arrival 1.5s ease-out; }
+@keyframes arrival { from { background: color-mix(in srgb, var(--accent) 30%, transparent); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; } }
+@media print { #document-root { width: auto; padding: 0; } .copy-code { display: none; } }

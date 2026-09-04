@@ -55,7 +55,7 @@ Requirement IDs use these prefixes:
 
 ### Secure Markdown Rendering
 
-- [ ] **T032 — Build the local rich-rendering stack** (`ARCH-7`): Bundle pinned markdown-it, KaTeX, Mermaid, Highlight.js, and DOMPurify assets in WebKit with CSP, sanitization, navigation policy, and a narrow native bridge.
+- [x] **T032 — Build the local rich-rendering stack** (`ARCH-7`): Bundle pinned markdown-it, KaTeX, Mermaid, Highlight.js, and DOMPurify assets in WebKit with CSP, sanitization, navigation policy, and a narrow native bridge.
 - [ ] **T033 — Enforce the local-first privacy boundary** (`ARCH-10`): Keep content processing local, exclude accounts and telemetry, restrict networking, block remote active content, and open external links outside MD22.
 - [ ] **T034 — Build one canonical rendering and export pipeline** (`ARCH-13`): Share parser configuration, semantic HTML, extensions, anchors, theme tokens, and assets across reading, HTML, and PDF output.
 - [ ] **T035 — Render the complete rich Markdown set** (`FR-11`): Support highlighted code and copy, tables, read-only tasks, footnotes, math, Mermaid, callouts, and sanitized embedded HTML with graceful partial failure.
@@ -132,3 +132,8 @@ Requirement IDs use these prefixes:
 - [x] **E008 — Separate throwing migration setup from test unwrapping**: Evaluate the throwing backup operation before `#require` so Swift Testing can unwrap the optional result without masking error handling.
 - [x] **E009 — Make file-type validation actor independent**: Mark the pure Markdown URL validator nonisolated so drag decoding can reuse it without losing MainActor isolation.
 - [x] **E010 — Use concrete colors for conditional history styling**: Resolve SwiftUI shape-style inference explicitly when switching unavailable history labels between secondary and error colors.
+- [x] **E011 — Handle dependency packages without license files**: Preserve the declared package-license metadata when an upstream renderer package omits a standalone license file from its distribution.
+- [x] **E012 — Construct a mutable WebPage configuration**: Use value semantics correctly while configuring the private WebKit data store and subresource policy.
+- [x] **E013 — Await WebPage navigation before renderer readiness**: Consume the structured navigation event sequence before probing the page bridge, allowing large bundled renderer assets to finish initial execution.
+- [x] **E014 — Surface renderer startup diagnostics in tests**: Capture local JavaScript startup failures without exposing document content so WebKit integration failures can be diagnosed deterministically.
+- [x] **E015 — Return values from WebPage JavaScript calls**: Use explicit JavaScript returns because the macOS 26 bridge executes supplied source as an asynchronous function body rather than an expression evaluator.
