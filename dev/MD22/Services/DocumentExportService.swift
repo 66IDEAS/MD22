@@ -17,6 +17,17 @@ final class DocumentExportService {
         guard let data = html.data(using: .utf8) else { throw MD22Error.exportFailed }
         return try await writer.write(data, beside: snapshot.url, pathExtension: "html")
     }
+
+    func exportPDF(snapshot: DocumentSnapshot, themeID: String) async throws -> URL {
+        let exportRenderer = WebDocumentRenderer()
+        try await exportRenderer.render(snapshot: snapshot, themeID: themeID)
+        try await exportRenderer.prepareForExport(themeID: themeID)
+        let data = try await exportRenderer.page.exported(
+            as: .pdf(region: .contents, allowTransparentBackground: false)
+        )
+        guard data.starts(with: Data("%PDF".utf8)) else { throw MD22Error.exportFailed }
+        return try await writer.write(data, beside: snapshot.url, pathExtension: "pdf")
+    }
 }
 
 actor ExportFileWriter {

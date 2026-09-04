@@ -109,6 +109,7 @@ final class WebDocumentRenderer: DocumentRendering {
     }
 
     func exportHTML(themeID: String) async throws -> String {
+        try await prepareForExport(themeID: themeID)
         guard let html = try await page.callJavaScript(
             "return window.MD22?.exportHTML(themeID)",
             arguments: ["themeID": themeID],
@@ -117,6 +118,16 @@ final class WebDocumentRenderer: DocumentRendering {
             throw MD22Error.exportFailed
         }
         return html
+    }
+
+    func prepareForExport(themeID: String) async throws {
+        guard let prepared = try await page.callJavaScript(
+            "return await window.MD22?.prepareExport(themeID)",
+            arguments: ["themeID": themeID],
+            contentWorld: .page
+        ) as? Bool, prepared else {
+            throw MD22Error.exportFailed
+        }
     }
 
     func viewState() async -> RendererViewState? {

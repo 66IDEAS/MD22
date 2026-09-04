@@ -287,10 +287,29 @@ window.MD22 = Object.freeze({
   clearSearch,
   nextSearch: () => activateSearch(state.activeSearchIndex + 1),
   previousSearch: () => activateSearch(state.activeSearchIndex - 1),
+  prepareExport: async (themeID) => {
+    clearSearch();
+    document.documentElement.dataset.theme = themeID || "light";
+    document.documentElement.dataset.reduceMotion = "true";
+    document.documentElement.dataset.exporting = "true";
+    await document.fonts?.ready;
+    const pendingImages = [...document.images]
+      .filter((image) => !image.complete)
+      .map((image) => new Promise((resolve) => {
+        image.addEventListener("load", resolve, { once: true });
+        image.addEventListener("error", resolve, { once: true });
+      }));
+    await Promise.race([
+      Promise.all(pendingImages),
+      new Promise((resolve) => setTimeout(resolve, 3000))
+    ]);
+    return true;
+  },
   exportHTML: (themeID) => {
     const clone = document.documentElement.cloneNode(true);
     clone.dataset.theme = themeID || "light";
     clone.dataset.reduceMotion = "true";
+    clone.dataset.exporting = "true";
     delete clone.dataset.ready;
     clone.querySelectorAll("script, .bookmark-heading, .copy-code").forEach((element) => element.remove());
     clone.querySelectorAll("mark.search-match").forEach((mark) => {

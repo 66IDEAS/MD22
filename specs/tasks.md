@@ -94,7 +94,7 @@ Requirement IDs use these prefixes:
 ### Export
 
 - [x] **T058 — Export the displayed document to HTML** (`FR-5`): Save beside the source using safe numbered filenames, preserve document structure without reader navigation UI, and report the resulting file or failure.
-- [ ] **T059 — Export the displayed document to PDF** (`FR-6`): Produce polished adjacent PDFs with safe numbered filenames, no reader navigation artifacts, and clear success or failure feedback.
+- [x] **T059 — Export the displayed document to PDF** (`FR-6`): Produce polished adjacent PDFs with safe numbered filenames, no reader navigation artifacts, and clear success or failure feedback.
 - [ ] **T060 — Implement independent remembered export styling** (`FR-21`): Select format and export theme independently, default to Light, remember one theme across formats, preserve publication consistency, and make motion static.
 - [ ] **T061 — Build the one-step export interaction** (`UX-12`): Implement the split button, remembered primary action, immediate alternatives, nonblocking progress, success and Finder reveal, silent numbering, and anchored retry feedback.
 
