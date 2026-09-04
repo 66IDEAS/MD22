@@ -7,6 +7,9 @@ struct DocumentWindowView: View {
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var inspectorPresented = true
     @State private var searchPresented = false
+    @State private var searchQuery = ""
+    @State private var searchState = DocumentSearchState()
+    @State private var searchTask: Task<Void, Never>?
     @State private var isDropTargeted = false
     @State private var historySelection: String?
     @State private var didAttemptRestoration = false
@@ -47,6 +50,11 @@ struct DocumentWindowView: View {
                 columnVisibility: $columnVisibility,
                 inspectorPresented: $inspectorPresented,
                 searchPresented: $searchPresented,
+                searchQuery: $searchQuery,
+                searchState: searchState,
+                onPreviousSearchResult: previousSearchResult,
+                onNextSearchResult: nextSearchResult,
+                onCloseSearch: closeSearch,
                 documentTitle: session.title,
                 canNavigateBack: session.canNavigateBack,
                 canNavigateForward: session.canNavigateForward,
@@ -107,6 +115,21 @@ struct DocumentWindowView: View {
             } catch {
                 session.showTransientMessage(error.localizedDescription)
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .md22ToggleSearch)) { _ in
+            searchPresented = true
+        }
+        .onChange(of: searchQuery) { _, query in
+            searchTask?.cancel()
+            searchTask = Task {
+                try? await Task.sleep(for: .milliseconds(120))
+                guard !Task.isCancelled else { return }
+                searchState = await renderer.search(query)
+            }
+        }
+        .onChange(of: session.snapshot?.url) { _, _ in
+            searchQuery = ""
+            searchState = DocumentSearchState()
         }
         .onDisappear { session.cancel() }
         .dropDestination(for: URL.self) { urls, _ in
@@ -185,6 +208,25 @@ struct DocumentWindowView: View {
             )
         } catch {
             session.showTransientMessage(error.localizedDescription)
+        }
+    }
+
+    private func previousSearchResult() {
+        Task { searchState = await renderer.previousSearchResult(query: searchQuery) }
+    }
+
+    private func nextSearchResult() {
+        Task { searchState = await renderer.nextSearchResult(query: searchQuery) }
+    }
+
+    private func closeSearch() {
+        searchTask?.cancel()
+        searchPresented = false
+        searchQuery = ""
+        searchState = DocumentSearchState()
+        Task {
+            await renderer.clearSearch()
+            await renderer.focusDocument()
         }
     }
 

@@ -4,6 +4,11 @@ struct ReaderToolbar: ToolbarContent {
     @Binding var columnVisibility: NavigationSplitViewVisibility
     @Binding var inspectorPresented: Bool
     @Binding var searchPresented: Bool
+    @Binding var searchQuery: String
+    var searchState = DocumentSearchState()
+    var onPreviousSearchResult: () -> Void = {}
+    var onNextSearchResult: () -> Void = {}
+    var onCloseSearch: () -> Void = {}
     var documentTitle: String?
     var canNavigateBack = false
     var canNavigateForward = false
@@ -55,13 +60,22 @@ struct ReaderToolbar: ToolbarContent {
         }
 
         ToolbarItemGroup(placement: .primaryAction) {
-            Button("Search", systemImage: "magnifyingglass") {
-                searchPresented.toggle()
-                NotificationCenter.default.post(name: .md22ToggleSearch, object: nil)
+            if searchPresented {
+                SearchToolbarView(
+                    query: $searchQuery,
+                    state: searchState,
+                    onPrevious: onPreviousSearchResult,
+                    onNext: onNextSearchResult,
+                    onClose: onCloseSearch
+                )
+            } else {
+                Button("Search", systemImage: "magnifyingglass") {
+                    searchPresented = true
+                }
+                .labelStyle(.iconOnly)
+                .keyboardShortcut("f", modifiers: .command)
+                .help("Find in Document")
             }
-            .labelStyle(.iconOnly)
-            .keyboardShortcut("f", modifiers: .command)
-            .help("Find in Document")
 
             Button("Toggle Inspector", systemImage: "sidebar.right") {
                 inspectorPresented.toggle()
@@ -71,4 +85,3 @@ struct ReaderToolbar: ToolbarContent {
         }
     }
 }
-

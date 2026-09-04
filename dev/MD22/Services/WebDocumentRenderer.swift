@@ -169,6 +169,13 @@ final class WebDocumentRenderer: DocumentRendering {
         _ = try? await page.callJavaScript("window.MD22?.clearSearch()", contentWorld: .page)
     }
 
+    func focusDocument() async {
+        _ = try? await page.callJavaScript(
+            "const root=document.querySelector('#document-root'); root.tabIndex=-1; root.focus({preventScroll:true})",
+            contentWorld: .page
+        )
+    }
+
     private static func searchState(from result: Any?, query: String) -> DocumentSearchState {
         guard let state = result as? [String: Any] else { return DocumentSearchState(query: query) }
         return DocumentSearchState(
