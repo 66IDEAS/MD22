@@ -100,7 +100,7 @@ Requirement IDs use these prefixes:
 
 ### Settings, Updates, and Support
 
-- [ ] **T062 — Integrate secure Sparkle updates** (`ARCH-8`): Add stable Sparkle 2 through SwiftPM with an HTTPS appcast, signed and notarized updates, automatic checks, and a manual check command.
+- [x] **T062 — Integrate secure Sparkle updates** (`ARCH-8`): Add stable Sparkle 2 through SwiftPM with an HTTPS appcast, signed and notarized updates, automatic checks, and a manual check command.
 - [ ] **T063 — Build minimal Settings and About windows** (`UX-20`): Present General appearance and update controls, inline status, standard application information, the GitHub link, license, and third-party acknowledgements without duplicating reading controls.
 - [ ] **T064 — Add privacy-safe local diagnostics** (`ARCH-24`): Use categorized Unified Logging, redact user-derived values, avoid automatic transmission, and create explicit, inspectable diagnostic packages.
 

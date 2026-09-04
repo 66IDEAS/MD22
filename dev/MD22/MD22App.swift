@@ -12,6 +12,7 @@ struct MD22App: App {
         .defaultSize(width: 1_240, height: 800)
         .commands {
             DocumentCommands()
+            UpdateCommands(updateService: environment.updateService)
         }
     }
 }

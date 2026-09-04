@@ -33,6 +33,6 @@ protocol PlatformIntegrating: AnyObject {
 @MainActor
 protocol UpdateChecking: AnyObject {
     var canCheckForUpdates: Bool { get }
+    var automaticallyChecksForUpdates: Bool { get set }
     func checkForUpdates()
 }
-

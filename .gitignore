@@ -3,6 +3,7 @@ dev/.build/
 dev/node_modules/
 dev/DerivedData/
 dev/build/
+dev/.secrets/
 dev/MD22.xcodeproj/
 dev/MD22.xcworkspace/
 dev/Resources/Renderer/generated/

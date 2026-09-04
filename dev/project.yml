@@ -4,6 +4,10 @@ options:
   deploymentTarget:
     macOS: "26.0"
   createIntermediateGroups: true
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.4
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -40,6 +44,13 @@ targets:
         NSHighResolutionCapable: true
         NSSupportsAutomaticGraphicsSwitching: true
         NSHumanReadableCopyright: Copyright © 2026 Alexander Ilg. Released under the MIT License.
+        SUFeedURL: https://github.com/alexanderilg/MD22/releases/latest/download/appcast.xml
+        SUPublicEDKey: 1QOZ3YyOnlurRuF++s3TVDzHf80ghJUcRMHRAto1dV8=
+        SUEnableAutomaticChecks: true
+        SUAutomaticallyUpdate: false
+        SUScheduledCheckInterval: 86400
+        SUVerifyUpdateBeforeExtraction: true
+        SURequireSignedFeed: true
         CFBundleDocumentTypes:
           - CFBundleTypeName: Markdown Document
             CFBundleTypeRole: Viewer
@@ -54,6 +65,8 @@ targets:
               - mkdn
     entitlements:
       path: MD22/MD22.entitlements
+    dependencies:
+      - package: Sparkle
     settings:
       base:
         PRODUCT_NAME: MD22

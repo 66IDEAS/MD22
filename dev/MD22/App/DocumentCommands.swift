@@ -82,3 +82,16 @@ struct DocumentCommands: Commands {
         }
     }
 }
+
+struct UpdateCommands: Commands {
+    let updateService: UpdateService
+
+    var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") {
+                updateService.checkForUpdates()
+            }
+            .disabled(!updateService.canCheckForUpdates)
+        }
+    }
+}

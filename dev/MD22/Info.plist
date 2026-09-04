@@ -55,5 +55,19 @@
 	<string>Copyright © 2026 Alexander Ilg. Released under the MIT License.</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
+	<key>SUAutomaticallyUpdate</key>
+	<false/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/alexanderilg/MD22/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>1QOZ3YyOnlurRuF++s3TVDzHf80ghJUcRMHRAto1dV8=</string>
+	<key>SURequireSignedFeed</key>
+	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
 </dict>
 </plist>
