@@ -40,6 +40,7 @@ struct HistorySidebarView: View {
         .listStyle(.sidebar)
         .navigationSplitViewColumnWidth(min: 190, ideal: 238, max: 310)
         .accessibilityLabel("Document history")
+        .accessibilityIdentifier("history.sidebar")
         .safeAreaInset(edge: .bottom) {
             historyFooter
         }

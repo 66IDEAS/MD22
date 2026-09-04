@@ -31,6 +31,7 @@ struct DocumentInspectorView: View {
         }
         .inspectorColumnWidth(min: 200, ideal: 246, max: 320)
         .accessibilityLabel("Document inspector")
+        .accessibilityIdentifier("document.inspector")
         .alert("Bookmarks Could Not Be Updated", isPresented: errorPresented) {
             Button("OK", role: .cancel) { operationError = nil }
         } message: {

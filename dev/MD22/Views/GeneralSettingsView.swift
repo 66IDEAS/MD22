@@ -21,6 +21,7 @@ struct GeneralSettingsView: View {
 
             Section("Updates") {
                 Toggle("Automatically check for updates", isOn: automaticUpdatesBinding)
+                    .accessibilityIdentifier("settings.automaticUpdates")
 
                 HStack {
                     updateStatus

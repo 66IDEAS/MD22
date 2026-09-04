@@ -15,6 +15,9 @@ settings:
     ARCHS: arm64
     ONLY_ACTIVE_ARCH: false
     CODE_SIGN_STYLE: Automatic
+    LD_RUNPATH_SEARCH_PATHS:
+      - $(inherited)
+      - '@executable_path/../Frameworks'
     ENABLE_HARDENED_RUNTIME: true
     ENABLE_APP_SANDBOX: false
     GENERATE_INFOPLIST_FILE: false
@@ -75,6 +78,7 @@ targets:
       configs:
         Debug:
           SWIFT_OPTIMIZATION_LEVEL: -Onone
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
           ENABLE_TESTABILITY: true
           DEAD_CODE_STRIPPING: false
     scheme:

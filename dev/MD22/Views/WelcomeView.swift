@@ -27,6 +27,7 @@ struct WelcomeView: View {
         .animation(environment.accessibility.reduceMotion ? nil : .snappy, value: isDropTargeted)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("MD22 welcome")
+        .accessibilityIdentifier("welcome.view")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.background.secondary)
     }

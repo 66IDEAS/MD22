@@ -25,6 +25,7 @@ struct ExportToolbarControl: View {
                 }
             }
             .keyboardShortcut("e", modifiers: [.command, .shift])
+            .accessibilityIdentifier("export.primary")
 
             Menu {
                 Text("Current: \(format.title) · \(theme.title)")

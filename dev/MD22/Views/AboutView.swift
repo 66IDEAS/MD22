@@ -23,6 +23,7 @@ struct AboutView: View {
                 Text(versionDescription)
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("about.version")
                 Text("A focused, read-only Markdown reader for macOS.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -61,6 +62,7 @@ struct AboutView: View {
             Link(destination: URL(string: "https://github.com/alexanderilg/MD22")!) {
                 Label("MD22 on GitHub", systemImage: "link")
             }
+            .accessibilityIdentifier("about.github")
             Text("Copyright © 2026 Alexander Ilg")
                 .font(.caption)
                 .foregroundStyle(.secondary)

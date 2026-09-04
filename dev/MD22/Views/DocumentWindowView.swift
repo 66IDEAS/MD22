@@ -137,6 +137,15 @@ struct DocumentWindowView: View {
         .task(id: initialRequest?.id) {
             guard !didAttemptRestoration else { return }
             didAttemptRestoration = true
+#if DEBUG
+            if let uiTestDocumentURL = Self.uiTestDocumentURL {
+                openCurrent(uiTestDocumentURL, source: .openPanel)
+                return
+            }
+            if ProcessInfo.processInfo.arguments.contains("--md22-ui-test-fresh") {
+                return
+            }
+#endif
             if let initialRequest {
                 openRequest(initialRequest)
                 return
@@ -160,6 +169,15 @@ struct DocumentWindowView: View {
             }
         }
     }
+
+#if DEBUG
+    private static var uiTestDocumentURL: URL? {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let flag = arguments.firstIndex(of: "--md22-ui-test-document"),
+              arguments.indices.contains(flag + 1) else { return nil }
+        return URL(fileURLWithPath: arguments[flag + 1])
+    }
+#endif
 
     private var commandHandlingView: some View {
         documentRoutingView

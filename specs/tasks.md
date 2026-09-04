@@ -107,7 +107,7 @@ Requirement IDs use these prefixes:
 ### Quality, Performance, and Delivery
 
 - [x] **T065 — Establish responsiveness and cancellation budgets** (`ARCH-23`): Add small, 1 MB, 10 MB, and rich-content performance fixtures; measure critical flows; cancel obsolete work; and prevent main-actor blocking.
-- [ ] **T066 — Build the layered automated test suite** (`ARCH-16`): Cover units, integrations, UI flows, fixtures, conformance, semantic output, theme and export regression, migrations, lifecycle, multiwindow, accessibility, and performance.
+- [x] **T066 — Build the layered automated test suite** (`ARCH-16`): Cover units, integrations, UI flows, fixtures, conformance, semantic output, theme and export regression, migrations, lifecycle, multiwindow, accessibility, and performance.
 - [ ] **T067 — Configure direct signed and notarized distribution** (`ARCH-5`): Enable Developer ID signing and Hardened Runtime, omit App Sandbox, notarize releases, and verify expected adjacent-file access.
 - [ ] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
 
@@ -152,3 +152,12 @@ Requirement IDs use these prefixes:
 - [x] **E028 — Preserve asynchronous read return semantics after logging**: Return the detached coordinated-read result explicitly after adding a preceding Unified Logging statement.
 - [x] **E029 — Decode diagnostic timestamps consistently**: Configure the package test decoder for the ISO 8601 date representation emitted by the diagnostic manifest.
 - [x] **E030 — Keep diagnostic package creation responsive**: Mirror bounded privacy-safe event codes alongside categorized Unified Logging instead of synchronously enumerating the process log store.
+- [x] **E031 — Import Foundation for bundle conformance checks**: Add the explicit module import required by Swift 6 when the foundation test inspects application metadata and bundled legal resources.
+- [x] **E032 — Distinguish inert unsafe-link text from executable links**: Assert that sanitization removes a `javascript:` href while allowing the rejected Markdown syntax to remain visible as harmless readable text.
+- [x] **E033 — Provide a default typed window value**: Supply an explicit welcome request for the value-based `WindowGroup` so a full reader window opens on ordinary application launch.
+- [x] **E034 — Handle nonoptional value-window bindings**: Adapt the default-value `WindowGroup` content closure to its concrete bound request while translating the welcome sentinel into no initial document.
+- [x] **E035 — Restore explicit request construction**: Add the private complete initializer needed for synthetic welcome requests after the route initializer suppressed Swift's memberwise initializer.
+- [x] **E036 — Align UI-test identities without a development certificate**: Ad-hoc sign the disposable target application and complete macOS UI-test runner after an unsigned build so Launch Services and XCTest can load them on credential-free CLI and CI hosts.
+- [x] **E037 — Separate default and routed window scenes**: Use an ordinary `WindowGroup` with explicit presented launch behavior for the welcome and New Window experience while retaining a value-based group for targeted history and bookmark windows.
+- [x] **E038 — Restore embedded-framework runtime lookup**: Preserve the inherited macOS framework runpath in generated target settings so the bundled Sparkle framework loads in standalone and UI-test launches.
+- [x] **E039 — Restore the generated Debug compilation condition**: Declare the standard `DEBUG` Swift condition explicitly so test-only launch fixtures remain excluded from releases and available to the UI suite.

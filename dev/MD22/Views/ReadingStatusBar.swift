@@ -83,6 +83,7 @@ struct ReadingStatusBar: View {
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Reading status, \(session.progressPercentage) percent")
         .accessibilityValue(accessibilitySummary)
+        .accessibilityIdentifier("reading.status")
     }
 
     @ViewBuilder

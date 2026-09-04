@@ -18,6 +18,7 @@ struct ReadOnlyDocumentView: View {
                 .webViewContentBackground(.hidden)
                 .opacity(renderer.isReady ? 1 : 0)
                 .accessibilityLabel("Rendered Markdown document")
+                .accessibilityIdentifier("document.reader")
 
             if let error = renderer.renderError {
                 ContentUnavailableView(
