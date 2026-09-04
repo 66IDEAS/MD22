@@ -1,0 +1,77 @@
+import Foundation
+import Observation
+
+@MainActor
+@Observable
+final class DocumentSession {
+    private let fileAccess: any FileAccessing
+    private let history: HistoryRepository
+    private var loadTask: Task<Void, Never>?
+    private var generation = 0
+
+    private(set) var snapshot: DocumentSnapshot?
+    private(set) var analysis: DocumentAnalysis?
+    private(set) var isLoading = false
+    private(set) var errorMessage: String?
+    private(set) var navigationBackStack: [URL] = []
+    private(set) var navigationForwardStack: [URL] = []
+
+    init(environment: AppEnvironment) {
+        fileAccess = environment.fileAccess
+        history = environment.history
+    }
+
+    var title: String? { snapshot?.url.lastPathComponent }
+    var canNavigateBack: Bool { !navigationBackStack.isEmpty }
+    var canNavigateForward: Bool { !navigationForwardStack.isEmpty }
+
+    func open(_ url: URL, recordsNavigation: Bool = true) {
+        loadTask?.cancel()
+        generation += 1
+        let requestedGeneration = generation
+        let previousURL = snapshot?.url
+        errorMessage = nil
+        isLoading = true
+
+        loadTask = Task { [weak self, fileAccess] in
+            do {
+                let loaded = try await fileAccess.read(url)
+                try Task.checkCancellation()
+                guard let self, requestedGeneration == self.generation else { return }
+                if recordsNavigation, let previousURL, previousURL != loaded.url {
+                    self.navigationBackStack.append(previousURL)
+                    self.navigationForwardStack.removeAll()
+                }
+                self.snapshot = loaded
+                self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
+                _ = try self.history.recordOpen(loaded)
+                self.isLoading = false
+            } catch is CancellationError {
+                return
+            } catch {
+                guard let self, requestedGeneration == self.generation else { return }
+                self.isLoading = false
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    func navigateBack() {
+        guard let destination = navigationBackStack.popLast() else { return }
+        if let current = snapshot?.url { navigationForwardStack.append(current) }
+        open(destination, recordsNavigation: false)
+    }
+
+    func navigateForward() {
+        guard let destination = navigationForwardStack.popLast() else { return }
+        if let current = snapshot?.url { navigationBackStack.append(current) }
+        open(destination, recordsNavigation: false)
+    }
+
+    func cancel() {
+        generation += 1
+        loadTask?.cancel()
+        loadTask = nil
+    }
+}
+
