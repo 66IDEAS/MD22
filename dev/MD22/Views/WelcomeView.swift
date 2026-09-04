@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    var isDropTargeted = false
+
     var body: some View {
         VStack(spacing: 14) {
             BrandLogo()
@@ -15,10 +17,11 @@ struct WelcomeView: View {
                 .foregroundStyle(.tertiary)
         }
         .liquidGlassCard()
+        .scaleEffect(isDropTargeted ? 1.025 : 1)
+        .animation(.snappy, value: isDropTargeted)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("MD22 welcome")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.background.secondary)
     }
 }
-

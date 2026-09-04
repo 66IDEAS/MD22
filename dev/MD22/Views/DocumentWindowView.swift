@@ -6,6 +6,7 @@ struct DocumentWindowView: View {
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var inspectorPresented = true
     @State private var searchPresented = false
+    @State private var isDropTargeted = false
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -57,6 +58,32 @@ struct DocumentWindowView: View {
             session.navigateForward()
         }
         .onDisappear { session.cancel() }
+        .dropDestination(for: URL.self) { urls, _ in
+            guard let url = DocumentDropHandler.firstMarkdownURL(in: urls) else {
+                session.showTransientMessage(MD22Error.unsupportedFile.localizedDescription)
+                return false
+            }
+            do {
+                try environment.router.route(url, source: .drop)
+                return true
+            } catch {
+                session.showTransientMessage(error.localizedDescription)
+                return false
+            }
+        } isTargeted: { isTargeted in
+            isDropTargeted = isTargeted
+        }
+        .overlay(alignment: .top) {
+            if let message = session.transientMessage {
+                Text(message)
+                    .font(.callout)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .glassEffect(.regular, in: .capsule)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
     }
 
     @ViewBuilder
@@ -73,8 +100,7 @@ struct DocumentWindowView: View {
                 description: Text(errorMessage)
             )
         } else {
-            WelcomeView()
+            WelcomeView(isDropTargeted: isDropTargeted)
         }
     }
 }
-

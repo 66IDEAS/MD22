@@ -35,7 +35,7 @@ final class DocumentRouter {
         self.platform = platform
     }
 
-    static let allowedExtensions: Set<String> = ["md", "markdown", "mdown", "mkd", "mkdn"]
+    nonisolated static let allowedExtensions: Set<String> = ["md", "markdown", "mdown", "mkd", "mkdn"]
 
     static var contentTypes: [UTType] {
         var types: [UTType] = []
@@ -98,7 +98,7 @@ final class DocumentRouter {
         platform.openExternally(url)
     }
 
-    static func accepts(_ url: URL) -> Bool {
+    nonisolated static func accepts(_ url: URL) -> Bool {
         url.isFileURL && allowedExtensions.contains(url.pathExtension.lowercased())
     }
 }

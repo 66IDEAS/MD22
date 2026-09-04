@@ -13,6 +13,7 @@ final class DocumentSession {
     private(set) var analysis: DocumentAnalysis?
     private(set) var isLoading = false
     private(set) var errorMessage: String?
+    private(set) var transientMessage: String?
     private(set) var navigationBackStack: [URL] = []
     private(set) var navigationForwardStack: [URL] = []
 
@@ -73,5 +74,13 @@ final class DocumentSession {
         loadTask?.cancel()
         loadTask = nil
     }
-}
 
+    func showTransientMessage(_ message: String) {
+        transientMessage = message
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(3))
+            guard self?.transientMessage == message else { return }
+            self?.transientMessage = nil
+        }
+    }
+}
