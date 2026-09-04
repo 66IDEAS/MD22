@@ -3,7 +3,12 @@ import SwiftUI
 struct DocumentInspectorView: View {
     let session: DocumentSession
     let renderer: WebDocumentRenderer
+    var onOpenBookmark: (BookmarkRecord) -> Void = { _ in }
+    var onOpenBookmarkInNewWindow: (BookmarkRecord) -> Void = { _ in }
+    @Environment(AppEnvironment.self) private var environment
     @State private var selection = InspectorSection.outline
+    @State private var bookmarkScope = BookmarkScope.currentDocument
+    @State private var operationError: String?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,16 +26,16 @@ struct DocumentInspectorView: View {
             if selection == .outline {
                 outlineContent
             } else {
-                ContentUnavailableView(
-                    "No Bookmarks",
-                    systemImage: "bookmark",
-                    description: Text("Bookmarks appear here.")
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                bookmarksContent
             }
         }
         .inspectorColumnWidth(min: 200, ideal: 246, max: 320)
         .accessibilityLabel("Document inspector")
+        .alert("Bookmarks Could Not Be Updated", isPresented: errorPresented) {
+            Button("OK", role: .cancel) { operationError = nil }
+        } message: {
+            Text(operationError ?? "")
+        }
     }
 
     @ViewBuilder
@@ -62,6 +67,103 @@ struct DocumentInspectorView: View {
             .accessibilityLabel("Document outline")
         }
     }
+
+    @ViewBuilder
+    private var bookmarksContent: some View {
+        let records = bookmarkScope == .currentDocument
+            ? environment.bookmarks.records(for: session.snapshot?.url)
+            : environment.bookmarks.records
+        VStack(spacing: 0) {
+            Picker("Bookmark Scope", selection: $bookmarkScope) {
+                ForEach(BookmarkScope.allCases) { scope in
+                    Text(scope.title).tag(scope)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+
+            if records.isEmpty {
+                ContentUnavailableView(
+                    "No Bookmarks",
+                    systemImage: "bookmark",
+                    description: Text(bookmarkScope == .currentDocument ? "Bookmark a place in this document to return later." : "Bookmarks from every document appear here.")
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List(records) { record in
+                    Button { onOpenBookmark(record) } label: {
+                        BookmarkRow(record: record, showsFilename: bookmarkScope == .allDocuments)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!FileManager.default.isReadableFile(atPath: record.canonicalPath))
+                    .contextMenu {
+                        Button("Open") { onOpenBookmark(record) }
+                            .disabled(!FileManager.default.isReadableFile(atPath: record.canonicalPath))
+                        Button("Open in New Window") { onOpenBookmarkInNewWindow(record) }
+                            .disabled(!FileManager.default.isReadableFile(atPath: record.canonicalPath))
+                        Button("Show in Finder") {
+                            environment.platform.revealInFinder(URL(fileURLWithPath: record.canonicalPath))
+                        }
+                        .disabled(!FileManager.default.isReadableFile(atPath: record.canonicalPath))
+                        Divider()
+                        Button("Remove Bookmark", role: .destructive) {
+                            perform { try environment.bookmarks.remove(record) }
+                        }
+                    }
+                }
+                .listStyle(.sidebar)
+            }
+        }
+    }
+
+    private var errorPresented: Binding<Bool> {
+        Binding(get: { operationError != nil }, set: { if !$0 { operationError = nil } })
+    }
+
+    private func perform(_ action: () throws -> Void) {
+        do { try action() } catch { operationError = error.localizedDescription }
+    }
+}
+
+private struct BookmarkRow: View {
+    let record: BookmarkRecord
+    let showsFilename: Bool
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: icon)
+                .foregroundStyle(isAvailable ? Color.secondary : Color.red)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(record.title).lineLimit(2)
+                if let excerpt = record.excerpt, excerpt != record.title {
+                    Text(excerpt).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                }
+                if showsFilename || !isAvailable {
+                    Text(isAvailable ? record.fileDisplayName : "Unavailable — \(record.fileDisplayName)")
+                        .font(.caption2)
+                        .foregroundStyle(isAvailable ? Color.secondary : Color.red)
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var isAvailable: Bool { FileManager.default.isReadableFile(atPath: record.canonicalPath) }
+    private var icon: String {
+        switch record.kind {
+        case .heading: "textformat"
+        case .passage: "quote.opening"
+        case .position: "bookmark"
+        }
+    }
+}
+
+private enum BookmarkScope: String, CaseIterable, Identifiable {
+    case currentDocument
+    case allDocuments
+    var id: String { rawValue }
+    var title: String { self == .currentDocument ? "Current" : "All Files" }
 }
 
 private struct OutlineNode: Identifiable {

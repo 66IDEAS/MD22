@@ -9,6 +9,7 @@ final class AppEnvironment {
     let router: DocumentRouter
     let persistence: PersistenceController
     let history: HistoryRepository
+    let bookmarks: BookmarkRepository
     let accessibility = AccessibilityPreferences()
     let preferences = PreferencesStore()
 
@@ -23,5 +24,6 @@ final class AppEnvironment {
         router = DocumentRouter(platform: platform)
         self.persistence = persistence ?? PersistenceController.openRecovering()
         history = HistoryRepository(container: self.persistence.container, defaults: defaults)
+        bookmarks = BookmarkRepository(container: self.persistence.container)
     }
 }
