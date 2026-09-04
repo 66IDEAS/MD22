@@ -44,7 +44,7 @@ Requirement IDs use these prefixes:
 - [x] **T024 — Build the scan-first history sidebar** (`UX-5`): Present Pinned and Recent sections, two-line identity, native selection, accessible unavailable states, contextual actions, reordering, and restrained clearing controls.
 - [x] **T025 — Implement history selection behavior** (`FR-3`): Display selected available files, identify selection clearly, and leave the current document intact when an unavailable entry is chosen.
 - [x] **T026 — Implement pinned history entries** (`FR-20`): Add direct pinning, pinned-first ordering, manual reordering, persistence, unavailable states, and preservation during history clearing.
-- [ ] **T027 — Reveal files in Finder** (`FR-4`): Reveal and select the chosen file in Finder and disable the action when the file cannot be accessed.
+- [x] **T027 — Reveal files in Finder** (`FR-4`): Reveal and select the chosen file in Finder and disable the action when the file cannot be accessed.
 
 ### File Lifecycle and Reading Continuity
 

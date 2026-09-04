@@ -20,7 +20,8 @@ struct DocumentWindowView: View {
                 HistorySidebarView(
                     history: environment.history,
                     selection: $historySelection,
-                    onOpen: openHistoryRecord
+                    onOpen: openHistoryRecord,
+                    onReveal: revealHistoryRecord
                 )
             } detail: {
                 documentContent
@@ -116,6 +117,17 @@ struct DocumentWindowView: View {
         } catch {
             session.showTransientMessage(error.localizedDescription)
         }
+    }
+
+    private func revealHistoryRecord(_ record: HistoryRecord) {
+        guard record.isAvailable,
+              let url = environment.history.resolvedURL(for: record),
+              FileManager.default.isReadableFile(atPath: url.path) else {
+            try? environment.history.markUnavailable(path: record.canonicalPath)
+            session.showTransientMessage(MD22Error.unavailableFile.localizedDescription)
+            return
+        }
+        environment.router.reveal(url)
     }
 
     @ViewBuilder
