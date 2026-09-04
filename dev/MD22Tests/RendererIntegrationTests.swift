@@ -98,5 +98,6 @@ struct RendererIntegrationTests {
         #expect(html.contains("footnote"))
         #expect(html.contains("callout-note"))
         #expect(!html.contains("<script"))
+        #expect(html.contains("wide-lane"))
     }
 }

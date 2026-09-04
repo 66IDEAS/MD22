@@ -140,6 +140,14 @@ root.querySelectorAll("img").forEach((image) => {
   }, { once: true });
 });
 
+root.querySelectorAll("table, pre.mermaid, .katex-display").forEach((element) => {
+  if (element.parentElement?.classList.contains("wide-lane")) return;
+  const lane = document.createElement("div");
+  lane.className = "wide-lane";
+  element.replaceWith(lane);
+  lane.append(element);
+});
+
 const headings = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")];
 state.wordCount = (root.textContent.match(/[\p{Letter}\p{Number}]+/gu) || []).length;
 

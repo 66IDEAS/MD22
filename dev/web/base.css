@@ -40,6 +40,9 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .copy-code { position: absolute; inset: .45em .55em auto auto; opacity: 0; transition: opacity .15s; }
 .code-block:hover .copy-code, .copy-code:focus-visible { opacity: 1; }
 .table-wrap, table { overflow-x: auto; }
+.wide-lane { width: min(1080px, calc(100vw - 56px)); margin-inline: 50%; transform: translateX(-50%); overflow-x: auto; }
+.wide-lane > table { min-width: min(100%, 620px); }
+.wide-lane > .katex-display { min-width: max-content; padding-inline: 1em; }
 table { width: 100%; border-collapse: collapse; font-size: .93em; }
 th, td { border-bottom: 1px solid var(--line); padding: .6em .75em; text-align: start; }
 th { font-family: ui-sans-serif, sans-serif; background: color-mix(in srgb, var(--accent) 8%, transparent); }
@@ -48,6 +51,16 @@ th { font-family: ui-sans-serif, sans-serif; background: color-mix(in srgb, var(
 .task-list-item input:checked { background: var(--accent); box-shadow: inset 0 0 0 3px var(--page); }
 .callout { border: 1px solid var(--accent); border-inline-start-width: 4px; border-radius: 8px; padding: .85em 1em; background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .callout-title { font: 700 .86em ui-sans-serif, sans-serif; text-transform: uppercase; letter-spacing: .04em; }
+.callout-title::before { display: inline-block; width: 1.45em; }
+.callout-note .callout-title::before { content: "ⓘ"; }
+.callout-tip .callout-title::before { content: "✦"; }
+.callout-important .callout-title::before { content: "◆"; }
+.callout-warning .callout-title::before { content: "△"; }
+.callout-caution .callout-title::before { content: "!"; }
+.footnotes { margin-top: 4em; padding-top: 1em; border-top: 1px solid var(--line); color: var(--muted); font-size: .88em; }
+.footnote-ref a, .footnote-backref { font-family: ui-sans-serif, sans-serif; font-weight: 650; text-decoration: none; }
+.mermaid { display: flex; justify-content: center; min-height: 80px; background: transparent; }
+.mermaid svg { min-width: min(100%, 540px); }
 .missing-resource, .rich-error { display: block; padding: 1em; border: 1px dashed var(--muted); color: var(--muted); border-radius: 8px; font: .86em ui-sans-serif, sans-serif; }
 mark.search-match { background: #ffe26a; color: #111; border-radius: 2px; }
 mark.search-match.active { background: #ff9f0a; outline: 2px solid currentColor; outline-offset: 1px; }
