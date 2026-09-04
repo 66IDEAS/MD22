@@ -13,12 +13,25 @@ struct ReadingStatusBar: View {
                     .truncationMode(.middle)
                     .help(destination)
             } else {
-                Label("Ready", systemImage: "checkmark.circle")
+                Text(session.currentSection ?? session.title ?? "Ready")
+                    .lineLimit(1)
             }
             Spacer(minLength: 12)
-            Text(session.snapshot?.url.lastPathComponent ?? "No document")
-                .foregroundStyle(.secondary)
-            Divider().frame(height: 12)
+            if let analysis = session.analysis {
+                Text("\(session.progressPercentage)%")
+                    .monospacedDigit()
+                    .accessibilityLabel("Reading progress \(session.progressPercentage) percent")
+                Divider().frame(height: 12)
+                Text("\(analysis.wordCount.formatted()) words")
+                    .foregroundStyle(.secondary)
+                Divider().frame(height: 12)
+                Text("\(analysis.estimatedReadingMinutes) min read")
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("No document")
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 12)
             Menu {
                 Picker("Document Theme", selection: displayThemeBinding) {
                     ForEach(DisplayTheme.allCases) { theme in

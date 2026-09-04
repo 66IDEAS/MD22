@@ -10,6 +10,15 @@ struct RendererCoreTests {
         #expect(result.headings.map(\.id) == ["resume", "details", "details-1"])
     }
 
+    @Test("Analysis provides reading metrics for the status bar")
+    func readingMetrics() {
+        let words = Array(repeating: "word", count: 440).joined(separator: " ")
+        let result = MarkdownAnalysis.analyze("# Chapter\n\n\(words)")
+        #expect(result.wordCount == 441)
+        #expect(result.estimatedReadingMinutes == 3)
+        #expect(result.headings.first?.title == "Chapter")
+    }
+
     @Test("Relative resources resolve beside the document")
     func relativeResources() {
         let document = URL(fileURLWithPath: "/tmp/project/docs/readme.md")

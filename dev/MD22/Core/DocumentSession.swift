@@ -36,6 +36,13 @@ final class DocumentSession {
     var title: String? { snapshot?.url.lastPathComponent }
     var canNavigateBack: Bool { !navigationBackStack.isEmpty }
     var canNavigateForward: Bool { !navigationForwardStack.isEmpty }
+    var currentSection: String? {
+        guard let headingID = readingLocation.headingID else { return nil }
+        return analysis?.headings.first { $0.id == headingID }?.title
+    }
+    var progressPercentage: Int {
+        Int((min(max(readingLocation.progress, 0), 1) * 100).rounded())
+    }
 
     func open(
         _ url: URL,
