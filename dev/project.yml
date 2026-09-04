@@ -40,6 +40,18 @@ targets:
         NSHighResolutionCapable: true
         NSSupportsAutomaticGraphicsSwitching: true
         NSHumanReadableCopyright: Copyright © 2026 Alexander Ilg. Released under the MIT License.
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Markdown Document
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - public.markdown
+            CFBundleTypeExtensions:
+              - md
+              - markdown
+              - mdown
+              - mkd
+              - mkdn
     entitlements:
       path: MD22/MD22.entitlements
     settings:

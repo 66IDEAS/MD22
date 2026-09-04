@@ -30,6 +30,15 @@ struct ContentView: View {
                 documentTitle: nil
             )
         }
+        .onOpenURL { url in
+            try? environment.router.route(url, source: .finder)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .md22OpenDocument)) { _ in
+            Task { @MainActor in
+                guard let url = await environment.router.chooseMarkdownFile() else { return }
+                try? environment.router.route(url, source: .openPanel)
+            }
+        }
     }
 }
 

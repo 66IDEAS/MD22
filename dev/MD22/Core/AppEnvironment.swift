@@ -5,6 +5,7 @@ import Observation
 final class AppEnvironment {
     let fileAccess: any FileAccessing
     let platform: any PlatformIntegrating
+    let router: DocumentRouter
     let accessibility = AccessibilityPreferences()
     let preferences = PreferencesStore()
 
@@ -14,5 +15,6 @@ final class AppEnvironment {
     ) {
         self.fileAccess = fileAccess
         self.platform = platform
+        router = DocumentRouter(platform: platform)
     }
 }

@@ -30,7 +30,7 @@ Requirement IDs use these prefixes:
 ### Application Shell and File Opening
 
 - [x] **T015 — Build the focused unified toolbar** (`UX-4`): Implement the approved leading navigation, central Open and Export, trailing search and inspector, contextual actions, menus, and keyboard discoverability.
-- [ ] **T016 — Centralize native file and window routing** (`ARCH-21`): Route UTType registration, Finder and Open With events, drops, commands, links, history, bookmarks, new windows, Finder reveal, and external URLs through shared services.
+- [x] **T016 — Centralize native file and window routing** (`ARCH-21`): Route UTType registration, Finder and Open With events, drops, commands, links, history, bookmarks, new windows, Finder reveal, and external URLs through shared services.
 - [ ] **T017 — Support direct Markdown opening** (`FR-9`): Implement Open, file association, double-click, Open With, history insertion, and standard keyboard access without importing files.
 - [ ] **T018 — Support drag-and-drop viewing** (`FR-1`): Accept valid Markdown drops, render them, add them to history, and reject invalid drops without disrupting the current document.
 - [ ] **T019 — Implement the first-launch and drop experience** (`UX-13`): Present the complete window shell, restrained welcome content, drop emphasis, native Open action, and calm invalid-item feedback.
@@ -127,3 +127,4 @@ Requirement IDs use these prefixes:
 - [x] **E003 — Preserve testable app symbols**: Disable dead-code stripping for Debug app builds so hosted tests can link internal symbols that are intentionally not referenced by the executable.
 - [x] **E004 — Link hosted tests against the app**: Set the unit-test bundle loader explicitly so internal MD22 symbols resolve against its test host under generated Xcode 26 projects.
 - [x] **E005 — Correct the container renderer pin**: Replace the unpublished `markdown-it-container` 4.0.1 reference with the verified 4.0.0 release before producing the dependency lockfile.
+- [x] **E006 — Resolve Markdown UTTypes dynamically**: Build accepted content types from registered Markdown filename extensions because the macOS 26 SDK does not expose a static `UTType.markdown` member.
