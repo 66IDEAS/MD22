@@ -21,10 +21,13 @@ fi
 
 ARCHIVE_NAME="MD22-$VERSION-$BUILD_NUMBER.xcarchive"
 FINAL_ARCHIVE="$RELEASE_ROOT/$ARCHIVE_NAME"
-if [[ -e $FINAL_ARCHIVE ]]; then
-    print -u2 "Refusing to replace an existing release archive: $FINAL_ARCHIVE"
-    exit 73
-fi
+FINAL_APP_DIRECTORY="$RELEASE_ROOT/MD22-$VERSION-$BUILD_NUMBER"
+for OUTPUT_PATH in "$FINAL_ARCHIVE" "$FINAL_APP_DIRECTORY"; do
+    if [[ -e $OUTPUT_PATH ]]; then
+        print -u2 "Refusing to replace an existing release output: $OUTPUT_PATH"
+        exit 73
+    fi
+done
 
 TEMPORARY_ROOT=$(mktemp -d /tmp/md22-release.XXXXXX)
 cleanup() {
@@ -38,13 +41,14 @@ trap cleanup EXIT
 cd "$PROJECT_DIR"
 npm ci
 npm run build:renderer
-xcodegen generate
+"$SCRIPT_DIR/generate-project.zsh"
 
 xcodebuild \
     -project MD22.xcodeproj \
     -scheme MD22 \
     -configuration Release \
     -destination 'generic/platform=macOS' \
+    -onlyUsePackageVersionsFromResolvedFile \
     -derivedDataPath "$TEMPORARY_ROOT/DerivedData" \
     -archivePath "$TEMPORARY_ROOT/$ARCHIVE_NAME" \
     DEVELOPMENT_TEAM="$TEAM_ID" \
@@ -54,9 +58,20 @@ xcodebuild \
     CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
     archive
 
-APP_PATH="$TEMPORARY_ROOT/$ARCHIVE_NAME/Products/Applications/MD22.app"
+EXPORT_OPTIONS="$TEMPORARY_ROOT/DeveloperIDExportOptions.plist"
+ditto "$PROJECT_DIR/Config/DeveloperIDExportOptions.plist" "$EXPORT_OPTIONS"
+/usr/libexec/PlistBuddy -c "Add :teamID string $TEAM_ID" "$EXPORT_OPTIONS"
+xcodebuild \
+    -exportArchive \
+    -archivePath "$TEMPORARY_ROOT/$ARCHIVE_NAME" \
+    -exportPath "$TEMPORARY_ROOT/Export" \
+    -exportOptionsPlist "$EXPORT_OPTIONS"
+
+APP_PATH="$TEMPORARY_ROOT/Export/MD22.app"
 "$SCRIPT_DIR/verify-release.zsh" "$APP_PATH"
 
 mkdir -p "$RELEASE_ROOT"
 mv "$TEMPORARY_ROOT/$ARCHIVE_NAME" "$FINAL_ARCHIVE"
+mv "$TEMPORARY_ROOT/Export" "$FINAL_APP_DIRECTORY"
 print "Created signed release archive: $FINAL_ARCHIVE"
+print "Created exported Developer ID app: $FINAL_APP_DIRECTORY/MD22.app"

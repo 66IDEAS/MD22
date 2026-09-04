@@ -13,7 +13,7 @@ Requirements: macOS 26, Xcode 26 command-line tools, XcodeGen, and Node.js.
 cd dev
 npm ci
 npm run build:renderer
-xcodegen generate
+scripts/generate-project.zsh
 xcodebuild -project MD22.xcodeproj -scheme MD22 \
   -derivedDataPath DerivedData CODE_SIGNING_ALLOWED=NO build
 ```

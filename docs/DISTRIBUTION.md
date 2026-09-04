@@ -40,7 +40,7 @@ For a local release, first store credentials in the Keychain with Apple's
 ```sh
 export MD22_NOTARY_KEYCHAIN_PROFILE='MD22-notary'
 dev/scripts/notarize-release.zsh \
-  dev/build/release/MD22-1.0.0-1.xcarchive/Products/Applications/MD22.app
+  dev/build/release/MD22-1.0.0-1/MD22.app
 ```
 
 For CI, provide `MD22_NOTARY_KEY_PATH`, `MD22_NOTARY_KEY_ID`, and, for a team

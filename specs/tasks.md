@@ -162,3 +162,4 @@ Requirement IDs use these prefixes:
 - [x] **E038 — Restore embedded-framework runtime lookup**: Preserve the inherited macOS framework runpath in generated target settings so the bundled Sparkle framework loads in standalone and UI-test launches.
 - [x] **E039 — Restore the generated Debug compilation condition**: Declare the standard `DEBUG` Swift condition explicitly so test-only launch fixtures remain excluded from releases and available to the UI suite.
 - [x] **E040 — Use Xcode's supported generic macOS archive destination**: Select the generic macOS destination and enforce Apple silicon through the target `ARCHS` setting because Xcode rejects an architecture qualifier on `Any Mac`.
+- [x] **E041 — Export archives through Xcode's Developer ID distribution path**: Run `xcodebuild -exportArchive` with committed export policy so Sparkle helpers and the final application receive Xcode's complete distribution-signing treatment.
