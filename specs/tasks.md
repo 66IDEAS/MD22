@@ -21,7 +21,7 @@ Requirement IDs use these prefixes:
 - [x] **T007 — Create modular concurrency-safe boundaries** (`ARCH-12`): Separate file access, rendering, persistence, export, updates, and platform integration behind protocols and actor-isolated services.
 - [x] **T008 — Prepare the renderer for app-extension reuse** (`ARCH-19`): Keep parsing, semantic HTML, themes, resource mapping, and bookmark-location logic independent of the main app and persistence store.
 - [x] **T009 — Establish Apple-platform conformance criteria** (`ARCH-3`): Define implementation checks for macOS conventions, accessibility, privacy, security, menus, windows, signing, and notarization.
-- [ ] **T010 — Add dependency and release supply-chain controls** (`ARCH-17`): Commit lockfiles, enable dependency monitoring, enforce license and vulnerability policy, and prepare SBOM, checksums, provenance, and immutable releases.
+- [x] **T010 — Add dependency and release supply-chain controls** (`ARCH-17`): Commit lockfiles, enable dependency monitoring, enforce license and vulnerability policy, and prepare SBOM, checksums, provenance, and immutable releases.
 - [ ] **T011 — Establish accessibility and localization foundations** (`ARCH-22`): Use semantic native and HTML structures, honor system accessibility settings, and externalize all strings through String Catalogs.
 - [ ] **T012 — Apply the native Liquid Glass visual language** (`UX-1`): Style the application shell, controls, sidebars, selection, spacing, and motion according to current macOS conventions.
 - [ ] **T013 — Build independent application appearances** (`UX-2`): Provide polished System, Light, and Dark application chrome that remains independent from document themes.
@@ -126,3 +126,4 @@ Requirement IDs use these prefixes:
 - [x] **E002 — Enable app-module testability in Debug builds**: Explicitly enable testability and unoptimized Swift compilation for Debug because generated target settings did not inherit those flags.
 - [x] **E003 — Preserve testable app symbols**: Disable dead-code stripping for Debug app builds so hosted tests can link internal symbols that are intentionally not referenced by the executable.
 - [x] **E004 — Link hosted tests against the app**: Set the unit-test bundle loader explicitly so internal MD22 symbols resolve against its test host under generated Xcode 26 projects.
+- [x] **E005 — Correct the container renderer pin**: Replace the unpublished `markdown-it-container` 4.0.1 reference with the verified 4.0.0 release before producing the dependency lockfile.
