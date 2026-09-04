@@ -54,6 +54,7 @@ struct RendererIntegrationTests {
         let artifact = try RendererHTMLBuilder.build(snapshot: snapshot)
         #expect(artifact.pipelineVersion == RendererHTMLBuilder.pipelineVersion)
         #expect(artifact.html.contains("MD22 md22-renderer-1"))
+        #expect(artifact.html.contains("data-theme=\"light\""))
         #expect(artifact.baseURL == snapshot.url.deletingLastPathComponent())
     }
 

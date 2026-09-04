@@ -13,6 +13,7 @@ struct ReadOnlyDocumentView: View {
                 .webViewTextSelection(.enabled)
                 .webViewLinkPreviews(.enabled)
                 .webViewBackForwardNavigationGestures(.disabled)
+                .webViewContentBackground(.hidden)
                 .opacity(renderer.isReady ? 1 : 0)
                 .accessibilityLabel("Rendered Markdown document")
 
