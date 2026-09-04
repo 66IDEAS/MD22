@@ -108,6 +108,17 @@ final class WebDocumentRenderer: DocumentRendering {
         ) as? String
     }
 
+    func exportHTML(themeID: String) async throws -> String {
+        guard let html = try await page.callJavaScript(
+            "return window.MD22?.exportHTML(themeID)",
+            arguments: ["themeID": themeID],
+            contentWorld: .page
+        ) as? String, html.hasPrefix("<!doctype html>") else {
+            throw MD22Error.exportFailed
+        }
+        return html
+    }
+
     func viewState() async -> RendererViewState? {
         guard let result = try? await page.callJavaScript("return window.MD22?.state()", contentWorld: .page),
               let state = result as? [String: Any] else { return nil }

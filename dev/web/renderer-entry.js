@@ -287,7 +287,18 @@ window.MD22 = Object.freeze({
   clearSearch,
   nextSearch: () => activateSearch(state.activeSearchIndex + 1),
   previousSearch: () => activateSearch(state.activeSearchIndex - 1),
-  exportHTML: () => `<!doctype html>\n${document.documentElement.outerHTML}`
+  exportHTML: (themeID) => {
+    const clone = document.documentElement.cloneNode(true);
+    clone.dataset.theme = themeID || "light";
+    clone.dataset.reduceMotion = "true";
+    delete clone.dataset.ready;
+    clone.querySelectorAll("script, .bookmark-heading, .copy-code").forEach((element) => element.remove());
+    clone.querySelectorAll("mark.search-match").forEach((mark) => {
+      mark.replaceWith(document.createTextNode(mark.textContent || ""));
+    });
+    clone.querySelectorAll(".arrival-target").forEach((element) => element.classList.remove("arrival-target"));
+    return `<!doctype html>\n${clone.outerHTML}`;
+  }
 });
 
 document.documentElement.dataset.ready = "true";

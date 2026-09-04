@@ -10,6 +10,7 @@ final class AppEnvironment {
     let persistence: PersistenceController
     let history: HistoryRepository
     let bookmarks: BookmarkRepository
+    let exportService = DocumentExportService()
     let accessibility = AccessibilityPreferences()
     let preferences = PreferencesStore()
 
