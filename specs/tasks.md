@@ -18,7 +18,7 @@ Requirement IDs use these prefixes:
 - [x] **T004 — Establish MIT licensing and notices** (`ARCH-6`): Add the MIT license and a policy for preserving compatible third-party attributions across source and distributed artifacts.
 - [x] **T005 — Integrate the fixed MD22 brand assets** (`UX-21`): Add the supplied icon and logo without redesign, recoloring, or theme-driven reinterpretation.
 - [x] **T006 — Organize the open-source repository** (`ARCH-2`): Make source, build configuration, rendering assets, dependency versions, and replaceable boundaries suitable for public development.
-- [ ] **T007 — Create modular concurrency-safe boundaries** (`ARCH-12`): Separate file access, rendering, persistence, export, updates, and platform integration behind protocols and actor-isolated services.
+- [x] **T007 — Create modular concurrency-safe boundaries** (`ARCH-12`): Separate file access, rendering, persistence, export, updates, and platform integration behind protocols and actor-isolated services.
 - [ ] **T008 — Prepare the renderer for app-extension reuse** (`ARCH-19`): Keep parsing, semantic HTML, themes, resource mapping, and bookmark-location logic independent of the main app and persistence store.
 - [ ] **T009 — Establish Apple-platform conformance criteria** (`ARCH-3`): Define implementation checks for macOS conventions, accessibility, privacy, security, menus, windows, signing, and notarization.
 - [ ] **T010 — Add dependency and release supply-chain controls** (`ARCH-17`): Commit lockfiles, enable dependency monitoring, enforce license and vulnerability policy, and prepare SBOM, checksums, provenance, and immutable releases.
