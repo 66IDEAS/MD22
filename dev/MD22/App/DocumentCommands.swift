@@ -95,3 +95,15 @@ struct UpdateCommands: Commands {
         }
     }
 }
+
+struct AboutCommands: Commands {
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some Commands {
+        CommandGroup(replacing: .appInfo) {
+            Button("About MD22") {
+                openWindow(id: "about")
+            }
+        }
+    }
+}

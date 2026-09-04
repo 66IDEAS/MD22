@@ -12,7 +12,19 @@ struct MD22App: App {
         .defaultSize(width: 1_240, height: 800)
         .commands {
             DocumentCommands()
+            AboutCommands()
             UpdateCommands(updateService: environment.updateService)
         }
+
+        Settings {
+            GeneralSettingsView(environment: environment)
+                .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
+        }
+
+        Window("About MD22", id: "about") {
+            AboutView()
+                .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
+        }
+        .windowResizability(.contentSize)
     }
 }

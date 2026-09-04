@@ -23,6 +23,10 @@ final class UpdateService: UpdateChecking {
         set { controller.updater.automaticallyChecksForUpdates = newValue }
     }
 
+    var lastUpdateCheckDate: Date? {
+        controller.updater.lastUpdateCheckDate
+    }
+
     func checkForUpdates() {
         guard canCheckForUpdates else { return }
         controller.checkForUpdates(nil)

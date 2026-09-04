@@ -101,7 +101,7 @@ Requirement IDs use these prefixes:
 ### Settings, Updates, and Support
 
 - [x] **T062 — Integrate secure Sparkle updates** (`ARCH-8`): Add stable Sparkle 2 through SwiftPM with an HTTPS appcast, signed and notarized updates, automatic checks, and a manual check command.
-- [ ] **T063 — Build minimal Settings and About windows** (`UX-20`): Present General appearance and update controls, inline status, standard application information, the GitHub link, license, and third-party acknowledgements without duplicating reading controls.
+- [x] **T063 — Build minimal Settings and About windows** (`UX-20`): Present General appearance and update controls, inline status, standard application information, the GitHub link, license, and third-party acknowledgements without duplicating reading controls.
 - [ ] **T064 — Add privacy-safe local diagnostics** (`ARCH-24`): Use categorized Unified Logging, redact user-derived values, avoid automatic transmission, and create explicit, inspectable diagnostic packages.
 
 ### Quality, Performance, and Delivery
@@ -148,3 +148,4 @@ Requirement IDs use these prefixes:
 - [x] **E024 — Remove duplicate native panel constraints**: Keep each split-view width contract at one view boundary so AppKit can satisfy the native sidebar and inspector constraints without recovery warnings.
 - [x] **E025 — Isolate HTML publication preparation from the reader**: Wait for fonts and images without mutating the visible page's display theme, search state, or reader controls before cloning its static export DOM.
 - [x] **E026 — Scope document commands to the focused window**: Route menu and keyboard actions through SwiftUI focused values so commands affect only the active window in a multiwindow session.
+- [x] **E027 — Preserve build status through zsh pipelines**: Avoid Bash-specific `PIPESTATUS` checks when validating piped Xcode builds under the repository's zsh command environment.
