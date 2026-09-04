@@ -65,7 +65,7 @@ Requirement IDs use these prefixes:
 
 ### Themes and Reading Appearance
 
-- [ ] **T039 — Establish the declarative theme package model** (`ARCH-20`): Define the versioned manifest, design tokens, scoped CSS, static assets, validation rules, security limits, and document-only rendering boundary.
+- [x] **T039 — Establish the declarative theme package model** (`ARCH-20`): Define the versioned manifest, design tokens, scoped CSS, static assets, validation rules, security limits, and document-only rendering boundary.
 - [ ] **T040 — Implement built-in display-theme selection** (`FR-8`): Provide Light, Dark, Sci-Fi, Blueprint, and 8-Bit themes with instant status-bar switching, strong identities, legibility, and independence from export styling.
 - [ ] **T041 — Build the theme-driven document canvas** (`UX-6`): Fill the central pane with the selected theme, center readable prose, provide wide lanes and safe overflow, and reveal content controls only contextually.
 - [ ] **T042 — Create the five approved theme identities** (`UX-9`): Implement the complete Light, Dark, Sci-Fi, Blueprint, and 8-Bit visual systems, including rich elements, restrained motion, and readability overrides.
