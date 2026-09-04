@@ -3,6 +3,7 @@ import SwiftUI
 struct ReadingStatusBar: View {
     let session: DocumentSession
     @Environment(AppEnvironment.self) private var environment
+    @State private var readingPopoverPresented = false
 
     var body: some View {
         HStack(spacing: 14) {
@@ -29,6 +30,15 @@ struct ReadingStatusBar: View {
             }
             .menuStyle(.borderlessButton)
             .help("Choose Document Theme")
+            Button("Reading Appearance", systemImage: "textformat.size") {
+                readingPopoverPresented.toggle()
+            }
+            .labelStyle(.iconOnly)
+            .buttonStyle(.borderless)
+            .help("Reading Appearance")
+            .popover(isPresented: $readingPopoverPresented, arrowEdge: .bottom) {
+                ReadingAppearancePopover(preferences: environment.preferences)
+            }
         }
         .font(.caption)
         .padding(.horizontal, 12)
