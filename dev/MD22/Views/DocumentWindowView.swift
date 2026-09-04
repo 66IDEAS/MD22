@@ -19,7 +19,8 @@ struct DocumentWindowView: View {
             NavigationSplitView(columnVisibility: $columnVisibility) {
                 HistorySidebarView(
                     history: environment.history,
-                    selection: $historySelection
+                    selection: $historySelection,
+                    onOpen: openHistoryRecord
                 )
             } detail: {
                 documentContent
@@ -48,6 +49,17 @@ struct DocumentWindowView: View {
             guard let route = environment.router.pendingRoute,
                   route.disposition == .currentWindow else { return }
             session.open(route.url)
+        }
+        .onChange(of: historySelection) { _, path in
+            guard let path,
+                  let record = (environment.history.pinnedRecords + environment.history.recentRecords)
+                    .first(where: { $0.canonicalPath == path }) else { return }
+            openHistoryRecord(record)
+        }
+        .onChange(of: session.snapshot?.url) { _, url in
+            if let url {
+                historySelection = url.standardizedFileURL.path
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22OpenDocument)) { _ in
             Task { @MainActor in
@@ -87,6 +99,22 @@ struct DocumentWindowView: View {
                     .padding(.top, 8)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
+        }
+    }
+
+    private func openHistoryRecord(_ record: HistoryRecord) {
+        guard record.isAvailable,
+              let url = environment.history.resolvedURL(for: record),
+              FileManager.default.isReadableFile(atPath: url.path) else {
+            try? environment.history.markUnavailable(path: record.canonicalPath)
+            session.showTransientMessage(MD22Error.unavailableFile.localizedDescription)
+            return
+        }
+        guard session.snapshot?.url.standardizedFileURL != url.standardizedFileURL else { return }
+        do {
+            try environment.router.route(url, source: .history)
+        } catch {
+            session.showTransientMessage(error.localizedDescription)
         }
     }
 
