@@ -1,6 +1,34 @@
 import Foundation
 
+struct RenderedDocument: Sendable {
+    let html: String
+    let baseURL: URL
+    let pipelineVersion: String
+}
+
 enum RendererHTMLBuilder {
+    static let pipelineVersion = "md22-renderer-1"
+
+    static func build(
+        snapshot: DocumentSnapshot,
+        themeCSS: String = "",
+        mermaidTheme: String = "neutral",
+        reduceMotion: Bool = false,
+        bundle: Bundle = .main
+    ) throws -> RenderedDocument {
+        RenderedDocument(
+            html: try makeHTML(
+                snapshot: snapshot,
+                themeCSS: themeCSS,
+                mermaidTheme: mermaidTheme,
+                reduceMotion: reduceMotion,
+                bundle: bundle
+            ),
+            baseURL: snapshot.url.deletingLastPathComponent(),
+            pipelineVersion: pipelineVersion
+        )
+    }
+
     static func makeHTML(
         snapshot: DocumentSnapshot,
         themeCSS: String = "",
@@ -33,6 +61,7 @@ enum RendererHTMLBuilder {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width,initial-scale=1">
+          <meta name="generator" content="MD22 \(pipelineVersion)">
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'; script-src 'nonce-\(nonce)'; style-src 'nonce-\(nonce)'; img-src data: file: https:; media-src data: file: https:; font-src data:; connect-src 'none'">
           <title>\(title)</title>
           <style nonce="\(nonce)">\(baseCSS)\n\(themeCSS)</style>

@@ -30,8 +30,8 @@ final class WebDocumentRenderer: DocumentRendering {
         renderError = nil
         debugMessage = nil
         do {
-            let html = try RendererHTMLBuilder.makeHTML(snapshot: snapshot)
-            for try await _ in page.load(html: html, baseURL: snapshot.url.deletingLastPathComponent()) {}
+            let document = try RendererHTMLBuilder.build(snapshot: snapshot)
+            for try await _ in page.load(html: document.html, baseURL: document.baseURL) {}
             for _ in 0..<500 {
                 try Task.checkCancellation()
                 if let ready = try? await page.callJavaScript(

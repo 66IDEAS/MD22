@@ -42,4 +42,18 @@ struct RendererIntegrationTests {
         #expect(WebNavigationPolicy.isInternalPageURL(URL(fileURLWithPath: "/tmp/document.md")))
         #expect(!WebNavigationPolicy.isInternalPageURL(URL(string: "https://example.com/tracker")!))
     }
+
+    @Test("Reader and export adapters share one versioned pipeline")
+    func canonicalPipeline() throws {
+        let snapshot = DocumentSnapshot(
+            url: URL(fileURLWithPath: "/tmp/Canonical.md"),
+            markdown: "# Stable heading\n\n| A | B |\n| - | - |\n| 1 | 2 |",
+            modificationDate: nil,
+            fileIdentifier: nil
+        )
+        let artifact = try RendererHTMLBuilder.build(snapshot: snapshot)
+        #expect(artifact.pipelineVersion == RendererHTMLBuilder.pipelineVersion)
+        #expect(artifact.html.contains("MD22 md22-renderer-1"))
+        #expect(artifact.baseURL == snapshot.url.deletingLastPathComponent())
+    }
 }
