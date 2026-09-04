@@ -1,5 +1,6 @@
 .DS_Store
 dev/.build/
+dev/node_modules/
 dev/DerivedData/
 dev/build/
 dev/MD22.xcodeproj/
@@ -9,4 +10,3 @@ dev/Resources/Renderer/generated/
 *.dSYM
 *.dmg
 *.zip
-

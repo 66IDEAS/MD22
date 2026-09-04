@@ -9,13 +9,22 @@ final class WebNavigationPolicy: WebPage.NavigationDeciding {
         for action: WebPage.NavigationAction,
         preferences: inout WebPage.NavigationPreferences
     ) async -> WKNavigationActionPolicy {
-        guard action.navigationType == .linkActivated,
-              let url = action.request.url else { return .allow }
-        onOpenURL?(url)
-        return .cancel
+        guard let url = action.request.url else { return .cancel }
+        if action.navigationType == .linkActivated {
+            onOpenURL?(url)
+            return .cancel
+        }
+        return Self.isInternalPageURL(url) ? .allow : .cancel
     }
 
     func decidePolicy(for response: WebPage.NavigationResponse) async -> WKNavigationResponsePolicy {
-        response.canShowMimeType ? .allow : .cancel
+        guard response.canShowMimeType,
+              let url = response.response.url,
+              Self.isInternalPageURL(url) else { return .cancel }
+        return .allow
+    }
+
+    nonisolated static func isInternalPageURL(_ url: URL) -> Bool {
+        url.scheme == "file" || url.scheme == "about"
     }
 }

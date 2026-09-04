@@ -31,3 +31,6 @@ The generated app is at
 
 MD22 is licensed under the [MIT License](LICENSE).
 
+## Privacy
+
+MD22 has no accounts, analytics, telemetry, or cloud document processing. Markdown rendering, search, bookmarks, history, and export remain on the Mac. The private WebKit renderer blocks remote code and styles; only resources that a document explicitly references may be loaded, while external links open in the default application.

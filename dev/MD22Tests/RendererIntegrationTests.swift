@@ -39,5 +39,7 @@ struct RendererIntegrationTests {
         #expect(html.contains("default-src 'none'"))
         #expect(html.contains("connect-src 'none'"))
         #expect(!html.contains("https://cdn"))
+        #expect(WebNavigationPolicy.isInternalPageURL(URL(fileURLWithPath: "/tmp/document.md")))
+        #expect(!WebNavigationPolicy.isInternalPageURL(URL(string: "https://example.com/tracker")!))
     }
 }

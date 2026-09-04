@@ -88,4 +88,9 @@ final class WebDocumentRenderer: DocumentRendering {
             verticalOffset: dictionary["verticalOffset"] as? Double ?? 0
         )
     }
+
+    func consumePendingNavigation() -> URL? {
+        defer { pendingNavigationURL = nil }
+        return pendingNavigationURL
+    }
 }
