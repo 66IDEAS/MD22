@@ -9,6 +9,7 @@ final class DocumentSession {
     private var loadTask: Task<Void, Never>?
     private var loadingIndicatorTask: Task<Void, Never>?
     private var refreshTask: Task<Void, Never>?
+    private var readingLocationSaveTask: Task<Void, Never>?
     private var filePresenter: DocumentFilePresenter?
     private var generation = 0
 
@@ -20,6 +21,7 @@ final class DocumentSession {
     private(set) var transientMessage: String?
     private(set) var navigationBackStack: [URL] = []
     private(set) var navigationForwardStack: [URL] = []
+    private(set) var readingLocation = ReadingLocation.beginning
 
     init(environment: AppEnvironment) {
         fileAccess = environment.fileAccess
@@ -57,6 +59,7 @@ final class DocumentSession {
                 self.snapshot = loaded
                 self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
                 _ = try self.history.recordOpen(loaded)
+                self.readingLocation = try self.history.readingLocation(for: loaded.url)
                 self.isLoading = false
                 self.showsLoadingIndicator = false
                 self.loadingIndicatorTask?.cancel()
@@ -98,6 +101,8 @@ final class DocumentSession {
         showsLoadingIndicator = false
         refreshTask?.cancel()
         refreshTask = nil
+        readingLocationSaveTask?.cancel()
+        readingLocationSaveTask = nil
         filePresenter?.invalidate()
         filePresenter = nil
     }
@@ -109,6 +114,17 @@ final class DocumentSession {
             try? await Task.sleep(for: debounce)
             guard !Task.isCancelled else { return }
             await self?.reloadCurrentSnapshot()
+        }
+    }
+
+    func updateReadingLocation(_ location: ReadingLocation) {
+        readingLocation = location
+        guard let url = snapshot?.url else { return }
+        readingLocationSaveTask?.cancel()
+        readingLocationSaveTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(350))
+            guard !Task.isCancelled else { return }
+            try? self?.history.saveReadingLocation(location, for: url)
         }
     }
 

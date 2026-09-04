@@ -51,7 +51,7 @@ Requirement IDs use these prefixes:
 - [x] **T028 — Implement coordinated file access and monitoring** (`ARCH-14`): Use coordinated asynchronous reads, debounced filesystem events, immutable snapshots, sequencing guards, and strictly read-only source handling.
 - [x] **T029 — Automatically refresh changed files** (`FR-16`): Refresh saved changes, preserve heading and reading position where possible, report refresh briefly, and mark inaccessible sources unavailable.
 - [x] **T030 — Implement calm loading and lifecycle feedback** (`UX-14`): Avoid spinner flicker, preserve the current view during transitions, show nonmodal unavailability, and render clear inline failures for missing or invalid content.
-- [ ] **T031 — Persist and restore reading continuity** (`FR-17`): Remember positions per file, reopen the last document and position, and retain positions independently from history membership.
+- [x] **T031 — Persist and restore reading continuity** (`FR-17`): Remember positions per file, reopen the last document and position, and retain positions independently from history membership.
 
 ### Secure Markdown Rendering
 

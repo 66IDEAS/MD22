@@ -8,6 +8,7 @@ struct DocumentWindowView: View {
     @State private var searchPresented = false
     @State private var isDropTargeted = false
     @State private var historySelection: String?
+    @State private var didAttemptRestoration = false
 
     init(environment: AppEnvironment) {
         self.environment = environment
@@ -50,6 +51,17 @@ struct DocumentWindowView: View {
             guard let route = environment.router.pendingRoute,
                   route.disposition == .currentWindow else { return }
             session.open(route.url)
+        }
+        .task {
+            guard !didAttemptRestoration else { return }
+            didAttemptRestoration = true
+            guard environment.router.pendingRoute == nil,
+                  let url = environment.history.lastDocumentURL else { return }
+            if await environment.fileAccess.isAvailable(url) {
+                try? environment.router.route(url, source: .restoration)
+            } else {
+                try? environment.history.markUnavailable(path: url.standardizedFileURL.path)
+            }
         }
         .onChange(of: historySelection) { _, path in
             guard let path,
