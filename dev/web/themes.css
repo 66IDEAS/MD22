@@ -1,0 +1,98 @@
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page: #f7f1e3;
+  --ink: #28251f;
+  --muted: #716a5f;
+  --accent: #1e6689;
+  --line: #d9cebb;
+  --code: #eee5d4;
+  font-family: Charter, "Iowan Old Style", Georgia, serif;
+}
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3 { font-family: Avenir Next, ui-sans-serif, sans-serif; letter-spacing: -.025em; }
+:root[data-theme="light"] h1 { color: #173f55; }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #17191d;
+  --ink: #e9e8e3;
+  --muted: #a5a8af;
+  --accent: #7cc6e8;
+  --line: #383d45;
+  --code: #22262d;
+  font-family: Charter, "Iowan Old Style", Georgia, serif;
+}
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3 { font-family: Avenir Next, ui-sans-serif, sans-serif; color: #f4f1e8; }
+:root[data-theme="dark"] img { filter: brightness(.9); }
+
+:root[data-theme="sci-fi"] {
+  color-scheme: dark;
+  --page: #07131d;
+  --ink: #d8f2f2;
+  --muted: #82a5aa;
+  --accent: #37e3e0;
+  --line: #174653;
+  --code: #091f2c;
+  font-family: Avenir Next, ui-sans-serif, sans-serif;
+  background-color: var(--page);
+  background-image: linear-gradient(#0d2b3840 1px, transparent 1px), linear-gradient(90deg, #0d2b3840 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+:root[data-theme="sci-fi"] body { background: transparent; }
+:root[data-theme="sci-fi"] h1,
+:root[data-theme="sci-fi"] h2,
+:root[data-theme="sci-fi"] h3 { font-family: Futura, Avenir Next, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: #5ff7f2; text-shadow: 0 0 18px #37e3e050; }
+:root[data-theme="sci-fi"] h2 { border-color: #db8c3766; }
+:root[data-theme="sci-fi"] .callout-important,
+:root[data-theme="sci-fi"] .callout-warning { --accent: #e8a84d; }
+:root[data-theme="sci-fi"] #document-root::before { content: "MD // 22"; display: block; color: #e45fa8; font: 600 .65em ui-monospace, monospace; letter-spacing: .28em; margin-bottom: 2em; }
+
+:root[data-theme="blueprint"] {
+  color-scheme: dark;
+  --page: #064b94;
+  --ink: #eefaff;
+  --muted: #b9dced;
+  --accent: #8be8ff;
+  --line: #77cce566;
+  --code: #063d78;
+  font-family: "SF Mono", Menlo, ui-monospace, monospace;
+  background-color: var(--page);
+  background-image: linear-gradient(#bcecff19 1px, transparent 1px), linear-gradient(90deg, #bcecff19 1px, transparent 1px), linear-gradient(#bcecff0d 1px, transparent 1px), linear-gradient(90deg, #bcecff0d 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+}
+:root[data-theme="blueprint"] body { background: transparent; }
+:root[data-theme="blueprint"] h1,
+:root[data-theme="blueprint"] h2,
+:root[data-theme="blueprint"] h3 { font-family: "SF Mono", Menlo, monospace; font-weight: 650; letter-spacing: .025em; }
+:root[data-theme="blueprint"] h1 { border: 2px solid var(--line); padding: .45em .55em; }
+:root[data-theme="blueprint"] .code-block,
+:root[data-theme="blueprint"] .callout { border-radius: 0; }
+
+:root[data-theme="8-bit"] {
+  color-scheme: dark;
+  --page: #1a1530;
+  --ink: #fff7d6;
+  --muted: #c4b9d9;
+  --accent: #5ce1e6;
+  --line: #6f5ca8;
+  --code: #251d45;
+  font-family: Avenir Next, ui-sans-serif, sans-serif;
+  image-rendering: pixelated;
+}
+:root[data-theme="8-bit"] h1,
+:root[data-theme="8-bit"] h2,
+:root[data-theme="8-bit"] h3 { font-family: "SF Mono", Menlo, monospace; letter-spacing: .035em; color: #ffdf70; text-shadow: 3px 3px 0 #7b3f91; }
+:root[data-theme="8-bit"] h2 { border-bottom: 4px solid var(--accent); }
+:root[data-theme="8-bit"] .code-block,
+:root[data-theme="8-bit"] .callout,
+:root[data-theme="8-bit"] .missing-resource { border-radius: 0; box-shadow: 4px 4px 0 #0d0a19; border-width: 2px; }
+:root[data-theme="8-bit"] a { text-decoration-style: dotted; text-decoration-thickness: 3px; }
+:root[data-theme="8-bit"] #document-root::before { content: "◆ ◆ ◆"; display: block; color: #f067aa; font-family: monospace; letter-spacing: .5em; margin-bottom: 2em; }
+
+@media (prefers-contrast: more) {
+  :root { --muted: var(--ink); --line: var(--ink); }
+  a { text-decoration-thickness: .14em; }
+}

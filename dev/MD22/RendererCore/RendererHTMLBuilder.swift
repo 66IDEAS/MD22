@@ -13,7 +13,7 @@ enum RendererHTMLBuilder {
         snapshot: DocumentSnapshot,
         themeID: String = DisplayTheme.light.rawValue,
         themeCSS: String = "",
-        mermaidTheme: String = "neutral",
+        mermaidTheme: String? = nil,
         reduceMotion: Bool = false,
         bundle: Bundle = .main
     ) throws -> RenderedDocument {
@@ -35,7 +35,7 @@ enum RendererHTMLBuilder {
         snapshot: DocumentSnapshot,
         themeID: String = DisplayTheme.light.rawValue,
         themeCSS: String = "",
-        mermaidTheme: String = "neutral",
+        mermaidTheme: String? = nil,
         reduceMotion: Bool = false,
         bundle: Bundle = .main
     ) throws -> String {
@@ -49,7 +49,7 @@ enum RendererHTMLBuilder {
             "markdown": snapshot.markdown,
             "documentURL": snapshot.url.absoluteString,
             "themeID": themeID,
-            "mermaidTheme": mermaidTheme,
+            "mermaidTheme": mermaidTheme ?? BuiltInThemeCatalog.manifest(for: themeID).mermaidTheme,
             "reduceMotion": reduceMotion,
             "missingReferences": LocalReferenceScanner.missingReferences(
                 in: snapshot.markdown,

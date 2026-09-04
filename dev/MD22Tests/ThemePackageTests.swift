@@ -36,4 +36,11 @@ struct ThemePackageTests {
         )
         #expect(throws: ThemePackageError.self) { try ThemePackageValidator.validate(package) }
     }
+
+    @Test("The five built-in themes have complete distinct manifests")
+    func builtInThemes() {
+        #expect(BuiltInThemeCatalog.manifests.map(\.id) == ["light", "dark", "sci-fi", "blueprint", "8-bit"])
+        #expect(Set(BuiltInThemeCatalog.manifests.map(\.tokens.page)).count == 5)
+        #expect(BuiltInThemeCatalog.manifests.allSatisfy { $0.schemaVersion == 1 })
+    }
 }
