@@ -28,11 +28,25 @@ struct ReadingStatusBar: View {
                         .lineLimit(1)
                 }
                 Spacer(minLength: 12)
-                if let message = session.transientMessage {
-                    Text(message)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .transition(.opacity)
+                if session.isExporting {
+                    HStack(spacing: 6) {
+                        ProgressView().controlSize(.mini)
+                        Text("Exporting…")
+                    }
+                    .foregroundStyle(.secondary)
+                } else if let message = session.transientMessage {
+                    HStack(spacing: 8) {
+                        Text(message)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                        if let url = session.transientActionURL {
+                            Button("Reveal in Finder") {
+                                environment.platform.revealInFinder(url)
+                            }
+                            .buttonStyle(.link)
+                        }
+                    }
+                    .transition(.opacity)
                 } else {
                     ViewThatFits(in: .horizontal) {
                         fullMetrics

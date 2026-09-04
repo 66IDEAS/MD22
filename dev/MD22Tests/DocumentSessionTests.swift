@@ -115,4 +115,20 @@ struct DocumentSessionTests {
         first.cancel()
         second.cancel()
     }
+
+    @Test("Export feedback stays nonmodal and exposes its result")
+    func exportFeedback() throws {
+        let persistence = try PersistenceController(isStoredInMemoryOnly: true)
+        let suite = try #require(UserDefaults(suiteName: UUID().uuidString))
+        let session = DocumentSession(environment: AppEnvironment(persistence: persistence, defaults: suite))
+        let output = URL(fileURLWithPath: "/tmp/Guide.pdf")
+
+        session.beginExport()
+        #expect(session.isExporting)
+        session.finishExport(at: output)
+
+        #expect(!session.isExporting)
+        #expect(session.transientMessage == "Exported Guide.pdf")
+        #expect(session.transientActionURL == output)
+    }
 }

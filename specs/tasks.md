@@ -96,7 +96,7 @@ Requirement IDs use these prefixes:
 - [x] **T058 — Export the displayed document to HTML** (`FR-5`): Save beside the source using safe numbered filenames, preserve document structure without reader navigation UI, and report the resulting file or failure.
 - [x] **T059 — Export the displayed document to PDF** (`FR-6`): Produce polished adjacent PDFs with safe numbered filenames, no reader navigation artifacts, and clear success or failure feedback.
 - [x] **T060 — Implement independent remembered export styling** (`FR-21`): Select format and export theme independently, default to Light, remember one theme across formats, preserve publication consistency, and make motion static.
-- [ ] **T061 — Build the one-step export interaction** (`UX-12`): Implement the split button, remembered primary action, immediate alternatives, nonblocking progress, success and Finder reveal, silent numbering, and anchored retry feedback.
+- [x] **T061 — Build the one-step export interaction** (`UX-12`): Implement the split button, remembered primary action, immediate alternatives, nonblocking progress, success and Finder reveal, silent numbering, and anchored retry feedback.
 
 ### Settings, Updates, and Support
 
@@ -147,3 +147,4 @@ Requirement IDs use these prefixes:
 - [x] **E023 — Use the declared renderer verification path**: Run renderer integration tests through the Xcode test target because the asset package intentionally exposes build and audit scripts rather than an npm test script.
 - [x] **E024 — Remove duplicate native panel constraints**: Keep each split-view width contract at one view boundary so AppKit can satisfy the native sidebar and inspector constraints without recovery warnings.
 - [x] **E025 — Isolate HTML publication preparation from the reader**: Wait for fonts and images without mutating the visible page's display theme, search state, or reader controls before cloning its static export DOM.
+- [x] **E026 — Scope document commands to the focused window**: Route menu and keyboard actions through SwiftUI focused values so commands affect only the active window in a multiwindow session.

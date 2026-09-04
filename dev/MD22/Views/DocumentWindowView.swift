@@ -19,6 +19,8 @@ struct DocumentWindowView: View {
     @State private var searchQuery = ""
     @State private var searchState = DocumentSearchState()
     @State private var searchTask: Task<Void, Never>?
+    @State private var exportTask: Task<Void, Never>?
+    @State private var exportError: String?
     @State private var isDropTargeted = false
     @State private var historySelection: String?
     @State private var didAttemptRestoration = false
@@ -99,6 +101,10 @@ struct DocumentWindowView: View {
                 onToggleInspector: toggleInspector,
                 onToggleStatusBar: toggleStatusBar,
                 onToggleDistractionFree: toggleDistractionFree,
+                onOpen: openMarkdown,
+                onNavigateBack: session.navigateBack,
+                onNavigateForward: session.navigateForward,
+                onSearch: showSearch,
                 searchState: searchState,
                 onPreviousSearchResult: previousSearchResult,
                 onNextSearchResult: nextSearchResult,
@@ -106,7 +112,14 @@ struct DocumentWindowView: View {
                 documentTitle: session.title,
                 canNavigateBack: session.canNavigateBack,
                 canNavigateForward: session.canNavigateForward,
-                canExport: session.snapshot != nil
+                canExport: session.snapshot != nil,
+                exportFormat: environment.preferences.exportFormat,
+                exportTheme: environment.preferences.exportTheme,
+                isExporting: session.isExporting,
+                exportError: exportError,
+                onExport: exportDocument,
+                onRetryExport: retryExport,
+                onDismissExportError: { exportError = nil }
             )
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
@@ -163,16 +176,7 @@ struct DocumentWindowView: View {
             session.navigateForward()
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22AddBookmark)) { _ in
-            do {
-                if !session.selectedText.isEmpty {
-                    _ = try session.bookmarkSelection()
-                } else {
-                    _ = try session.bookmarkCurrentHeading()
-                }
-                session.showTransientMessage("Bookmark added")
-            } catch {
-                session.showTransientMessage(error.localizedDescription)
-            }
+            addBookmark()
         }
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleSearch)) { _ in
             searchPresented = true
@@ -213,10 +217,14 @@ struct DocumentWindowView: View {
 
     private var windowInteractionView: some View {
         focusCommandView
+        .focusedSceneValue(\.md22DocumentActions, focusedDocumentActions)
         .onOpenURL { url in
             openCurrent(url, source: .finder)
         }
-        .onDisappear { session.cancel() }
+        .onDisappear {
+            exportTask?.cancel()
+            session.cancel()
+        }
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = DocumentDropHandler.firstMarkdownURL(in: urls) else {
                 session.showTransientMessage(MD22Error.unsupportedFile.localizedDescription)
@@ -406,6 +414,97 @@ struct DocumentWindowView: View {
             await renderer.clearSearch()
             await renderer.focusDocument()
         }
+    }
+
+    private func openMarkdown() {
+        Task { @MainActor in
+            guard let url = await environment.router.chooseMarkdownFile() else { return }
+            openCurrent(url, source: .openPanel)
+        }
+    }
+
+    private func showSearch() {
+        guard session.snapshot != nil else { return }
+        searchPresented = true
+    }
+
+    private func addBookmark() {
+        do {
+            if !session.selectedText.isEmpty {
+                _ = try session.bookmarkSelection()
+            } else {
+                _ = try session.bookmarkCurrentHeading()
+            }
+            session.showTransientMessage("Bookmark added")
+        } catch {
+            session.showTransientMessage(error.localizedDescription)
+        }
+    }
+
+    private var focusedDocumentActions: FocusedDocumentActions {
+        FocusedDocumentActions(
+            canNavigateBack: session.canNavigateBack,
+            canNavigateForward: session.canNavigateForward,
+            canExport: session.snapshot != nil,
+            open: openMarkdown,
+            export: retryExport,
+            addBookmark: addBookmark,
+            navigateBack: session.navigateBack,
+            navigateForward: session.navigateForward,
+            find: showSearch,
+            toggleHistory: toggleHistory,
+            toggleInspector: toggleInspector,
+            toggleStatusBar: toggleStatusBar,
+            toggleDistractionFree: toggleDistractionFree,
+            focusHistory: { focusedRegion = .history },
+            focusDocument: {
+                focusedRegion = nil
+                Task { await renderer.focusDocument() }
+            },
+            focusInspector: { focusedRegion = .inspector },
+            focusStatusBar: { focusedRegion = .statusBar }
+        )
+    }
+
+    private func exportDocument(format: ExportFormat, theme: DisplayTheme) {
+        guard let snapshot = session.snapshot, !session.isExporting else { return }
+        environment.preferences.exportFormat = format
+        environment.preferences.exportTheme = theme
+        exportError = nil
+        session.beginExport()
+        exportTask?.cancel()
+        exportTask = Task { @MainActor in
+            do {
+                let output: URL
+                switch format {
+                case .html:
+                    output = try await environment.exportService.exportHTML(
+                        snapshot: snapshot,
+                        renderer: renderer,
+                        themeID: theme.rawValue
+                    )
+                case .pdf:
+                    output = try await environment.exportService.exportPDF(
+                        snapshot: snapshot,
+                        themeID: theme.rawValue
+                    )
+                }
+                try Task.checkCancellation()
+                session.finishExport(at: output)
+            } catch is CancellationError {
+                session.failExport()
+            } catch {
+                session.failExport()
+                exportError = error.localizedDescription
+            }
+        }
+    }
+
+    private func retryExport() {
+        exportDocument(
+            format: environment.preferences.exportFormat,
+            theme: environment.preferences.exportTheme
+        )
     }
 
     private func toggleDistractionFree() {

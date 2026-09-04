@@ -11,6 +11,10 @@ struct ReaderToolbar: ToolbarContent {
     var onToggleInspector: () -> Void = {}
     var onToggleStatusBar: () -> Void = {}
     var onToggleDistractionFree: () -> Void = {}
+    var onOpen: () -> Void = {}
+    var onNavigateBack: () -> Void = {}
+    var onNavigateForward: () -> Void = {}
+    var onSearch: () -> Void = {}
     var searchState = DocumentSearchState()
     var onPreviousSearchResult: () -> Void = {}
     var onNextSearchResult: () -> Void = {}
@@ -19,6 +23,13 @@ struct ReaderToolbar: ToolbarContent {
     var canNavigateBack = false
     var canNavigateForward = false
     var canExport = false
+    var exportFormat = ExportFormat.pdf
+    var exportTheme = DisplayTheme.light
+    var isExporting = false
+    var exportError: String?
+    var onExport: (ExportFormat, DisplayTheme) -> Void = { _, _ in }
+    var onRetryExport: () -> Void = {}
+    var onDismissExportError: () -> Void = {}
 
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .navigation) {
@@ -29,14 +40,14 @@ struct ReaderToolbar: ToolbarContent {
             .help("Show or hide History (Option-Command-1)")
 
             Button("Back", systemImage: "chevron.left") {
-                NotificationCenter.default.post(name: .md22NavigateBack, object: nil)
+                onNavigateBack()
             }
             .labelStyle(.iconOnly)
             .disabled(!canNavigateBack)
             .help("Go Back (Command-[)")
 
             Button("Forward", systemImage: "chevron.right") {
-                NotificationCenter.default.post(name: .md22NavigateForward, object: nil)
+                onNavigateForward()
             }
             .labelStyle(.iconOnly)
             .disabled(!canNavigateForward)
@@ -52,17 +63,21 @@ struct ReaderToolbar: ToolbarContent {
 
         ToolbarItemGroup(placement: .automatic) {
             Button("Open", systemImage: "folder") {
-                NotificationCenter.default.post(name: .md22OpenDocument, object: nil)
+                onOpen()
             }
             .keyboardShortcut("o", modifiers: .command)
             .help("Open Markdown…")
 
-            Button("Export", systemImage: "square.and.arrow.up") {
-                NotificationCenter.default.post(name: .md22ExportDocument, object: nil)
-            }
-            .keyboardShortcut("e", modifiers: [.command, .shift])
+            ExportToolbarControl(
+                format: exportFormat,
+                theme: exportTheme,
+                isExporting: isExporting,
+                errorMessage: exportError,
+                onExport: onExport,
+                onRetry: onRetryExport,
+                onDismissError: onDismissExportError
+            )
             .disabled(!canExport)
-            .help("Export Document")
         }
 
         ToolbarItemGroup(placement: .primaryAction) {
@@ -76,7 +91,7 @@ struct ReaderToolbar: ToolbarContent {
                 )
             } else {
                 Button("Search", systemImage: "magnifyingglass") {
-                    searchPresented = true
+                    onSearch()
                 }
                 .labelStyle(.iconOnly)
                 .keyboardShortcut("f", modifiers: .command)

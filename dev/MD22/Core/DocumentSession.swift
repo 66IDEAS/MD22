@@ -20,6 +20,8 @@ final class DocumentSession {
     private(set) var showsLoadingIndicator = false
     private(set) var errorMessage: String?
     private(set) var transientMessage: String?
+    private(set) var transientActionURL: URL?
+    private(set) var isExporting = false
     private(set) var navigationBackStack: [NavigationEntry] = []
     private(set) var navigationForwardStack: [NavigationEntry] = []
     private(set) var readingLocation = ReadingLocation.beginning
@@ -166,13 +168,30 @@ final class DocumentSession {
         updateReadingLocation(state.location)
     }
 
-    func showTransientMessage(_ message: String) {
+    func showTransientMessage(_ message: String, actionURL: URL? = nil) {
         transientMessage = message
+        transientActionURL = actionURL
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(3))
             guard self?.transientMessage == message else { return }
             self?.transientMessage = nil
+            self?.transientActionURL = nil
         }
+    }
+
+    func beginExport() {
+        isExporting = true
+        transientMessage = nil
+        transientActionURL = nil
+    }
+
+    func finishExport(at url: URL) {
+        isExporting = false
+        showTransientMessage("Exported \(url.lastPathComponent)", actionURL: url)
+    }
+
+    func failExport() {
+        isExporting = false
     }
 
     private func monitor(_ url: URL) {
