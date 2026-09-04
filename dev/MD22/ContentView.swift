@@ -8,6 +8,7 @@ struct ContentView: View {
             Text("A focused Markdown reader")
                 .foregroundStyle(.secondary)
         }
+        .liquidGlassCard()
         .frame(minWidth: 760, minHeight: 520)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("MD22 welcome")
