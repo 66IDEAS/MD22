@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Dark" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Dark" } }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Light" } }
+      }
+    },
     "A focused Markdown reader" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "A focused Markdown reader" } }
@@ -14,6 +24,11 @@
     "MD22 welcome" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "MD22 welcome" } }
+      }
+    },
+    "System" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "System" } }
       }
     },
     "That item is not a Markdown file." : {
@@ -49,4 +64,3 @@
   },
   "version" : "1.0"
 }
-

@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AppEnvironment.self) private var environment
+
     var body: some View {
         VStack(spacing: 12) {
             BrandLogo()
@@ -12,6 +14,7 @@ struct ContentView: View {
         .frame(minWidth: 760, minHeight: 520)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("MD22 welcome")
+        .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
     }
 }
 
