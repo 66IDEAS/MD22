@@ -14,7 +14,6 @@ struct ReadOnlyDocumentView: View {
                 .frame(maxWidth: .infinity, alignment: .top)
         }
         .background(.background)
-        .accessibilityLabel("Markdown document")
+        .accessibilityLabel("Read-only Markdown document")
     }
 }
-
