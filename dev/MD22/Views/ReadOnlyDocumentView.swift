@@ -47,6 +47,8 @@ struct ReadOnlyDocumentView: View {
                 await renderer.restore(session.readingLocation)
                 if let headingID = session.navigationTargetHeadingID {
                     await renderer.navigate(to: headingID)
+                } else if session.navigationEmphasizesArrival {
+                    await renderer.emphasizeCurrentLocation()
                 }
                 while !Task.isCancelled {
                     if let state = await renderer.viewState() {

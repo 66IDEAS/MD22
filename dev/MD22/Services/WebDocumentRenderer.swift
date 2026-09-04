@@ -79,6 +79,13 @@ final class WebDocumentRenderer: DocumentRendering {
         )
     }
 
+    func emphasizeCurrentLocation() async {
+        _ = try? await page.callJavaScript(
+            "return window.MD22?.emphasizeLocation()",
+            contentWorld: .page
+        )
+    }
+
     func currentLocation() async -> ReadingLocation {
         guard let result = try? await page.callJavaScript("return window.MD22?.state()", contentWorld: .page),
               let dictionary = result as? [String: Any] else { return .beginning }

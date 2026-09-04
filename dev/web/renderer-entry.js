@@ -268,9 +268,20 @@ window.MD22 = Object.freeze({
     return true;
   },
   restore: (location) => {
-    if (location?.headingID && window.MD22.navigateTo(location.headingID, false)) return;
     const maximum = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    window.scrollTo({ top: location?.verticalOffset || maximum * (location?.progress || 0), behavior: "instant" });
+    const exactOffset = location?.verticalOffset || maximum * (location?.progress || 0);
+    if (exactOffset > 0) {
+      window.scrollTo({ top: exactOffset, behavior: "instant" });
+    } else if (location?.headingID) {
+      window.MD22.navigateTo(location.headingID, false);
+    }
+  },
+  emphasizeLocation: () => {
+    const target = document.elementFromPoint(window.innerWidth / 2, Math.min(180, window.innerHeight / 3))
+      ?.closest("h1, h2, h3, h4, h5, h6, p, li, blockquote, pre, table") || root;
+    target.classList.add("arrival-target");
+    setTimeout(() => target.classList.remove("arrival-target"), 1500);
+    return true;
   },
   search,
   clearSearch,

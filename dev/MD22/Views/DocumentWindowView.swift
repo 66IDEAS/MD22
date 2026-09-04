@@ -85,6 +85,7 @@ struct DocumentWindowView: View {
             }
         }
         .frame(minWidth: 760, minHeight: 520)
+        .navigationTitle(session.windowTitle)
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
         .toolbar {
             ReaderToolbar(
@@ -374,7 +375,8 @@ struct DocumentWindowView: View {
         session.open(
             request.url,
             targetHeadingID: request.headingID,
-            targetLocation: request.location
+            targetLocation: request.location,
+            emphasizesArrival: request.source == .bookmark
         )
     }
 
@@ -382,7 +384,8 @@ struct DocumentWindowView: View {
         session.open(
             route.url,
             targetHeadingID: route.headingID,
-            targetLocation: route.location
+            targetLocation: route.location,
+            emphasizesArrival: route.source == .bookmark
         )
     }
 

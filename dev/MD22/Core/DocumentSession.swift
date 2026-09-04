@@ -24,6 +24,7 @@ final class DocumentSession {
     private(set) var navigationForwardStack: [NavigationEntry] = []
     private(set) var readingLocation = ReadingLocation.beginning
     private(set) var navigationTargetHeadingID: String?
+    private(set) var navigationEmphasizesArrival = false
     private(set) var hoveredLinkDestination: String?
     private(set) var selectedText = ""
 
@@ -34,6 +35,11 @@ final class DocumentSession {
     }
 
     var title: String? { snapshot?.url.lastPathComponent }
+    var windowTitle: String {
+        guard let url = snapshot?.url else { return "MD22" }
+        let parent = url.deletingLastPathComponent().lastPathComponent
+        return parent.isEmpty ? url.lastPathComponent : "\(url.lastPathComponent) — \(parent)"
+    }
     var canNavigateBack: Bool { !navigationBackStack.isEmpty }
     var canNavigateForward: Bool { !navigationForwardStack.isEmpty }
     var currentSection: String? {
@@ -48,7 +54,8 @@ final class DocumentSession {
         _ url: URL,
         recordsNavigation: Bool = true,
         targetHeadingID: String? = nil,
-        targetLocation: ReadingLocation? = nil
+        targetLocation: ReadingLocation? = nil,
+        emphasizesArrival: Bool = false
     ) {
         loadTask?.cancel()
         generation += 1
@@ -57,6 +64,7 @@ final class DocumentSession {
         errorMessage = nil
         isLoading = true
         navigationTargetHeadingID = targetHeadingID
+        navigationEmphasizesArrival = emphasizesArrival
         showsLoadingIndicator = false
         loadingIndicatorTask?.cancel()
         loadingIndicatorTask = Task { [weak self] in

@@ -83,4 +83,36 @@ struct DocumentSessionTests {
         #expect(try environment.history.readingLocation(for: file) == location)
         session.cancel()
     }
+
+    @Test("Two windows keep independent locations for the same file")
+    func independentWindowLocations() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: UUID().uuidString, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appending(path: "Shared.md")
+        try "# Start\n\n## Middle\n\n## End".write(to: file, atomically: true, encoding: .utf8)
+
+        let persistence = try PersistenceController(isStoredInMemoryOnly: true)
+        let suite = try #require(UserDefaults(suiteName: UUID().uuidString))
+        let environment = AppEnvironment(persistence: persistence, defaults: suite)
+        let first = DocumentSession(environment: environment)
+        let second = DocumentSession(environment: environment)
+        let firstLocation = ReadingLocation(headingID: "middle", progress: 0.4, verticalOffset: 400)
+        let secondLocation = ReadingLocation(headingID: "end", progress: 0.9, verticalOffset: 900)
+
+        first.open(file, targetLocation: firstLocation)
+        second.open(file, targetLocation: secondLocation, emphasizesArrival: true)
+        for _ in 0..<100 where first.snapshot == nil || second.snapshot == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        #expect(first.readingLocation == firstLocation)
+        #expect(second.readingLocation == secondLocation)
+        #expect(!first.navigationEmphasizesArrival)
+        #expect(second.navigationEmphasizesArrival)
+        #expect(first.windowTitle.hasPrefix("Shared.md — "))
+        first.cancel()
+        second.cancel()
+    }
 }

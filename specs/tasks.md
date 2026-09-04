@@ -89,7 +89,7 @@ Requirement IDs use these prefixes:
 - [x] **T054 — Implement responsive panels and distraction-free mode** (`UX-16`): Support native resizing, transitions, narrow-window overlays, restoration, per-window layouts, and standard full-screen toolbar behavior.
 - [x] **T055 — Complete keyboard and assistive access** (`UX-17`): Implement predictable region focus, standard reading and list keys, visible focus affordances, VoiceOver semantics, shortcut discovery, and accessibility-setting adaptations.
 - [x] **T056 — Open history entries and bookmarks in new windows** (`FR-22`): Preserve the originating window, restore files or bookmark targets, permit duplicate-file windows, and re-add retained bookmark files to history.
-- [ ] **T057 — Implement native multiwindow continuity** (`UX-25`): Cascade and identify new windows, inherit global appearance, keep window state independent, emphasize bookmark arrival, and preserve standard macOS window behavior.
+- [x] **T057 — Implement native multiwindow continuity** (`UX-25`): Cascade and identify new windows, inherit global appearance, keep window state independent, emphasize bookmark arrival, and preserve standard macOS window behavior.
 
 ### Export
 
