@@ -33,7 +33,7 @@ Requirement IDs use these prefixes:
 - [x] **T016 — Centralize native file and window routing** (`ARCH-21`): Route UTType registration, Finder and Open With events, drops, commands, links, history, bookmarks, new windows, Finder reveal, and external URLs through shared services.
 - [x] **T017 — Support direct Markdown opening** (`FR-9`): Implement Open, file association, double-click, Open With, history insertion, and standard keyboard access without importing files.
 - [x] **T018 — Support drag-and-drop viewing** (`FR-1`): Accept valid Markdown drops, render them, add them to history, and reject invalid drops without disrupting the current document.
-- [ ] **T019 — Implement the first-launch and drop experience** (`UX-13`): Present the complete window shell, restrained welcome content, drop emphasis, native Open action, and calm invalid-item feedback.
+- [x] **T019 — Implement the first-launch and drop experience** (`UX-13`): Present the complete window shell, restrained welcome content, drop emphasis, native Open action, and calm invalid-item feedback.
 - [ ] **T020 — Enforce a read-only viewer experience** (`FR-7`): Exclude editing and source-save workflows, accounts, vaults, folder indexing, and startup dashboards while guaranteeing that source Markdown is never modified.
 
 ### Persistence, History, and Pins

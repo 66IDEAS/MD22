@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @Environment(AppEnvironment.self) private var environment
     var isDropTargeted = false
 
     var body: some View {
@@ -12,13 +13,18 @@ struct WelcomeView: View {
             Label("Drop a Markdown file here", systemImage: "arrow.down.doc")
                 .font(.headline)
                 .padding(.top, 8)
-            Text("or choose Open from the toolbar")
-                .font(.subheadline)
+            Button("Open Markdown…", systemImage: "folder") {
+                NotificationCenter.default.post(name: .md22OpenDocument, object: nil)
+            }
+            .buttonStyle(.glassProminent)
+            .keyboardShortcut("o", modifiers: .command)
+            Text("Files stay in place and are never imported.")
+                .font(.caption)
                 .foregroundStyle(.tertiary)
         }
         .liquidGlassCard()
         .scaleEffect(isDropTargeted ? 1.025 : 1)
-        .animation(.snappy, value: isDropTargeted)
+        .animation(environment.accessibility.reduceMotion ? nil : .snappy, value: isDropTargeted)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("MD22 welcome")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
