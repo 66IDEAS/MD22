@@ -82,6 +82,8 @@ final class PreferencesStore {
         static let showsHistory = "showsHistory"
         static let showsInspector = "showsInspector"
         static let showsStatusBar = "showsStatusBar"
+        static let exportFormat = "exportFormat"
+        static let exportTheme = "exportTheme"
     }
 
     private let defaults: UserDefaults
@@ -112,6 +114,14 @@ final class PreferencesStore {
         didSet { defaults.set(showsStatusBar, forKey: Key.showsStatusBar) }
     }
 
+    var exportFormat: ExportFormat {
+        didSet { defaults.set(exportFormat.rawValue, forKey: Key.exportFormat) }
+    }
+
+    var exportTheme: DisplayTheme {
+        didSet { defaults.set(exportTheme.rawValue, forKey: Key.exportTheme) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         appAppearance = AppAppearance(rawValue: defaults.string(forKey: Key.appAppearance) ?? "") ?? .system
@@ -125,6 +135,8 @@ final class PreferencesStore {
         showsHistory = defaults.object(forKey: Key.showsHistory) as? Bool ?? true
         showsInspector = defaults.object(forKey: Key.showsInspector) as? Bool ?? true
         showsStatusBar = defaults.object(forKey: Key.showsStatusBar) as? Bool ?? true
+        exportFormat = ExportFormat(rawValue: defaults.string(forKey: Key.exportFormat) ?? "") ?? .pdf
+        exportTheme = DisplayTheme(rawValue: defaults.string(forKey: Key.exportTheme) ?? "") ?? .light
     }
 
     func resetReadingSettings() {

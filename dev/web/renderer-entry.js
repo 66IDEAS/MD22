@@ -287,11 +287,7 @@ window.MD22 = Object.freeze({
   clearSearch,
   nextSearch: () => activateSearch(state.activeSearchIndex + 1),
   previousSearch: () => activateSearch(state.activeSearchIndex - 1),
-  prepareExport: async (themeID) => {
-    clearSearch();
-    document.documentElement.dataset.theme = themeID || "light";
-    document.documentElement.dataset.reduceMotion = "true";
-    document.documentElement.dataset.exporting = "true";
+  waitForExportResources: async () => {
     await document.fonts?.ready;
     const pendingImages = [...document.images]
       .filter((image) => !image.complete)
@@ -304,6 +300,13 @@ window.MD22 = Object.freeze({
       new Promise((resolve) => setTimeout(resolve, 3000))
     ]);
     return true;
+  },
+  prepareExport: async (themeID) => {
+    clearSearch();
+    document.documentElement.dataset.theme = themeID || "light";
+    document.documentElement.dataset.reduceMotion = "true";
+    document.documentElement.dataset.exporting = "true";
+    return window.MD22.waitForExportResources();
   },
   exportHTML: (themeID) => {
     const clone = document.documentElement.cloneNode(true);

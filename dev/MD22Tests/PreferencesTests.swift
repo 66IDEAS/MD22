@@ -11,6 +11,8 @@ struct PreferencesTests {
         let defaults = try #require(UserDefaults(suiteName: suiteName))
         defer { defaults.removePersistentDomain(forName: suiteName) }
         let preferences = PreferencesStore(defaults: defaults)
+        #expect(preferences.exportFormat == .pdf)
+        #expect(preferences.exportTheme == .light)
         preferences.readingSettings = ReadingSettings(
             fontScale: 9,
             lineSpacing: 1.5,
@@ -36,5 +38,11 @@ struct PreferencesTests {
         #expect(!layoutRestored.showsHistory)
         #expect(!layoutRestored.showsInspector)
         #expect(!layoutRestored.showsStatusBar)
+
+        preferences.exportFormat = .html
+        preferences.exportTheme = .sciFi
+        let exportRestored = PreferencesStore(defaults: defaults)
+        #expect(exportRestored.exportFormat == .html)
+        #expect(exportRestored.exportTheme == .sciFi)
     }
 }

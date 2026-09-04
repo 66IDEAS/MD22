@@ -52,9 +52,13 @@ enum BookmarkKind: String, Sendable, Codable, CaseIterable {
     case position
 }
 
-enum ExportFormat: String, Sendable, Codable, CaseIterable {
+enum ExportFormat: String, Sendable, Codable, CaseIterable, Identifiable {
     case html
     case pdf
+
+    var id: String { rawValue }
+    var title: String { self == .html ? "HTML" : "PDF" }
+    var pathExtension: String { rawValue }
 }
 
 enum MD22Error: LocalizedError, Sendable, Equatable {
