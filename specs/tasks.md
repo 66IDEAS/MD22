@@ -74,7 +74,7 @@ Requirement IDs use these prefixes:
 
 ### Long-Document Navigation and Bookmarks
 
-- [ ] **T045 — Implement the heading outline** (`FR-13`): Build the right-panel outline hierarchy, heading navigation, current-section tracking, collapse behavior, and refresh updates.
+- [x] **T045 — Implement the heading outline** (`FR-13`): Build the right-panel outline hierarchy, heading navigation, current-section tracking, collapse behavior, and refresh updates.
 - [ ] **T046 — Build the quiet Outline and Bookmarks inspector** (`UX-7`): Implement its segmented tabs, restrained outline tracking, compact bookmark rows, scope filter, contextual actions, and accessible unavailable states.
 - [ ] **T047 — Implement document bookmarks** (`FR-19`): Support heading, passage, and position bookmarks; current and all-file scopes; retained metadata; target restoration; and removal of invalidated targets without changing source.
 - [ ] **T048 — Implement immediate contextual bookmarking** (`UX-11`): Add margin, selection, menu, keyboard, confirmation, and direct-removal interactions without modal naming or forced tab changes.
@@ -140,3 +140,4 @@ Requirement IDs use these prefixes:
 - [x] **E016 — Normalize generated renderer whitespace**: Remove line-ending whitespace emitted inside bundled grammar literals so repository hygiene checks remain deterministic.
 - [x] **E017 — Preserve fragments on project-relative links**: Resolve local paths independently from percent-encoded heading fragments so cross-document anchor navigation retains its target.
 - [x] **E018 — Isolate defaults in concurrent session tests**: Inject per-test defaults suites so parallel document sessions cannot race over the application-level restoration key.
+- [x] **E019 — Align duplicate heading anchors across native and web renderers**: Use the same zero-based duplicate suffix progression so outline, links, bookmarks, reading state, and rendered headings share stable identifiers.

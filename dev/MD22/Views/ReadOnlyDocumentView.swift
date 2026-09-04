@@ -4,8 +4,8 @@ import WebKit
 struct ReadOnlyDocumentView: View {
     let snapshot: DocumentSnapshot
     let session: DocumentSession
+    let renderer: WebDocumentRenderer
     @Environment(AppEnvironment.self) private var environment
-    @State private var renderer = WebDocumentRenderer()
 
     var body: some View {
         ZStack {

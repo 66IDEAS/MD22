@@ -3,6 +3,7 @@ import SwiftUI
 struct DocumentWindowView: View {
     let environment: AppEnvironment
     @State private var session: DocumentSession
+    @State private var renderer: WebDocumentRenderer
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var inspectorPresented = true
     @State private var searchPresented = false
@@ -13,6 +14,7 @@ struct DocumentWindowView: View {
     init(environment: AppEnvironment) {
         self.environment = environment
         _session = State(initialValue: DocumentSession(environment: environment))
+        _renderer = State(initialValue: WebDocumentRenderer())
     }
 
     var body: some View {
@@ -28,7 +30,7 @@ struct DocumentWindowView: View {
                 documentContent
             }
             .inspector(isPresented: $inspectorPresented) {
-                DocumentInspectorView()
+                DocumentInspectorView(session: session, renderer: renderer)
             }
 
             Divider()
@@ -145,7 +147,7 @@ struct DocumentWindowView: View {
     @ViewBuilder
     private var documentContent: some View {
         if let snapshot = session.snapshot {
-            ReadOnlyDocumentView(snapshot: snapshot, session: session)
+            ReadOnlyDocumentView(snapshot: snapshot, session: session, renderer: renderer)
                 .overlay(alignment: .top) {
                     if session.showsLoadingIndicator {
                         ProgressView()

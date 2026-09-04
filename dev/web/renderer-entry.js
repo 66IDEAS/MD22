@@ -21,7 +21,7 @@ const slugify = (value) => {
     .replace(/[^\p{Letter}\p{Number}]+/gu, "-").replace(/^-|-$/g, "") || "section";
   const count = slugCounts.get(base) || 0;
   slugCounts.set(base, count + 1);
-  return count ? `${base}-${count + 1}` : base;
+  return count ? `${base}-${count}` : base;
 };
 
 const md = new MarkdownIt({
