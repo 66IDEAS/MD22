@@ -2,18 +2,24 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AppEnvironment.self) private var environment
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
+    @State private var inspectorPresented = true
 
     var body: some View {
-        VStack(spacing: 12) {
-            BrandLogo()
-                .frame(width: 190, height: 60)
-            Text("A focused Markdown reader")
-                .foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+            NavigationSplitView(columnVisibility: $columnVisibility) {
+                HistorySidebarView()
+            } detail: {
+                WelcomeView()
+            }
+            .inspector(isPresented: $inspectorPresented) {
+                DocumentInspectorView()
+            }
+
+            Divider()
+            ReadingStatusBar()
         }
-        .liquidGlassCard()
         .frame(minWidth: 760, minHeight: 520)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("MD22 welcome")
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
     }
 }

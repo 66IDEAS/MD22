@@ -25,7 +25,7 @@ Requirement IDs use these prefixes:
 - [x] **T011 — Establish accessibility and localization foundations** (`ARCH-22`): Use semantic native and HTML structures, honor system accessibility settings, and externalize all strings through String Catalogs.
 - [x] **T012 — Apply the native Liquid Glass visual language** (`UX-1`): Style the application shell, controls, sidebars, selection, spacing, and motion according to current macOS conventions.
 - [x] **T013 — Build independent application appearances** (`UX-2`): Provide polished System, Light, and Dark application chrome that remains independent from document themes.
-- [ ] **T014 — Construct the reading-first window composition** (`UX-3`): Make the document dominant, with compact left history, narrower right inspector, and quiet bottom status areas that yield space appropriately.
+- [x] **T014 — Construct the reading-first window composition** (`UX-3`): Make the document dominant, with compact left history, narrower right inspector, and quiet bottom status areas that yield space appropriately.
 
 ### Application Shell and File Opening
 
