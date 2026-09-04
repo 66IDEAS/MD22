@@ -19,6 +19,16 @@ struct RendererCoreTests {
         #expect(linked?.fragment == "details")
     }
 
+    @Test("Missing project links are identified without indexing the project")
+    func missingReferences() {
+        let document = URL(fileURLWithPath: "/tmp/project/readme.md")
+        let missing = LocalReferenceScanner.missingReferences(
+            in: "[Missing](docs/unknown.md) [Web](https://example.com)",
+            documentURL: document
+        )
+        #expect(missing == ["docs/unknown.md"])
+    }
+
     @Test("A missing heading falls back to bounded reading progress")
     func bookmarkFallback() {
         let target = BookmarkTarget(

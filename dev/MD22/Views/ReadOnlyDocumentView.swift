@@ -35,7 +35,14 @@ struct ReadOnlyDocumentView: View {
                 if let headingID = session.navigationTargetHeadingID {
                     await renderer.navigate(to: headingID)
                 }
+                while !Task.isCancelled {
+                    if let state = await renderer.viewState() {
+                        session.updateRendererState(state)
+                    }
+                    try await Task.sleep(for: .milliseconds(250))
+                }
             } catch {
+                guard !Task.isCancelled else { return }
                 session.showTransientMessage(error.localizedDescription)
             }
         }

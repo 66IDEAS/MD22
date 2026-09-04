@@ -100,4 +100,19 @@ final class WebDocumentRenderer: DocumentRendering {
             contentWorld: .page
         ) as? String
     }
+
+    func viewState() async -> RendererViewState? {
+        guard let result = try? await page.callJavaScript("return window.MD22?.state()", contentWorld: .page),
+              let state = result as? [String: Any] else { return nil }
+        return RendererViewState(
+            location: ReadingLocation(
+                headingID: state["headingID"] as? String,
+                progress: state["progress"] as? Double ?? 0,
+                verticalOffset: state["verticalOffset"] as? Double ?? 0
+            ),
+            wordCount: state["wordCount"] as? Int ?? 0,
+            linkDestination: state["linkDestination"] as? String,
+            selectedText: state["selectedText"] as? String ?? ""
+        )
+    }
 }

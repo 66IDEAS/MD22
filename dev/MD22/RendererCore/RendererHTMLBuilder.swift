@@ -46,7 +46,11 @@ enum RendererHTMLBuilder {
             "markdown": snapshot.markdown,
             "documentURL": snapshot.url.absoluteString,
             "mermaidTheme": mermaidTheme,
-            "reduceMotion": reduceMotion
+            "reduceMotion": reduceMotion,
+            "missingReferences": LocalReferenceScanner.missingReferences(
+                in: snapshot.markdown,
+                documentURL: snapshot.url
+            )
         ]
         let data = try JSONSerialization.data(withJSONObject: bootstrap, options: [.sortedKeys])
         guard var bootstrapJSON = String(data: data, encoding: .utf8) else {
@@ -92,5 +96,23 @@ enum RendererHTMLBuilder {
             .replacingOccurrences(of: "<", with: "&lt;")
             .replacingOccurrences(of: ">", with: "&gt;")
             .replacingOccurrences(of: "\"", with: "&quot;")
+    }
+}
+
+enum LocalReferenceScanner {
+    static func missingReferences(in markdown: String, documentURL: URL) -> [String] {
+        guard let expression = try? NSRegularExpression(
+            pattern: #"(?<!!)\[[^\]]*\]\(([^\s\)]+)"#
+        ) else { return [] }
+        let range = NSRange(markdown.startIndex..., in: markdown)
+        return expression.matches(in: markdown, range: range).compactMap { match in
+            guard let valueRange = Range(match.range(at: 1), in: markdown) else { return nil }
+            let reference = String(markdown[valueRange])
+            guard !reference.hasPrefix("#"),
+                  let url = ResourceResolver.resolve(reference, relativeTo: documentURL),
+                  url.isFileURL,
+                  !FileManager.default.fileExists(atPath: url.path) else { return nil }
+            return reference
+        }
     }
 }

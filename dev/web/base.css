@@ -29,6 +29,8 @@ p, ul, ol, blockquote, table, pre, .katex-display, .callout { margin-block: 1.15
 a { color: var(--accent); text-decoration-thickness: .08em; text-underline-offset: .18em; }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 a.external-link::after { content: " ↗"; font: .75em ui-sans-serif, sans-serif; }
+a.broken-link { color: var(--muted); text-decoration-style: wavy; text-decoration-color: #c23b2f; }
+a.broken-link::after { content: " ⚠"; font: .72em ui-sans-serif, sans-serif; color: #c23b2f; }
 img, svg { display: block; max-width: 100%; height: auto; margin: 1.6em auto; }
 blockquote { border-inline-start: 3px solid var(--accent); color: var(--muted); margin-inline: 0; padding-inline: 1.2em; }
 hr { border: 0; border-top: 1px solid var(--line); margin: 3em 0; }

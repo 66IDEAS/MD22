@@ -27,6 +27,18 @@ struct ReadingLocation: Sendable, Codable, Equatable {
     static let beginning = ReadingLocation(headingID: nil, progress: 0, verticalOffset: 0)
 }
 
+struct NavigationEntry: Sendable, Equatable {
+    let url: URL
+    let location: ReadingLocation
+}
+
+struct RendererViewState: Sendable, Equatable {
+    let location: ReadingLocation
+    let wordCount: Int
+    let linkDestination: String?
+    let selectedText: String
+}
+
 enum BookmarkKind: String, Sendable, Codable, CaseIterable {
     case heading
     case passage

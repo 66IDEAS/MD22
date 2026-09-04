@@ -61,7 +61,7 @@ Requirement IDs use these prefixes:
 - [x] **T035 — Render the complete rich Markdown set** (`FR-11`): Support highlighted code and copy, tables, read-only tasks, footnotes, math, Mermaid, callouts, and sanitized embedded HTML with graceful partial failure.
 - [x] **T036 — Style rich content coherently** (`UX-19`): Apply the approved themed treatments for code, tables, tasks, callouts, footnotes, mathematics, Mermaid, embedded HTML, and wide-content overflow.
 - [x] **T037 — Resolve and navigate project-relative content** (`FR-10`): Render local images, follow Markdown links and anchors, open external links appropriately, support back and forward, and communicate missing targets without indexing a project.
-- [ ] **T038 — Implement spatially clear link feedback** (`UX-18`): Show destinations, preserve navigation locations, emphasize anchor targets, distinguish external and broken links, and maintain accessible focus and visited states.
+- [x] **T038 — Implement spatially clear link feedback** (`UX-18`): Show destinations, preserve navigation locations, emphasize anchor targets, distinguish external and broken links, and maintain accessible focus and visited states.
 
 ### Themes and Reading Appearance
 

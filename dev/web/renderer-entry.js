@@ -119,6 +119,11 @@ root.querySelectorAll("input.task-list-item-checkbox").forEach((checkbox) => {
 
 root.querySelectorAll("a[href]").forEach((link) => {
   const href = link.getAttribute("href");
+  if ((bootstrap.missingReferences || []).includes(href)) {
+    link.classList.add("broken-link");
+    link.setAttribute("aria-label", `${link.textContent}, unavailable link to ${href}`);
+    link.title = `Unavailable: ${href}`;
+  }
   if (/^https?:/i.test(href)) {
     link.classList.add("external-link");
     link.setAttribute("rel", "noopener noreferrer");

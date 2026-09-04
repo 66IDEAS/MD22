@@ -32,7 +32,7 @@ struct DocumentWindowView: View {
             }
 
             Divider()
-            ReadingStatusBar()
+            ReadingStatusBar(session: session)
         }
         .frame(minWidth: 760, minHeight: 520)
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)

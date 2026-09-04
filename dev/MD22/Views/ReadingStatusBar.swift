@@ -1,11 +1,20 @@
 import SwiftUI
 
 struct ReadingStatusBar: View {
+    let session: DocumentSession
+
     var body: some View {
         HStack(spacing: 14) {
-            Label("Ready", systemImage: "checkmark.circle")
+            if let destination = session.hoveredLinkDestination {
+                Label(destination, systemImage: "link")
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .help(destination)
+            } else {
+                Label("Ready", systemImage: "checkmark.circle")
+            }
             Spacer(minLength: 12)
-            Text("No document")
+            Text(session.snapshot?.url.lastPathComponent ?? "No document")
                 .foregroundStyle(.secondary)
             Divider().frame(height: 12)
             Button("Light", systemImage: "circle.lefthalf.filled") {}
@@ -20,4 +29,3 @@ struct ReadingStatusBar: View {
         .accessibilityLabel("Reading status")
     }
 }
-

@@ -19,10 +19,12 @@ final class DocumentSession {
     private(set) var showsLoadingIndicator = false
     private(set) var errorMessage: String?
     private(set) var transientMessage: String?
-    private(set) var navigationBackStack: [URL] = []
-    private(set) var navigationForwardStack: [URL] = []
+    private(set) var navigationBackStack: [NavigationEntry] = []
+    private(set) var navigationForwardStack: [NavigationEntry] = []
     private(set) var readingLocation = ReadingLocation.beginning
     private(set) var navigationTargetHeadingID: String?
+    private(set) var hoveredLinkDestination: String?
+    private(set) var selectedText = ""
 
     init(environment: AppEnvironment) {
         fileAccess = environment.fileAccess
@@ -33,7 +35,12 @@ final class DocumentSession {
     var canNavigateBack: Bool { !navigationBackStack.isEmpty }
     var canNavigateForward: Bool { !navigationForwardStack.isEmpty }
 
-    func open(_ url: URL, recordsNavigation: Bool = true, targetHeadingID: String? = nil) {
+    func open(
+        _ url: URL,
+        recordsNavigation: Bool = true,
+        targetHeadingID: String? = nil,
+        targetLocation: ReadingLocation? = nil
+    ) {
         loadTask?.cancel()
         generation += 1
         let requestedGeneration = generation
@@ -55,13 +62,13 @@ final class DocumentSession {
                 try Task.checkCancellation()
                 guard let self, requestedGeneration == self.generation else { return }
                 if recordsNavigation, let previousURL, previousURL != loaded.url {
-                    self.navigationBackStack.append(previousURL)
+                    self.navigationBackStack.append(NavigationEntry(url: previousURL, location: self.readingLocation))
                     self.navigationForwardStack.removeAll()
                 }
                 self.snapshot = loaded
                 self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
                 _ = try self.history.recordOpen(loaded)
-                self.readingLocation = try self.history.readingLocation(for: loaded.url)
+                self.readingLocation = try targetLocation ?? self.history.readingLocation(for: loaded.url)
                 self.isLoading = false
                 self.showsLoadingIndicator = false
                 self.loadingIndicatorTask?.cancel()
@@ -84,14 +91,18 @@ final class DocumentSession {
 
     func navigateBack() {
         guard let destination = navigationBackStack.popLast() else { return }
-        if let current = snapshot?.url { navigationForwardStack.append(current) }
-        open(destination, recordsNavigation: false)
+        if let current = snapshot?.url {
+            navigationForwardStack.append(NavigationEntry(url: current, location: readingLocation))
+        }
+        open(destination.url, recordsNavigation: false, targetLocation: destination.location)
     }
 
     func navigateForward() {
         guard let destination = navigationForwardStack.popLast() else { return }
-        if let current = snapshot?.url { navigationBackStack.append(current) }
-        open(destination, recordsNavigation: false)
+        if let current = snapshot?.url {
+            navigationBackStack.append(NavigationEntry(url: current, location: readingLocation))
+        }
+        open(destination.url, recordsNavigation: false, targetLocation: destination.location)
     }
 
     func cancel() {
@@ -120,6 +131,7 @@ final class DocumentSession {
     }
 
     func updateReadingLocation(_ location: ReadingLocation) {
+        guard readingLocation != location else { return }
         readingLocation = location
         guard let url = snapshot?.url else { return }
         readingLocationSaveTask?.cancel()
@@ -128,6 +140,12 @@ final class DocumentSession {
             guard !Task.isCancelled else { return }
             try? self?.history.saveReadingLocation(location, for: url)
         }
+    }
+
+    func updateRendererState(_ state: RendererViewState) {
+        hoveredLinkDestination = state.linkDestination
+        selectedText = state.selectedText
+        updateReadingLocation(state.location)
     }
 
     func showTransientMessage(_ message: String) {
