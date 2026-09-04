@@ -22,6 +22,7 @@ final class DocumentSession {
     private(set) var navigationBackStack: [URL] = []
     private(set) var navigationForwardStack: [URL] = []
     private(set) var readingLocation = ReadingLocation.beginning
+    private(set) var navigationTargetHeadingID: String?
 
     init(environment: AppEnvironment) {
         fileAccess = environment.fileAccess
@@ -32,13 +33,14 @@ final class DocumentSession {
     var canNavigateBack: Bool { !navigationBackStack.isEmpty }
     var canNavigateForward: Bool { !navigationForwardStack.isEmpty }
 
-    func open(_ url: URL, recordsNavigation: Bool = true) {
+    func open(_ url: URL, recordsNavigation: Bool = true, targetHeadingID: String? = nil) {
         loadTask?.cancel()
         generation += 1
         let requestedGeneration = generation
         let previousURL = snapshot?.url
         errorMessage = nil
         isLoading = true
+        navigationTargetHeadingID = targetHeadingID
         showsLoadingIndicator = false
         loadingIndicatorTask?.cancel()
         loadingIndicatorTask = Task { [weak self] in

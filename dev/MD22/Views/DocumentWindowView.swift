@@ -50,7 +50,7 @@ struct DocumentWindowView: View {
         .onChange(of: environment.router.pendingRoute?.id, initial: true) { _, _ in
             guard let route = environment.router.pendingRoute,
                   route.disposition == .currentWindow else { return }
-            session.open(route.url)
+            session.open(route.url, targetHeadingID: route.headingID)
         }
         .task {
             guard !didAttemptRestoration else { return }
@@ -145,7 +145,7 @@ struct DocumentWindowView: View {
     @ViewBuilder
     private var documentContent: some View {
         if let snapshot = session.snapshot {
-            ReadOnlyDocumentView(snapshot: snapshot)
+            ReadOnlyDocumentView(snapshot: snapshot, session: session)
                 .overlay(alignment: .top) {
                     if session.showsLoadingIndicator {
                         ProgressView()

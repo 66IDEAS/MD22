@@ -15,7 +15,8 @@ struct DocumentSessionTests {
         try "# Hello\n\nRead me.".write(to: file, atomically: true, encoding: .utf8)
 
         let persistence = try PersistenceController(isStoredInMemoryOnly: true)
-        let environment = AppEnvironment(persistence: persistence)
+        let suite = try #require(UserDefaults(suiteName: UUID().uuidString))
+        let environment = AppEnvironment(persistence: persistence, defaults: suite)
         let session = DocumentSession(environment: environment)
         session.open(file)
 
@@ -36,7 +37,8 @@ struct DocumentSessionTests {
         try "# Before".write(to: file, atomically: true, encoding: .utf8)
 
         let persistence = try PersistenceController(isStoredInMemoryOnly: true)
-        let environment = AppEnvironment(persistence: persistence)
+        let suite = try #require(UserDefaults(suiteName: UUID().uuidString))
+        let environment = AppEnvironment(persistence: persistence, defaults: suite)
         let session = DocumentSession(environment: environment)
         session.open(file)
         for _ in 0..<100 where session.snapshot == nil {
@@ -64,7 +66,8 @@ struct DocumentSessionTests {
         try "# Start\n\n# Chapter".write(to: file, atomically: true, encoding: .utf8)
 
         let persistence = try PersistenceController(isStoredInMemoryOnly: true)
-        let environment = AppEnvironment(persistence: persistence)
+        let suite = try #require(UserDefaults(suiteName: UUID().uuidString))
+        let environment = AppEnvironment(persistence: persistence, defaults: suite)
         let location = ReadingLocation(headingID: "chapter", progress: 0.7, verticalOffset: 900)
         try environment.history.saveReadingLocation(location, for: file)
         let session = DocumentSession(environment: environment)

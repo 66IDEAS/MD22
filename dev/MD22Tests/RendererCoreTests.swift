@@ -14,6 +14,9 @@ struct RendererCoreTests {
     func relativeResources() {
         let document = URL(fileURLWithPath: "/tmp/project/docs/readme.md")
         #expect(ResourceResolver.resolve("../images/diagram.png", relativeTo: document)?.path == "/tmp/project/images/diagram.png")
+        let linked = ResourceResolver.resolve("chapter.md#details", relativeTo: document)
+        #expect(linked?.path == "/tmp/project/docs/chapter.md")
+        #expect(linked?.fragment == "details")
     }
 
     @Test("A missing heading falls back to bounded reading progress")
@@ -31,4 +34,3 @@ struct RendererCoreTests {
         #expect(location == ReadingLocation(headingID: nil, progress: 1, verticalOffset: 0))
     }
 }
-

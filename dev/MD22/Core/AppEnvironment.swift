@@ -1,4 +1,5 @@
 import Observation
+import Foundation
 
 @MainActor
 @Observable
@@ -14,12 +15,13 @@ final class AppEnvironment {
     init(
         fileAccess: any FileAccessing = FileAccessService(),
         platform: any PlatformIntegrating = PlatformIntegrationService(),
-        persistence: PersistenceController? = nil
+        persistence: PersistenceController? = nil,
+        defaults: UserDefaults = .standard
     ) {
         self.fileAccess = fileAccess
         self.platform = platform
         router = DocumentRouter(platform: platform)
         self.persistence = persistence ?? PersistenceController.openRecovering()
-        history = HistoryRepository(container: self.persistence.container)
+        history = HistoryRepository(container: self.persistence.container, defaults: defaults)
     }
 }

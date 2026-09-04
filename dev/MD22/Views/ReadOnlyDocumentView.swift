@@ -3,6 +3,7 @@ import WebKit
 
 struct ReadOnlyDocumentView: View {
     let snapshot: DocumentSnapshot
+    let session: DocumentSession
     @Environment(AppEnvironment.self) private var environment
     @State private var renderer = WebDocumentRenderer()
 
@@ -28,7 +29,15 @@ struct ReadOnlyDocumentView: View {
             }
         }
         .task(id: snapshot) {
-            try? await renderer.render(snapshot: snapshot, themeID: "light")
+            do {
+                try await renderer.render(snapshot: snapshot, themeID: "light")
+                await renderer.restore(session.readingLocation)
+                if let headingID = session.navigationTargetHeadingID {
+                    await renderer.navigate(to: headingID)
+                }
+            } catch {
+                session.showTransientMessage(error.localizedDescription)
+            }
         }
         .onChange(of: renderer.pendingNavigationURL) { _, _ in
             guard let destination = renderer.consumePendingNavigation() else { return }
@@ -42,7 +51,15 @@ struct ReadOnlyDocumentView: View {
            let fragment = destination.fragment {
             Task { await renderer.navigate(to: fragment) }
         } else if destination.isFileURL, DocumentRouter.accepts(destination) {
-            try? environment.router.route(destination, source: .link)
+            guard FileManager.default.isReadableFile(atPath: destination.path) else {
+                session.showTransientMessage("The linked Markdown file is unavailable.")
+                return
+            }
+            do {
+                try environment.router.route(destination, source: .link)
+            } catch {
+                session.showTransientMessage(error.localizedDescription)
+            }
         } else {
             environment.platform.openExternally(destination)
         }

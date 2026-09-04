@@ -23,6 +23,7 @@ struct DocumentRoute: Identifiable, Sendable {
     let source: DocumentRouteSource
     let disposition: DocumentOpenDisposition
     let bookmarkID: UUID?
+    let headingID: String?
 }
 
 @MainActor
@@ -53,13 +54,17 @@ final class DocumentRouter {
         disposition: DocumentOpenDisposition = .currentWindow,
         bookmarkID: UUID? = nil
     ) throws {
-        let canonicalURL = url.standardizedFileURL
+        let headingID = url.fragment
+        var components = URLComponents(url: url.standardizedFileURL, resolvingAgainstBaseURL: false)
+        components?.fragment = nil
+        let canonicalURL = components?.url ?? url.standardizedFileURL
         guard Self.accepts(canonicalURL) else { throw MD22Error.unsupportedFile }
         pendingRoute = DocumentRoute(
             url: canonicalURL,
             source: source,
             disposition: disposition,
-            bookmarkID: bookmarkID
+            bookmarkID: bookmarkID,
+            headingID: headingID
         )
     }
 

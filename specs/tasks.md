@@ -60,7 +60,7 @@ Requirement IDs use these prefixes:
 - [x] **T034 — Build one canonical rendering and export pipeline** (`ARCH-13`): Share parser configuration, semantic HTML, extensions, anchors, theme tokens, and assets across reading, HTML, and PDF output.
 - [x] **T035 — Render the complete rich Markdown set** (`FR-11`): Support highlighted code and copy, tables, read-only tasks, footnotes, math, Mermaid, callouts, and sanitized embedded HTML with graceful partial failure.
 - [x] **T036 — Style rich content coherently** (`UX-19`): Apply the approved themed treatments for code, tables, tasks, callouts, footnotes, mathematics, Mermaid, embedded HTML, and wide-content overflow.
-- [ ] **T037 — Resolve and navigate project-relative content** (`FR-10`): Render local images, follow Markdown links and anchors, open external links appropriately, support back and forward, and communicate missing targets without indexing a project.
+- [x] **T037 — Resolve and navigate project-relative content** (`FR-10`): Render local images, follow Markdown links and anchors, open external links appropriately, support back and forward, and communicate missing targets without indexing a project.
 - [ ] **T038 — Implement spatially clear link feedback** (`UX-18`): Show destinations, preserve navigation locations, emphasize anchor targets, distinguish external and broken links, and maintain accessible focus and visited states.
 
 ### Themes and Reading Appearance
@@ -138,3 +138,5 @@ Requirement IDs use these prefixes:
 - [x] **E014 — Surface renderer startup diagnostics in tests**: Capture local JavaScript startup failures without exposing document content so WebKit integration failures can be diagnosed deterministically.
 - [x] **E015 — Return values from WebPage JavaScript calls**: Use explicit JavaScript returns because the macOS 26 bridge executes supplied source as an asynchronous function body rather than an expression evaluator.
 - [x] **E016 — Normalize generated renderer whitespace**: Remove line-ending whitespace emitted inside bundled grammar literals so repository hygiene checks remain deterministic.
+- [x] **E017 — Preserve fragments on project-relative links**: Resolve local paths independently from percent-encoded heading fragments so cross-document anchor navigation retains its target.
+- [x] **E018 — Isolate defaults in concurrent session tests**: Inject per-test defaults suites so parallel document sessions cannot race over the application-level restoration key.
