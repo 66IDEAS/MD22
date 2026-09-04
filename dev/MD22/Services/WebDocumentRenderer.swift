@@ -26,6 +26,8 @@ final class WebDocumentRenderer: DocumentRendering {
     }
 
     func render(snapshot: DocumentSnapshot, themeID: String) async throws {
+        MD22Log.renderer.debug("Renderer navigation started")
+        MD22Log.record(category: "renderer", code: "render.started")
         isReady = false
         renderError = nil
         debugMessage = nil
@@ -39,6 +41,8 @@ final class WebDocumentRenderer: DocumentRendering {
                     contentWorld: .page
                 ) as? Bool, ready {
                     isReady = true
+                    MD22Log.renderer.debug("Renderer ready")
+                    MD22Log.record(category: "renderer", code: "render.ready")
                     return
                 }
                 try await Task.sleep(for: .milliseconds(20))
@@ -53,6 +57,8 @@ final class WebDocumentRenderer: DocumentRendering {
             }
             throw MD22Error.rendererUnavailable
         } catch {
+            MD22Log.renderer.error("Renderer failed: \(MD22Log.identifier(for: error), privacy: .public)")
+            MD22Log.record(category: "renderer", code: "render.failed")
             if debugMessage == nil {
                 debugMessage = "Navigation or rendering failed: \(String(describing: error))"
             }

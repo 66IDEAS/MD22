@@ -102,7 +102,7 @@ Requirement IDs use these prefixes:
 
 - [x] **T062 — Integrate secure Sparkle updates** (`ARCH-8`): Add stable Sparkle 2 through SwiftPM with an HTTPS appcast, signed and notarized updates, automatic checks, and a manual check command.
 - [x] **T063 — Build minimal Settings and About windows** (`UX-20`): Present General appearance and update controls, inline status, standard application information, the GitHub link, license, and third-party acknowledgements without duplicating reading controls.
-- [ ] **T064 — Add privacy-safe local diagnostics** (`ARCH-24`): Use categorized Unified Logging, redact user-derived values, avoid automatic transmission, and create explicit, inspectable diagnostic packages.
+- [x] **T064 — Add privacy-safe local diagnostics** (`ARCH-24`): Use categorized Unified Logging, redact user-derived values, avoid automatic transmission, and create explicit, inspectable diagnostic packages.
 
 ### Quality, Performance, and Delivery
 
@@ -149,3 +149,6 @@ Requirement IDs use these prefixes:
 - [x] **E025 — Isolate HTML publication preparation from the reader**: Wait for fonts and images without mutating the visible page's display theme, search state, or reader controls before cloning its static export DOM.
 - [x] **E026 — Scope document commands to the focused window**: Route menu and keyboard actions through SwiftUI focused values so commands affect only the active window in a multiwindow session.
 - [x] **E027 — Preserve build status through zsh pipelines**: Avoid Bash-specific `PIPESTATUS` checks when validating piped Xcode builds under the repository's zsh command environment.
+- [x] **E028 — Preserve asynchronous read return semantics after logging**: Return the detached coordinated-read result explicitly after adding a preceding Unified Logging statement.
+- [x] **E029 — Decode diagnostic timestamps consistently**: Configure the package test decoder for the ISO 8601 date representation emitted by the diagnostic manifest.
+- [x] **E030 — Keep diagnostic package creation responsive**: Mirror bounded privacy-safe event codes alongside categorized Unified Logging instead of synchronously enumerating the process log store.

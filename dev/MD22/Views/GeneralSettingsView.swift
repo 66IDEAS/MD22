@@ -1,7 +1,9 @@
+import AppKit
 import SwiftUI
 
 struct GeneralSettingsView: View {
     let environment: AppEnvironment
+    @State private var diagnosticStatus: String?
 
     var body: some View {
         @Bindable var preferences = environment.preferences
@@ -31,6 +33,23 @@ struct GeneralSettingsView: View {
                     .disabled(!environment.updateService.canCheckForUpdates)
                 }
             }
+
+            Section("Support") {
+                Text("Diagnostic packages contain only app configuration and privacy-redacted MD22 logs. Nothing is sent automatically.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                HStack {
+                    if let diagnosticStatus {
+                        Text(diagnosticStatus)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Create Diagnostic Package…") {
+                        createDiagnosticPackage()
+                    }
+                }
+            }
         }
         .formStyle(.grouped)
         .frame(width: 480)
@@ -43,6 +62,29 @@ struct GeneralSettingsView: View {
             get: { environment.updateService.automaticallyChecksForUpdates },
             set: { environment.updateService.automaticallyChecksForUpdates = $0 }
         )
+    }
+
+    private func createDiagnosticPackage() {
+        let panel = NSOpenPanel()
+        panel.title = "Choose a Location for MD22 Diagnostics"
+        panel.message = "MD22 will create an inspectable package containing the four files described above."
+        panel.prompt = "Create Package"
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let directory = panel.url else { return }
+
+        diagnosticStatus = "Creating…"
+        Task {
+            do {
+                let packageURL = try await environment.diagnosticService.createPackage(in: directory)
+                diagnosticStatus = "Created \(packageURL.lastPathComponent)"
+                NSWorkspace.shared.activateFileViewerSelecting([packageURL])
+            } catch {
+                diagnosticStatus = "The diagnostic package could not be created."
+            }
+        }
     }
 
     @ViewBuilder

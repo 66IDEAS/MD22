@@ -13,12 +13,19 @@ final class DocumentExportService {
         renderer: WebDocumentRenderer,
         themeID: String
     ) async throws -> URL {
+        MD22Log.export.notice("HTML export started")
+        MD22Log.record(category: "export", code: "html.started")
         let html = try await renderer.exportHTML(themeID: themeID)
         guard let data = html.data(using: .utf8) else { throw MD22Error.exportFailed }
-        return try await writer.write(data, beside: snapshot.url, pathExtension: "html")
+        let url = try await writer.write(data, beside: snapshot.url, pathExtension: "html")
+        MD22Log.export.notice("HTML export completed; bytes=\(data.count, privacy: .public)")
+        MD22Log.record(category: "export", code: "html.completed")
+        return url
     }
 
     func exportPDF(snapshot: DocumentSnapshot, themeID: String) async throws -> URL {
+        MD22Log.export.notice("PDF export started")
+        MD22Log.record(category: "export", code: "pdf.started")
         let exportRenderer = WebDocumentRenderer()
         try await exportRenderer.render(snapshot: snapshot, themeID: themeID)
         try await exportRenderer.prepareForExport(themeID: themeID)
@@ -26,7 +33,10 @@ final class DocumentExportService {
             as: .pdf(region: .contents, allowTransparentBackground: false)
         )
         guard data.starts(with: Data("%PDF".utf8)) else { throw MD22Error.exportFailed }
-        return try await writer.write(data, beside: snapshot.url, pathExtension: "pdf")
+        let url = try await writer.write(data, beside: snapshot.url, pathExtension: "pdf")
+        MD22Log.export.notice("PDF export completed; bytes=\(data.count, privacy: .public)")
+        MD22Log.record(category: "export", code: "pdf.completed")
+        return url
     }
 }
 

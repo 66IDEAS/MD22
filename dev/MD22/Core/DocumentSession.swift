@@ -59,6 +59,8 @@ final class DocumentSession {
         targetLocation: ReadingLocation? = nil,
         emphasizesArrival: Bool = false
     ) {
+        MD22Log.lifecycle.notice("Document open requested")
+        MD22Log.record(category: "lifecycle", code: "document.open.requested")
         loadTask?.cancel()
         generation += 1
         let requestedGeneration = generation
@@ -86,6 +88,8 @@ final class DocumentSession {
                 }
                 self.snapshot = loaded
                 self.analysis = MarkdownAnalysis.analyze(loaded.markdown)
+                MD22Log.lifecycle.notice("Document open completed; bytes=\(loaded.markdown.utf8.count, privacy: .public)")
+                MD22Log.record(category: "lifecycle", code: "document.open.completed")
                 _ = try self.history.recordOpen(loaded)
                 self.readingLocation = try targetLocation ?? self.history.readingLocation(for: loaded.url)
                 try self.bookmarks.reconcile(snapshot: loaded, analysis: self.analysis ?? DocumentAnalysis(headings: [], wordCount: 0, estimatedReadingMinutes: 1))
@@ -96,6 +100,8 @@ final class DocumentSession {
             } catch is CancellationError {
                 return
             } catch {
+                MD22Log.lifecycle.error("Document open failed: \(MD22Log.identifier(for: error), privacy: .public)")
+                MD22Log.record(category: "lifecycle", code: "document.open.failed")
                 guard let self, requestedGeneration == self.generation else { return }
                 self.isLoading = false
                 self.showsLoadingIndicator = false
@@ -220,12 +226,16 @@ final class DocumentSession {
             guard loaded != snapshot else { return }
             snapshot = loaded
             analysis = MarkdownAnalysis.analyze(loaded.markdown)
+            MD22Log.lifecycle.notice("External document refresh completed")
+            MD22Log.record(category: "lifecycle", code: "document.refresh.completed")
             _ = try history.recordOpen(loaded)
             try bookmarks.reconcile(snapshot: loaded, analysis: analysis ?? DocumentAnalysis(headings: [], wordCount: 0, estimatedReadingMinutes: 1))
             showTransientMessage(String(localized: "Refreshed"))
         } catch is CancellationError {
             return
         } catch {
+            MD22Log.lifecycle.error("External document refresh failed: \(MD22Log.identifier(for: error), privacy: .public)")
+            MD22Log.record(category: "lifecycle", code: "document.refresh.failed")
             guard requestedGeneration == generation else { return }
             try? history.markUnavailable(path: url.standardizedFileURL.path)
             showTransientMessage(MD22Error.unavailableFile.localizedDescription)

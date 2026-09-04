@@ -29,6 +29,8 @@ final class UpdateService: UpdateChecking {
 
     func checkForUpdates() {
         guard canCheckForUpdates else { return }
+        MD22Log.updates.notice("Manual update check started")
+        MD22Log.record(category: "updates", code: "manual-check.started")
         controller.checkForUpdates(nil)
     }
 }

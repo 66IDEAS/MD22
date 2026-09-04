@@ -2,7 +2,9 @@ import Foundation
 
 actor FileAccessService: FileAccessing {
     func read(_ url: URL) async throws -> DocumentSnapshot {
-        try await Task.detached(priority: .userInitiated) {
+        MD22Log.fileAccess.debug("Coordinated file read started")
+        MD22Log.record(category: "file-access", code: "read.started")
+        return try await Task.detached(priority: .userInitiated) {
             var coordinationError: NSError?
             var result: Result<DocumentSnapshot, Error>?
             let coordinator = NSFileCoordinator(filePresenter: nil)
@@ -25,7 +27,10 @@ actor FileAccessService: FileAccessing {
             }
             if let coordinationError { throw coordinationError }
             guard let result else { throw MD22Error.unreadableFile }
-            return try result.get()
+            let snapshot = try result.get()
+            MD22Log.fileAccess.debug("Coordinated file read completed; bytes=\(snapshot.markdown.utf8.count, privacy: .public)")
+            MD22Log.record(category: "file-access", code: "read.completed")
+            return snapshot
         }.value
     }
 

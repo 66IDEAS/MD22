@@ -7,12 +7,16 @@ final class PersistenceController {
     let storeURL: URL?
 
     init(isStoredInMemoryOnly: Bool = false, storeDirectory: URL? = nil) throws {
+        MD22Log.persistence.debug("Persistence initialization started; inMemory=\(isStoredInMemoryOnly, privacy: .public)")
+        MD22Log.record(category: "persistence", code: "store.open.started")
         let schema = Schema(versionedSchema: MD22SchemaV1.self)
 
         if isStoredInMemoryOnly {
             storeURL = nil
             let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             container = try ModelContainer(for: schema, configurations: [configuration])
+            MD22Log.persistence.debug("In-memory persistence ready")
+            MD22Log.record(category: "persistence", code: "store.memory.ready")
             return
         }
 
@@ -34,6 +38,8 @@ final class PersistenceController {
             configurations: [configuration]
         )
         try StoreRecovery.writeCurrentVersion(in: directory)
+        MD22Log.persistence.notice("Persistent metadata store ready")
+        MD22Log.record(category: "persistence", code: "store.disk.ready")
     }
 
     static func openRecovering(storeDirectory: URL? = nil) -> PersistenceController {
@@ -41,9 +47,13 @@ final class PersistenceController {
         do {
             return try PersistenceController(storeDirectory: directory)
         } catch {
+            MD22Log.persistence.error("Persistent metadata store failed: \(MD22Log.identifier(for: error), privacy: .public)")
+            MD22Log.record(category: "persistence", code: "store.disk.failed")
             if let directory {
                 _ = try? StoreRecovery.preserveDamagedStore(in: directory)
                 if let recovered = try? PersistenceController(storeDirectory: directory) {
+                    MD22Log.persistence.notice("Persistent metadata store recovered")
+                    MD22Log.record(category: "persistence", code: "store.disk.recovered")
                     return recovered
                 }
             }

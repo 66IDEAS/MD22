@@ -11,6 +11,7 @@ final class AppEnvironment {
     let history: HistoryRepository
     let bookmarks: BookmarkRepository
     let exportService = DocumentExportService()
+    let diagnosticService = DiagnosticService()
     let updateService = UpdateService()
     let accessibility = AccessibilityPreferences()
     let preferences = PreferencesStore()
