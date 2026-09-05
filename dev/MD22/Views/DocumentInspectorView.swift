@@ -8,6 +8,7 @@ struct DocumentInspectorView: View {
     @Environment(AppEnvironment.self) private var environment
     @State private var selection = InspectorSection.outline
     @State private var bookmarkScope = BookmarkScope.currentDocument
+    @State private var expandedOutlineIDs: Set<String> = []
     @State private var operationError: String?
 
     var body: some View {
@@ -32,6 +33,13 @@ struct DocumentInspectorView: View {
         .inspectorColumnWidth(min: 200, ideal: 246, max: 320)
         .accessibilityLabel("Document inspector")
         .accessibilityIdentifier("document.inspector")
+        .onChange(of: session.analysis?.headings, initial: true) { _, headings in
+            expandEntireOutline(headings ?? [])
+        }
+        .onChange(of: selection) { _, section in
+            guard section == .outline else { return }
+            expandEntireOutline(session.analysis?.headings ?? [])
+        }
         .alert("Bookmarks Could Not Be Updated", isPresented: errorPresented) {
             Button("OK", role: .cancel) { operationError = nil }
         } message: {
@@ -51,17 +59,15 @@ struct DocumentInspectorView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             List {
-                OutlineGroup(nodes, children: \.children) { node in
-                    Button {
-                        Task { await renderer.navigate(to: node.id) }
-                    } label: {
-                        Text(node.title)
-                            .lineLimit(2)
-                            .foregroundStyle(session.readingLocation.headingID == node.id ? Color.accentColor : Color.primary)
-                            .fontWeight(session.readingLocation.headingID == node.id ? .semibold : .regular)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Go to \(node.title), heading level \(node.level)")
+                ForEach(nodes) { node in
+                    OutlineTreeRow(
+                        node: node,
+                        currentHeadingID: session.readingLocation.headingID,
+                        expandedIDs: $expandedOutlineIDs,
+                        onNavigate: { headingID in
+                            Task { await renderer.navigate(to: headingID) }
+                        }
+                    )
                 }
             }
             .listStyle(.sidebar)
@@ -125,6 +131,64 @@ struct DocumentInspectorView: View {
 
     private func perform(_ action: () throws -> Void) {
         do { try action() } catch { operationError = error.localizedDescription }
+    }
+
+    private func expandEntireOutline(_ headings: [Heading]) {
+        expandedOutlineIDs = OutlineNode.expandableIDs(
+            in: OutlineNode.makeTree(from: headings)
+        )
+    }
+}
+
+private struct OutlineTreeRow: View {
+    let node: OutlineNode
+    let currentHeadingID: String?
+    @Binding var expandedIDs: Set<String>
+    let onNavigate: (String) -> Void
+
+    var body: some View {
+        if let children = node.children {
+            DisclosureGroup(isExpanded: isExpanded) {
+                ForEach(children) { child in
+                    OutlineTreeRow(
+                        node: child,
+                        currentHeadingID: currentHeadingID,
+                        expandedIDs: $expandedIDs,
+                        onNavigate: onNavigate
+                    )
+                }
+            } label: {
+                outlineButton
+            }
+        } else {
+            outlineButton
+        }
+    }
+
+    private var outlineButton: some View {
+        Button {
+            onNavigate(node.id)
+        } label: {
+            Text(node.title)
+                .lineLimit(2)
+                .foregroundStyle(currentHeadingID == node.id ? Color.accentColor : Color.primary)
+                .fontWeight(currentHeadingID == node.id ? .semibold : .regular)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Go to \(node.title), heading level \(node.level)")
+    }
+
+    private var isExpanded: Binding<Bool> {
+        Binding(
+            get: { expandedIDs.contains(node.id) },
+            set: { expanded in
+                if expanded {
+                    expandedIDs.insert(node.id)
+                } else {
+                    expandedIDs.remove(node.id)
+                }
+            }
+        )
     }
 }
 
@@ -192,6 +256,16 @@ private struct OutlineNode: Identifiable {
 
     static func makeTree(from headings: [Heading]) -> [OutlineNode] {
         parse(headings, from: 0, parentLevel: 0).nodes
+    }
+
+    static func expandableIDs(in nodes: [OutlineNode]) -> Set<String> {
+        var identifiers: Set<String> = []
+        for node in nodes {
+            guard let children = node.children else { continue }
+            identifiers.insert(node.id)
+            identifiers.formUnion(expandableIDs(in: children))
+        }
+        return identifiers
     }
 
     private static func parse(

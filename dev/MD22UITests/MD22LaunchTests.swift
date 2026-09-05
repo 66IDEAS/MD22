@@ -20,7 +20,7 @@ final class MD22LaunchTests: XCTestCase {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let fixture = directory.appending(path: "UI Fixture.md")
-        try "# UI Fixture\n\nNeedle in a searchable document.".write(to: fixture, atomically: true, encoding: .utf8)
+        try "# UI Fixture\n\nNeedle in a searchable document.\n\n## Nested\n\n### Deep".write(to: fixture, atomically: true, encoding: .utf8)
         let application = makeApplication(arguments: [
             "--md22-ui-test-document", fixture.path,
         ])
@@ -32,6 +32,7 @@ final class MD22LaunchTests: XCTestCase {
         ).firstMatch
         XCTAssertTrue(documentWindow.waitForExistence(timeout: 8))
         XCTAssertTrue(application.webViews.firstMatch.exists)
+        XCTAssertTrue(application.buttons["Go to Deep, heading level 3"].waitForExistence(timeout: 3))
 
         application.typeKey("f", modifierFlags: .command)
         let searchField = application.textFields["Find in document"]

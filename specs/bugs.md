@@ -117,16 +117,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B009 — Document outlines initially hide nested headings
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** Parent headings in the Outline inspector begin collapsed, hiding
   the document structure until every disclosure control is opened manually.
 - **Expected:** Opening an outline initially expands its complete hierarchy while
   retaining the ability to collapse individual branches afterward.
 - **Evidence:** User report from Phase 1 testing on 2026-09-05.
-- **Verification:** Open a document containing at least three nested heading
-  levels and confirm every level is immediately visible and remains collapsible.
-- **Fix commit:** Pending
+- **Verification:** UI coverage opens a three-level document and finds the
+  deepest heading without manipulating a disclosure control; every branch still
+  uses a native, independently collapsible `DisclosureGroup`.
+- **Fix commit:** `fix: expand document outlines initially`
 
 ## B010 — Toolbar icons have unwanted shared circular backgrounds
 

@@ -171,6 +171,8 @@
 
 - A collapsible panel on the right side contains an Outline tab.
 - The outline reflects the hierarchy of headings in the displayed document.
+- The complete heading hierarchy is expanded when the outline is initially displayed.
+- The user can collapse and re-expand individual outline branches.
 - Selecting an outline entry moves to the corresponding section.
 - The outline identifies the current heading as the user scrolls.
 - The outline updates when the displayed document changes or refreshes.

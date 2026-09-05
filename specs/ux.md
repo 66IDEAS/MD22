@@ -26,7 +26,7 @@
 
 ## 7. Quiet Outline and Bookmarks Inspector
 
-**Description:** The right inspector must use a compact segmented control to switch between Outline and Bookmarks. The outline appears as an indented, collapsible tree with restrained hierarchy and a native highlight for the current section; automatic tracking keeps the active entry visible without distracting jumps. Bookmarks use compact rows with small symbols distinguishing headings, passages, and reading positions. A quiet scope filter switches between the current document and all files, with filename and shortened path shown as secondary context when needed. Long excerpts truncate gracefully and reveal their complete text on hover. New-window and removal actions remain contextual, and unavailable targets use the same accessible warning treatment as history entries.
+**Description:** The right inspector must use a compact segmented control to switch between Outline and Bookmarks. The outline appears as an indented, collapsible tree whose complete hierarchy is expanded when first shown, with restrained hierarchy and a native highlight for the current section; automatic tracking keeps the active entry visible without distracting jumps. Bookmarks use compact rows with small symbols distinguishing headings, passages, and reading positions. A quiet scope filter switches between the current document and all files, with filename and shortened path shown as secondary context when needed. Long excerpts truncate gracefully and reveal their complete text on hover. New-window and removal actions remain contextual, and unavailable targets use the same accessible warning treatment as history entries.
 
 ## 8. Information-Dense but Quiet Status Bar
 
