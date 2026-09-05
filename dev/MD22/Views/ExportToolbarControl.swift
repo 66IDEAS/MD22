@@ -15,13 +15,13 @@ struct ExportToolbarControl: View {
                 onExport(format, theme)
             } label: {
                 if isExporting {
-                    Label {
-                        Text("Exporting…")
-                    } icon: {
-                        ProgressView().controlSize(.mini)
-                    }
+                    ProgressView()
+                        .controlSize(.mini)
+                        .accessibilityLabel("Exporting…")
                 } else {
-                    Label("Export as \(format.title)", systemImage: "square.and.arrow.up")
+                    Image(systemName: "square.and.arrow.up")
+                        .imageScale(.medium)
+                        .accessibilityLabel("Export as \(format.title)")
                 }
             }
             .keyboardShortcut("e", modifiers: [.command, .shift])

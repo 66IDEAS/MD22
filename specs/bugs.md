@@ -74,16 +74,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B006 — Export toolbar control has no export icon
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Low
 - **Actual:** The toolbar's export control appears without a recognizable export
   glyph.
 - **Expected:** The primary export action displays Apple's standard export/share
   symbol while preserving its one-step action and options menu.
 - **Evidence:** [Missing export icon](bugs/screenshots/B006-missing-export-icon.png)
-- **Verification:** Inspect the toolbar in enabled and disabled states and run
-  the export-control UI test.
-- **Fix commit:** Pending
+- **Verification:** The split button's primary action now renders the standard
+  `square.and.arrow.up` image directly, independent of inherited toolbar label
+  styles, while retaining its dynamic accessible export label.
+- **Fix commit:** `fix: show the export toolbar icon`
 
 ## B007 — Document-theme selection has an unnecessary submenu
 
