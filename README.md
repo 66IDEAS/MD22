@@ -10,7 +10,7 @@ and publication-quality HTML and PDF export.
 Requirements: macOS 26, Xcode 26 command-line tools, XcodeGen, and Node.js.
 
 ```sh
-cd dev
+cd implementations/mac
 npm ci
 npm run build:renderer
 scripts/generate-project.zsh
@@ -19,7 +19,7 @@ xcodebuild -project MD22.xcodeproj -scheme MD22 \
 ```
 
 The generated app is at
-`dev/DerivedData/Build/Products/Debug/MD22.app`.
+`implementations/mac/DerivedData/Build/Products/Debug/MD22.app`.
 
 Developer ID archive, notarization, DMG, and Gatekeeper verification commands
 are documented in [Direct Distribution](docs/DISTRIBUTION.md). Release scripts
@@ -30,7 +30,7 @@ Run the same dependency, renderer, native unit, UI, Release-build, and
 architecture checks used by GitHub Actions with:
 
 ```sh
-dev/scripts/ci.zsh
+implementations/mac/scripts/ci.zsh
 ```
 
 Version tags are built by the protected release environment into signed and
@@ -40,10 +40,11 @@ GitHub attestations. Repository protection and secret setup are documented in
 
 ## Project layout
 
-- `dev/MD22`: native application source and bundled resources
-- `dev/web`: isolated renderer source
-- `dev/scripts`: reproducible build, validation, and release tools
-- `dev/MD22Tests` and `dev/MD22UITests`: automated verification
+- `implementations`: independently buildable Markdown-viewer implementations
+- `implementations/mac/MD22`: native macOS application source and bundled resources
+- `implementations/mac/web`: isolated renderer source used by the macOS app
+- `implementations/mac/scripts`: reproducible macOS build, validation, and release tools
+- `implementations/mac/MD22Tests` and `implementations/mac/MD22UITests`: macOS automated verification
 - `specs`: approved functional, UX, architecture, and task specifications
 
 MD22 is licensed under the [MIT License](LICENSE).

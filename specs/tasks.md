@@ -125,6 +125,7 @@ Requirement IDs use these prefixes:
 - [x] **T084 — Expand the complete outline initially** (`B009`): Reveal every heading level when an outline opens while preserving native per-branch collapse controls.
 - [x] **T085 — Remove shared toolbar control backgrounds** (`B010`): Suppress circular and pill-shaped shared backgrounds without changing toolbar actions or accessibility.
 - [x] **T086 — Expose one document-window command** (`B011`): Present one New Window command while retaining typed open-in-new-window routing as an internal scene.
+- [x] **T087 — Establish a multi-implementation repository layout**: Move the native macOS implementation from `dev/` to `implementations/mac/`, update repository tooling and documentation, remove the obsolete `dev/` directory, and verify the complete implementation from its new location.
 
 ## Phase 2
 
@@ -183,3 +184,4 @@ Requirement IDs use these prefixes:
 - [x] **E044 — Declare custom workflow shells explicitly**: Use GitHub Actions' `zsh {0}` custom-shell form so inline release scripts retain zsh semantics and pass workflow validation.
 - [x] **E045 — Preflight immutability with least privilege**: Query GitHub's administration-read immutable-release endpoint with a narrowly scoped protected token because the ordinary workflow token cannot receive that permission, while retaining the short-lived workflow token for publication.
 - [x] **E046 — Resolve recursive outline identifier inference**: Accumulate expandable heading identifiers explicitly so Swift 6 preserves the concrete `Set<String>` element type through recursive branches.
+- [x] **E047 — Rebase repository-level resources after implementation nesting**: Resolve shared specification assets and release legal files from the repository root after moving the macOS project two levels below it.

@@ -25,7 +25,7 @@ export MD22_SIGNING_IDENTITY='Developer ID Application: Example (TEAMID)'
 export MD22_TEAM_ID='TEAMID'
 export MD22_VERSION='1.0.0'
 export MD22_BUILD_NUMBER='1'
-dev/scripts/archive-release.zsh
+implementations/mac/scripts/archive-release.zsh
 ```
 
 The command rebuilds the pinned renderer, regenerates the Xcode project,
@@ -39,8 +39,8 @@ For a local release, first store credentials in the Keychain with Apple's
 
 ```sh
 export MD22_NOTARY_KEYCHAIN_PROFILE='MD22-notary'
-dev/scripts/notarize-release.zsh \
-  dev/build/release/MD22-1.0.0-1/MD22.app
+implementations/mac/scripts/notarize-release.zsh \
+  implementations/mac/build/release/MD22-1.0.0-1/MD22.app
 ```
 
 For CI, provide `MD22_NOTARY_KEY_PATH`, `MD22_NOTARY_KEY_ID`, and, for a team

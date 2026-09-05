@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: dev/package-lock.json
+          cache-dependency-path: implementations/mac/package-lock.json
       - name: Install the project generator
         shell: zsh {0}
         run: |
@@ -45,7 +45,7 @@ jobs:
           fi
           xcodegen version
       - name: Run the complete Phase 1 verification suite
-        run: dev/scripts/ci.zsh
+        run: implementations/mac/scripts/ci.zsh
 
   publish:
     name: Sign, notarize, and publish
@@ -74,7 +74,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: dev/package-lock.json
+          cache-dependency-path: implementations/mac/package-lock.json
       - name: Install the project generator
         shell: zsh {0}
         run: |
@@ -157,28 +157,28 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           export MD22_VERSION="$VERSION"
           export MD22_BUILD_NUMBER="$GITHUB_RUN_NUMBER"
-          dev/scripts/archive-release.zsh
+          implementations/mac/scripts/archive-release.zsh
           {
             print "MD22_VERSION=$VERSION"
             print "MD22_BUILD_NUMBER=$GITHUB_RUN_NUMBER"
-            print "MD22_RELEASE_DIRECTORY=$GITHUB_WORKSPACE/dev/build/release"
+            print "MD22_RELEASE_DIRECTORY=$GITHUB_WORKSPACE/implementations/mac/build/release"
           } >> "$GITHUB_ENV"
       - name: Notarize and package the application
         shell: zsh {0}
         run: |
           APP_PATH="$MD22_RELEASE_DIRECTORY/MD22-$MD22_VERSION-$MD22_BUILD_NUMBER/MD22.app"
-          dev/scripts/notarize-release.zsh "$APP_PATH" "$MD22_RELEASE_DIRECTORY"
+          implementations/mac/scripts/notarize-release.zsh "$APP_PATH" "$MD22_RELEASE_DIRECTORY"
       - name: Create the SBOM and signed update feed
         shell: zsh {0}
         run: |
           SBOM="$MD22_RELEASE_DIRECTORY/MD22-$MD22_VERSION.spdx.json"
-          node dev/scripts/generate-sbom.mjs "$SBOM" "$MD22_VERSION"
-          dev/scripts/generate-appcast.zsh \
+          node implementations/mac/scripts/generate-sbom.mjs "$SBOM" "$MD22_VERSION"
+          implementations/mac/scripts/generate-appcast.zsh \
             "$MD22_RELEASE_DIRECTORY" \
             "$MD22_SPARKLE_PRIVATE_KEY_PATH" \
             "$GITHUB_REF_NAME"
           cd "$MD22_RELEASE_DIRECTORY"
-          "$GITHUB_WORKSPACE/dev/scripts/make-checksums.sh" \
+          "$GITHUB_WORKSPACE/implementations/mac/scripts/make-checksums.sh" \
             "MD22-$MD22_VERSION-arm64.dmg" \
             "MD22-$MD22_VERSION-arm64.zip" \
             "MD22-$MD22_VERSION.spdx.json" \

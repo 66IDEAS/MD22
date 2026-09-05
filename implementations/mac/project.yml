@@ -33,7 +33,7 @@ targets:
     platform: macOS
     sources:
       - path: MD22
-      - path: ../specs/md22.icon
+      - path: ../../specs/md22.icon
         buildPhase: resources
     info:
       path: MD22/Info.plist

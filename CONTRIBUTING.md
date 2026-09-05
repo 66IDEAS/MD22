@@ -13,5 +13,5 @@ implementation and keep pull requests focused on one coherent change.
 6. Update third-party notices when dependencies change.
 
 Use Xcode command-line tools for reproducible builds. The generated Xcode
-project is intentionally ignored; edit `dev/project.yml` and regenerate it.
-
+project is intentionally ignored; edit `implementations/mac/project.yml` and
+regenerate it.

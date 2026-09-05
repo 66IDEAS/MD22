@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR=${0:A:h}
 PROJECT_DIR=${SCRIPT_DIR:h}
-REPOSITORY_DIR=${PROJECT_DIR:h}
+REPOSITORY_DIR=${PROJECT_DIR:h:h}
 DERIVED_DATA=$(mktemp -d /tmp/md22-ci.XXXXXX)
 
 cleanup() {
@@ -32,7 +32,7 @@ cd "$PROJECT_DIR"
 npm ci
 npm run audit:dependencies
 npm run build:renderer
-git -C "$REPOSITORY_DIR" diff --exit-code -- dev/MD22/Resources/Renderer
+git -C "$REPOSITORY_DIR" diff --exit-code -- implementations/mac/MD22/Resources/Renderer
 
 "$SCRIPT_DIR/generate-project.zsh"
 "$SCRIPT_DIR/verify-platform-conformance.sh"

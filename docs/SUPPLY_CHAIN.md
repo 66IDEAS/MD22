@@ -4,7 +4,7 @@
 
 All JavaScript renderer packages use exact versions in `package.json` and a
 committed npm lockfile. Swift packages resolve through the committed root
-`dev/Package.resolved`; project generation copies that resolution into Xcode's
+`implementations/mac/Package.resolved`; project generation copies that resolution into Xcode's
 workspace metadata before every build.
 
 `npm run audit:dependencies` rejects packages without a reviewed,

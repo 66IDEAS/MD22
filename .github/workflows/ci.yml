@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: dev/package-lock.json
+          cache-dependency-path: implementations/mac/package-lock.json
       - name: Install the project generator
         shell: zsh {0}
         run: |
@@ -54,4 +54,4 @@ jobs:
           fi
           xcodegen version
       - name: Run the complete Phase 1 verification suite
-        run: dev/scripts/ci.zsh
+        run: implementations/mac/scripts/ci.zsh
