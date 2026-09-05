@@ -122,6 +122,9 @@ Requirement IDs use these prefixes:
 - [x] **T081 — Add the standard export toolbar icon** (`B006`): Display a recognizable native export symbol on the primary toolbar action.
 - [x] **T082 — Flatten status-bar theme selection** (`B007`): Present all document themes immediately without an intermediate submenu.
 - [x] **T083 — Make distraction-free reading a direct toolbar toggle** (`B008`): Remove independent status-bar hiding and toggle distraction-free mode with one click.
+- [ ] **T084 — Expand the complete outline initially** (`B009`): Reveal every heading level when an outline opens while preserving native per-branch collapse controls.
+- [ ] **T085 — Remove shared toolbar control backgrounds** (`B010`): Suppress circular and pill-shaped shared backgrounds without changing toolbar actions or accessibility.
+- [ ] **T086 — Consolidate duplicate document window scenes** (`B011`): Expose one New Window command while retaining typed open-in-new-window routing.
 
 ## Phase 2
 

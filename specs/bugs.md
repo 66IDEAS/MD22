@@ -114,3 +114,42 @@ until its fix is committed and the stated verification has passed.
   hide both panels and the status bar, then activates it again and confirms the
   prior side-panel layout and normal status bar return.
 - **Fix commit:** `fix: make distraction-free reading a direct toggle`
+
+## B009 — Document outlines initially hide nested headings
+
+- **Status:** Open
+- **Severity:** Medium
+- **Actual:** Parent headings in the Outline inspector begin collapsed, hiding
+  the document structure until every disclosure control is opened manually.
+- **Expected:** Opening an outline initially expands its complete hierarchy while
+  retaining the ability to collapse individual branches afterward.
+- **Evidence:** User report from Phase 1 testing on 2026-09-05.
+- **Verification:** Open a document containing at least three nested heading
+  levels and confirm every level is immediately visible and remains collapsible.
+- **Fix commit:** Pending
+
+## B010 — Toolbar icons have unwanted shared circular backgrounds
+
+- **Status:** Open
+- **Severity:** Low
+- **Actual:** Navigation and action icons are wrapped in prominent circular or
+  pill-shaped shared backgrounds across the top toolbar.
+- **Expected:** Toolbar icons use an unadorned native presentation without shared
+  control backgrounds while retaining their actions, states, and accessibility.
+- **Evidence:** [Toolbar shared backgrounds](bugs/screenshots/B010-toolbar-shared-backgrounds.png)
+- **Verification:** Inspect enabled and disabled toolbar controls in a document
+  window and confirm they no longer have shared circular or pill backgrounds.
+- **Fix commit:** Pending
+
+## B011 — File menu exposes two indistinguishable New Window commands
+
+- **Status:** Open
+- **Severity:** Medium
+- **Actual:** SwiftUI contributes both “New Window” and “New Markdown Document
+  Window” because the app declares separate ordinary and routed window scenes.
+- **Expected:** The File menu exposes one “New Window” command, and the same
+  scene continues to support routed history and bookmark windows.
+- **Evidence:** User report from Phase 1 testing on 2026-09-05.
+- **Verification:** Confirm the File menu contains “New Window” but not “New
+  Markdown Document Window,” then verify typed new-window routing tests pass.
+- **Fix commit:** Pending
