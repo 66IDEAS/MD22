@@ -12,6 +12,13 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertTrue(application.descendants(matching: .any)["document.inspector"].exists)
         XCTAssertTrue(application.descendants(matching: .any)["reading.status"].exists)
         XCTAssertTrue(application.buttons["Open Markdown…"].isEnabled)
+
+        let fileMenu = application.menuBars.menuBarItems["File"]
+        fileMenu.click()
+        XCTAssertTrue(fileMenu.menus.menuItems["New Window"].exists)
+        XCTAssertFalse(fileMenu.menus.menuItems["New Markdown Document Window"].exists)
+        fileMenu.menus.menuItems["New Window"].click()
+        XCTAssertTrue(application.windows.element(boundBy: 1).waitForExistence(timeout: 3))
     }
 
     func testDocumentSearchAndLayoutShortcuts() throws {

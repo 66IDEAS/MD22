@@ -301,6 +301,7 @@
 
 - A history entry provides an Open in New Window action.
 - A bookmark provides an Open in New Window action.
+- The File menu provides exactly one New Window command for opening an empty reader window.
 - Opening an entry in a new window leaves the current window unchanged.
 - A new window opened from history displays the selected file.
 - A new window opened from a bookmark displays the associated file at the bookmarked heading, passage, or position.

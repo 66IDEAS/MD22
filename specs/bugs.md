@@ -145,13 +145,14 @@ until its fix is committed and the stated verification has passed.
 
 ## B011 — File menu exposes two indistinguishable New Window commands
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** SwiftUI contributes both “New Window” and “New Markdown Document
   Window” because the app declares separate ordinary and routed window scenes.
-- **Expected:** The File menu exposes one “New Window” command, and the same
-  scene continues to support routed history and bookmark windows.
+- **Expected:** The File menu exposes one “New Window” command while the routed
+  history and bookmark scene remains an internal implementation detail.
 - **Evidence:** User report from Phase 1 testing on 2026-09-05.
-- **Verification:** Confirm the File menu contains “New Window” but not “New
-  Markdown Document Window,” then verify typed new-window routing tests pass.
-- **Fix commit:** Pending
+- **Verification:** UI coverage confirms the File menu has one “New Window,” no
+  “New Markdown Document Window,” and that the remaining command creates another
+  reader window; typed new-window routing tests continue to cover routed values.
+- **Fix commit:** `fix: expose one new reader window command`

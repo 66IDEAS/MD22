@@ -32,9 +32,15 @@ extension FocusedValues {
 
 struct DocumentCommands: Commands {
     @FocusedValue(\.md22DocumentActions) private var actions
+    @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
-        CommandGroup(after: .newItem) {
+        CommandGroup(replacing: .newItem) {
+            Button("New Window") {
+                openWindow(id: "reader")
+            }
+            .keyboardShortcut("n", modifiers: .command)
+
             Button("Open Markdown…") { actions?.open() }
                 .keyboardShortcut("o", modifiers: .command)
                 .disabled(actions == nil)

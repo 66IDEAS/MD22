@@ -5,7 +5,7 @@ struct MD22App: App {
     @State private var environment = AppEnvironment()
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "reader") {
             ContentView()
                 .environment(environment)
         }
