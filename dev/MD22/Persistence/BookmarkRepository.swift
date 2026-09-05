@@ -14,9 +14,23 @@ final class BookmarkRepository {
     }
 
     func reload() throws {
-        records = try context.fetch(
+        let fetched = try context.fetch(
             FetchDescriptor<BookmarkRecord>(sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
         )
+        var uniqueRecords: [BookmarkRecord] = []
+        var removedDuplicate = false
+        for record in fetched {
+            if uniqueRecords.contains(where: { Self.matches($0, record) }) {
+                context.delete(record)
+                removedDuplicate = true
+            } else {
+                uniqueRecords.append(record)
+            }
+        }
+        if removedDuplicate {
+            try context.save()
+        }
+        records = uniqueRecords
     }
 
     func records(for url: URL?) -> [BookmarkRecord] {
@@ -33,7 +47,7 @@ final class BookmarkRepository {
         excerpt: String?,
         location: ReadingLocation
     ) throws -> BookmarkRecord {
-        let record = BookmarkRecord(
+        let candidate = BookmarkRecord(
             url: url,
             kind: kind,
             headingID: headingID,
@@ -41,10 +55,13 @@ final class BookmarkRepository {
             excerpt: excerpt,
             location: location
         )
-        context.insert(record)
+        if let existing = records.first(where: { Self.matches($0, candidate) }) {
+            return existing
+        }
+        context.insert(candidate)
         try context.save()
         try reload()
-        return record
+        return candidate
     }
 
     func remove(_ record: BookmarkRecord) throws {
@@ -69,5 +86,33 @@ final class BookmarkRepository {
         }
         try context.save()
         try reload()
+    }
+
+    private static func matches(_ left: BookmarkRecord, _ right: BookmarkRecord) -> Bool {
+        guard left.canonicalPath == right.canonicalPath, left.kind == right.kind else {
+            return false
+        }
+        switch left.kind {
+        case .heading:
+            return left.headingID != nil && left.headingID == right.headingID
+        case .passage:
+            guard normalized(left.excerpt) == normalized(right.excerpt),
+                  left.headingID == right.headingID else { return false }
+            return locationsAreNear(left.location, right.location)
+        case .position:
+            return left.headingID == right.headingID
+                && locationsAreNear(left.location, right.location)
+        }
+    }
+
+    private static func normalized(_ value: String?) -> String? {
+        value?
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+    }
+
+    private static func locationsAreNear(_ left: ReadingLocation, _ right: ReadingLocation) -> Bool {
+        abs(left.verticalOffset - right.verticalOffset) <= 32
+            || abs(left.progress - right.progress) <= 0.002
     }
 }

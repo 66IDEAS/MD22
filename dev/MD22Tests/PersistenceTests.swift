@@ -115,4 +115,89 @@ struct PersistenceTests {
         try bookmarks.reconcile(snapshot: changed, analysis: MarkdownAnalysis.analyze(changed.markdown))
         #expect(bookmarks.records.isEmpty)
     }
+
+    @Test("Logical bookmark targets are unique and stored duplicates are coalesced")
+    func bookmarkUniqueness() throws {
+        let persistence = try PersistenceController(isStoredInMemoryOnly: true)
+        let context = persistence.container.mainContext
+        let file = URL(fileURLWithPath: "/tmp/Project/Guide.md")
+        let initial = ReadingLocation(headingID: "chapter", progress: 0.4, verticalOffset: 100)
+        let duplicate = ReadingLocation(headingID: "chapter", progress: 0.4005, verticalOffset: 106)
+
+        context.insert(BookmarkRecord(
+            url: file,
+            kind: .heading,
+            headingID: "chapter",
+            title: "Chapter",
+            location: initial
+        ))
+        context.insert(BookmarkRecord(
+            url: file,
+            kind: .heading,
+            headingID: "chapter",
+            title: "Chapter",
+            location: duplicate
+        ))
+        try context.save()
+
+        let bookmarks = BookmarkRepository(container: persistence.container)
+        #expect(bookmarks.records.count == 1)
+        #expect(try context.fetchCount(FetchDescriptor<BookmarkRecord>()) == 1)
+
+        let heading = try bookmarks.add(
+            url: file,
+            kind: .heading,
+            headingID: "chapter",
+            title: "Chapter",
+            excerpt: nil,
+            location: duplicate
+        )
+        #expect(heading.id == bookmarks.records.first?.id)
+
+        let passage = try bookmarks.add(
+            url: file,
+            kind: .passage,
+            headingID: "chapter",
+            title: "Selected passage",
+            excerpt: "Selected   passage",
+            location: initial
+        )
+        let repeatedPassage = try bookmarks.add(
+            url: file,
+            kind: .passage,
+            headingID: "chapter",
+            title: "Selected passage",
+            excerpt: "Selected passage",
+            location: duplicate
+        )
+        #expect(passage.id == repeatedPassage.id)
+
+        let position = try bookmarks.add(
+            url: file,
+            kind: .position,
+            headingID: "chapter",
+            title: "Position 40%",
+            excerpt: nil,
+            location: initial
+        )
+        let repeatedPosition = try bookmarks.add(
+            url: file,
+            kind: .position,
+            headingID: "chapter",
+            title: "Position 40%",
+            excerpt: nil,
+            location: duplicate
+        )
+        #expect(position.id == repeatedPosition.id)
+
+        _ = try bookmarks.add(
+            url: file,
+            kind: .position,
+            headingID: "chapter",
+            title: "Position 80%",
+            excerpt: nil,
+            location: ReadingLocation(headingID: "chapter", progress: 0.8, verticalOffset: 900)
+        )
+        #expect(bookmarks.records.count == 4)
+    }
 }

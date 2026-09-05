@@ -18,16 +18,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B002 — Duplicate document bookmarks
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** High
 - **Actual:** The same logical bookmark target can be added more than once and
   appears as duplicate rows in the Bookmarks inspector.
 - **Expected:** A file can contain only one bookmark for a given logical target;
   repeating the add action must not create another record.
 - **Evidence:** [Duplicate bookmark rows](bugs/screenshots/B002-duplicate-bookmarks.png)
-- **Verification:** Add the same heading, passage, and position bookmark twice;
-  confirm one persisted record exists for each target and add a repository test.
-- **Fix commit:** Pending
+- **Verification:** Repository tests confirm repeated heading, normalized passage,
+  and nearby position targets reuse one record, distinct positions remain
+  independent, and previously stored duplicates are coalesced on load.
+- **Fix commit:** `fix: make bookmark creation idempotent`
 
 ## B003 — Bookmark rows use the wrong symbol and cannot toggle directly
 
