@@ -24,7 +24,6 @@ struct ExportToolbarControl: View {
                         .accessibilityLabel("Export as \(format.title)")
                 }
             }
-            .keyboardShortcut("e", modifiers: [.command, .shift])
             .accessibilityIdentifier("export.primary")
 
             Menu {
@@ -55,7 +54,7 @@ struct ExportToolbarControl: View {
         }
         .controlGroupStyle(.compactMenu)
         .disabled(isExporting)
-        .help("Export \(format.title) using the \(theme.title) theme (Shift-Command-E)")
+        .help("Export \(format.title) using the \(theme.title) theme (Command-E)")
         .accessibilityElement(children: .contain)
         .popover(isPresented: errorPresented, arrowEdge: .bottom) {
             VStack(alignment: .leading, spacing: 12) {

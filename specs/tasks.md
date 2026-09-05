@@ -114,6 +114,9 @@ Requirement IDs use these prefixes:
 ## Phase 1 Stabilization
 
 - [x] **T075 — Create the Phase 1 bug tracker**: Record user-reported defects with portable screenshot evidence, expected behavior, status, verification, and fix commits in `specs/bugs.md`.
+- [x] **T097 — Restore the one-step export shortcut** (`B012`): Assign Command-E to the remembered export action and verify that it creates the selected output format for the active document.
+- [x] **T098 — Restore the document bookmark shortcut** (`B013`): Expose Add Bookmark in the File menu, assign Command-D, and verify confirmation for the active document.
+- [x] **T099 — Use keyboard-layout-independent history navigation** (`B014`): Replace bracket shortcuts with Command-Left Arrow and Command-Right Arrow and verify backward and forward linked-document navigation.
 - [x] **T076 — Remove the duplicate history-sidebar toggle** (`B001`): Retain one native toolbar control for expanding and collapsing history.
 - [x] **T077 — Prevent duplicate logical bookmarks** (`B002`): Make repeated heading, passage, and position bookmark creation idempotent and verify persistence.
 - [x] **T078 — Add direct filled-star bookmark removal** (`B003`): Use a filled star for inspector bookmark rows and remove the selected bookmark when its star is activated.

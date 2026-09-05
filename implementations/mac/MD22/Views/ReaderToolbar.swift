@@ -34,14 +34,14 @@ struct ReaderToolbar: ToolbarContent {
             }
             .labelStyle(.iconOnly)
             .disabled(!canNavigateBack)
-            .help("Go Back (Command-[)")
+            .help("Go Back (Command-Left Arrow)")
 
             Button("Forward", systemImage: "chevron.right") {
                 onNavigateForward()
             }
             .labelStyle(.iconOnly)
             .disabled(!canNavigateForward)
-            .help("Go Forward (Command-])")
+            .help("Go Forward (Command-Right Arrow)")
         }
         .sharedBackgroundVisibility(.hidden)
 

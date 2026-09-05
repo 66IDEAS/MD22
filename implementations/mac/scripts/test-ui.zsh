@@ -36,12 +36,17 @@ runner="$derived_data/Build/Products/Debug/MD22UITests-Runner.app"
 codesign --force --deep --sign - --timestamp=none "$application"
 codesign --force --deep --sign - --timestamp=none "$runner"
 
+if (( $# == 0 )); then
+    test_selection=(-only-testing:MD22UITests)
+else
+    test_selection=("$@")
+fi
+
 xcodebuild -quiet \
     -project MD22.xcodeproj \
     -scheme MD22 \
     -configuration Debug \
     -derivedDataPath "$derived_data" \
     -onlyUsePackageVersionsFromResolvedFile \
-    -only-testing:MD22UITests \
-    test-without-building \
-    "$@"
+    "${test_selection[@]}" \
+    test-without-building

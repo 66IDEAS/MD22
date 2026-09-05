@@ -41,11 +41,15 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertTrue(application.webViews.firstMatch.exists)
         XCTAssertTrue(application.buttons["Go to Deep, heading level 3"].waitForExistence(timeout: 3))
 
+        application.activate()
+        documentWindow.click()
         application.typeKey("f", modifierFlags: .command)
         let searchField = application.textFields["Find in document"]
-        XCTAssertTrue(searchField.waitForExistence(timeout: 3))
+        XCTAssertTrue(searchField.waitForExistence(timeout: 8))
         application.typeText("Needle")
         XCTAssertTrue(application.staticTexts["Match 1 of 1"].waitForExistence(timeout: 3))
+        application.typeKey(.escape, modifierFlags: [])
+        XCTAssertFalse(searchField.waitForExistence(timeout: 1))
 
         application.typeKey("1", modifierFlags: [.command, .option])
         let historySidebar = application.descendants(matching: .any)["history.sidebar"]
@@ -65,6 +69,88 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertTrue(historySidebar.waitForExistence(timeout: 3))
         XCTAssertTrue(inspector.waitForExistence(timeout: 3))
         XCTAssertTrue(statusBar.waitForExistence(timeout: 3))
+    }
+
+    func testBookmarkAndExportShortcuts() throws {
+        continueAfterFailure = false
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fixture = directory.appending(path: "Keyboard Shortcuts.md")
+        let exportedPDF = directory.appending(path: "Keyboard Shortcuts.pdf")
+        let exportedHTML = directory.appending(path: "Keyboard Shortcuts.html")
+        try "# Keyboard Shortcuts\n\nA document for shortcut verification.".write(
+            to: fixture,
+            atomically: true,
+            encoding: .utf8
+        )
+
+        let application = makeApplication(arguments: [
+            "--md22-ui-test-document", fixture.path,
+        ])
+        application.launch()
+        ensureReaderWindow(in: application)
+        XCTAssertTrue(application.webViews.firstMatch.waitForExistence(timeout: 8))
+
+        let fileMenu = application.menuBars.menuBarItems["File"]
+        fileMenu.click()
+        let bookmarkCommand = fileMenu.menus.menuItems["Add Bookmark"]
+        XCTAssertTrue(bookmarkCommand.exists)
+        XCTAssertTrue(bookmarkCommand.isEnabled)
+        application.typeKey(.escape, modifierFlags: [])
+
+        application.typeKey("d", modifierFlags: .command)
+        XCTAssertTrue(application.staticTexts["Bookmark added"].waitForExistence(timeout: 3))
+
+        application.typeKey("e", modifierFlags: .command)
+        let exportCompleted = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in
+                FileManager.default.fileExists(atPath: exportedPDF.path)
+                    || FileManager.default.fileExists(atPath: exportedHTML.path)
+            },
+            object: nil
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [exportCompleted], timeout: 15), .completed)
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: exportedPDF.path)
+                || FileManager.default.fileExists(atPath: exportedHTML.path)
+        )
+    }
+
+    func testLayoutIndependentHistoryNavigationShortcuts() throws {
+        continueAfterFailure = false
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let first = directory.appending(path: "First.md")
+        let second = directory.appending(path: "Second.md")
+        try "# First\n\n[Open second](Second.md)".write(to: first, atomically: true, encoding: .utf8)
+        try "# Second\n\nDestination".write(to: second, atomically: true, encoding: .utf8)
+
+        let application = makeApplication(arguments: [
+            "--md22-ui-test-document", first.path,
+        ])
+        application.launch()
+        ensureReaderWindow(in: application)
+
+        let firstWindow = application.windows.matching(
+            NSPredicate(format: "title BEGINSWITH 'First.md'")
+        ).firstMatch
+        XCTAssertTrue(firstWindow.waitForExistence(timeout: 8))
+        let link = application.links["Open second"]
+        XCTAssertTrue(link.waitForExistence(timeout: 5))
+        link.click()
+
+        let secondWindow = application.windows.matching(
+            NSPredicate(format: "title BEGINSWITH 'Second.md'")
+        ).firstMatch
+        XCTAssertTrue(secondWindow.waitForExistence(timeout: 8))
+
+        application.typeKey(.leftArrow, modifierFlags: .command)
+        XCTAssertTrue(firstWindow.waitForExistence(timeout: 8))
+
+        application.typeKey(.rightArrow, modifierFlags: .command)
+        XCTAssertTrue(secondWindow.waitForExistence(timeout: 8))
     }
 
     func testSettingsAndAboutAreReachableFromStandardCommands() throws {

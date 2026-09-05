@@ -44,21 +44,23 @@ struct DocumentCommands: Commands {
             Button("Open Markdown…") { actions?.open() }
                 .keyboardShortcut("o", modifiers: .command)
                 .disabled(actions == nil)
-        }
-        CommandGroup(replacing: .saveItem) {
+
+            Divider()
+
             Button("Export Document") { actions?.export() }
-                .keyboardShortcut("e", modifiers: [.command, .shift])
+                .keyboardShortcut("e", modifiers: .command)
                 .disabled(actions?.canExport != true)
             Button("Add Bookmark") { actions?.addBookmark() }
                 .keyboardShortcut("d", modifiers: .command)
                 .disabled(actions?.canExport != true)
         }
+        CommandGroup(replacing: .saveItem) { }
         CommandMenu("Navigate") {
             Button("Back") { actions?.navigateBack() }
-                .keyboardShortcut("[", modifiers: .command)
+                .keyboardShortcut(.leftArrow, modifiers: .command)
                 .disabled(actions?.canNavigateBack != true)
             Button("Forward") { actions?.navigateForward() }
-                .keyboardShortcut("]", modifiers: .command)
+                .keyboardShortcut(.rightArrow, modifiers: .command)
                 .disabled(actions?.canNavigateForward != true)
             Divider()
             Button("Find in Document") { actions?.find() }

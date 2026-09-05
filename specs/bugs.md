@@ -156,3 +156,43 @@ until its fix is committed and the stated verification has passed.
   “New Markdown Document Window,” and that the remaining command creates another
   reader window; typed new-window routing tests continue to cover routed values.
 - **Fix commit:** `fix: expose one new reader window command`
+
+## B012 — Command-E does not export the current document
+
+- **Status:** Fixed
+- **Severity:** High
+- **Actual:** Pressing Command-E does not export the displayed document because
+  export is assigned to the unexpected Shift-Command-E combination.
+- **Expected:** Command-E performs the remembered one-step export action for the
+  current document.
+- **Evidence:** User report from Phase 1 testing on 2026-09-05.
+- **Verification:** UI coverage opens a Markdown file, presses Command-E, and
+  confirms that the remembered PDF or HTML export is created beside the source.
+- **Fix commit:** `fix: restore reliable reader shortcuts`
+
+## B013 — Command-D does not visibly add a bookmark
+
+- **Status:** Fixed
+- **Severity:** High
+- **Actual:** Pressing Command-D while reading does not produce a dependable,
+  observable bookmark action.
+- **Expected:** Command-D adds the appropriate bookmark for the active document
+  and confirms the action.
+- **Evidence:** User report from Phase 1 testing on 2026-09-05.
+- **Verification:** UI coverage confirms Add Bookmark is present and enabled in
+  the File menu, presses Command-D, and observes the active document's bookmark
+  confirmation.
+- **Fix commit:** `fix: restore reliable reader shortcuts`
+
+## B014 — Back and Forward shortcuts depend on bracket keys
+
+- **Status:** Fixed
+- **Severity:** Medium
+- **Actual:** Back and Forward use Command-[ and Command-], which require
+  awkward additional layout modifiers on a German keyboard.
+- **Expected:** Back and Forward use layout-independent Command-Left Arrow and
+  Command-Right Arrow shortcuts.
+- **Evidence:** User report from Phase 1 testing on 2026-09-05.
+- **Verification:** UI coverage follows a link to a second Markdown file, uses
+  Command-Left Arrow to return, and uses Command-Right Arrow to move forward.
+- **Fix commit:** `fix: restore reliable reader shortcuts`
