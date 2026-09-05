@@ -114,7 +114,7 @@ Requirement IDs use these prefixes:
 ## Phase 1 Stabilization
 
 - [x] **T075 — Create the Phase 1 bug tracker**: Record user-reported defects with portable screenshot evidence, expected behavior, status, verification, and fix commits in `specs/bugs.md`.
-- [ ] **T076 — Remove the duplicate history-sidebar toggle** (`B001`): Retain one native toolbar control for expanding and collapsing history.
+- [x] **T076 — Remove the duplicate history-sidebar toggle** (`B001`): Retain one native toolbar control for expanding and collapsing history.
 - [ ] **T077 — Prevent duplicate logical bookmarks** (`B002`): Make repeated heading, passage, and position bookmark creation idempotent and verify persistence.
 - [ ] **T078 — Add direct filled-star bookmark removal** (`B003`): Use a filled star for inspector bookmark rows and remove the selected bookmark when its star is activated.
 - [ ] **T079 — Persist the visible bookmarked state in the reader** (`B004`): Keep the current target's filled star visible and make it toggle bookmark removal.

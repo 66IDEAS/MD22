@@ -1,13 +1,11 @@
 import SwiftUI
 
 struct ReaderToolbar: ToolbarContent {
-    @Binding var columnVisibility: NavigationSplitViewVisibility
     @Binding var inspectorPresented: Bool
     @Binding var searchPresented: Bool
     @Binding var searchQuery: String
     @Binding var statusBarPresented: Bool
     var isDistractionFree = false
-    var onToggleHistory: () -> Void = {}
     var onToggleInspector: () -> Void = {}
     var onToggleStatusBar: () -> Void = {}
     var onToggleDistractionFree: () -> Void = {}
@@ -33,12 +31,6 @@ struct ReaderToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .navigation) {
-            Button("Toggle History", systemImage: "sidebar.left") {
-                onToggleHistory()
-            }
-            .labelStyle(.iconOnly)
-            .help("Show or hide History (Option-Command-1)")
-
             Button("Back", systemImage: "chevron.left") {
                 onNavigateBack()
             }

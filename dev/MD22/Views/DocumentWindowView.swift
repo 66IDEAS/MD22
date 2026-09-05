@@ -91,13 +91,11 @@ struct DocumentWindowView: View {
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
         .toolbar {
             ReaderToolbar(
-                columnVisibility: $columnVisibility,
                 inspectorPresented: $inspectorPresented,
                 searchPresented: $searchPresented,
                 searchQuery: $searchQuery,
                 statusBarPresented: $statusBarPresented,
                 isDistractionFree: isDistractionFree,
-                onToggleHistory: toggleHistory,
                 onToggleInspector: toggleInspector,
                 onToggleStatusBar: toggleStatusBar,
                 onToggleDistractionFree: toggleDistractionFree,

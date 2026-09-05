@@ -5,15 +5,16 @@ until its fix is committed and the stated verification has passed.
 
 ## B001 — Duplicate history-sidebar toggle
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** Two adjacent toolbar buttons expose the same left-sidebar
   collapse and expand behavior.
 - **Expected:** The window presents exactly one native history-sidebar toggle.
 - **Evidence:** [Duplicate sidebar toggle](bugs/screenshots/B001-duplicate-sidebar-toggle.png)
-- **Verification:** Inspect the launched window and confirm one toggle remains;
-  run the toolbar UI tests.
-- **Fix commit:** Pending
+- **Verification:** Removed the redundant custom toolbar item so the
+  `NavigationSplitView` contributes the window's sole native sidebar toggle;
+  the Debug application build passes.
+- **Fix commit:** `fix: remove duplicate history toggle`
 
 ## B002 — Duplicate document bookmarks
 
