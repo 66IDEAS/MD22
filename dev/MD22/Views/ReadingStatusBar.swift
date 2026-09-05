@@ -55,9 +55,15 @@ struct ReadingStatusBar: View {
                 }
                 Spacer(minLength: 12)
                 Menu {
-                    Picker("Document Theme", selection: displayThemeBinding) {
-                        ForEach(DisplayTheme.allCases) { theme in
-                            Text(theme.title).tag(theme)
+                    ForEach(DisplayTheme.allCases) { theme in
+                        Button {
+                            environment.preferences.displayTheme = theme
+                        } label: {
+                            if theme == environment.preferences.displayTheme {
+                                Label(theme.title, systemImage: "checkmark")
+                            } else {
+                                Text(theme.title)
+                            }
                         }
                     }
                 } label: {
@@ -65,6 +71,7 @@ struct ReadingStatusBar: View {
                 }
                 .menuStyle(.borderlessButton)
                 .help("Choose Document Theme")
+                .accessibilityIdentifier("theme.menu")
                 Button("Reading Appearance", systemImage: "textformat.size") {
                     readingPopoverPresented.toggle()
                 }
@@ -109,13 +116,6 @@ struct ReadingStatusBar: View {
         Text("\(session.progressPercentage)%")
             .monospacedDigit()
             .accessibilityLabel("Reading progress \(session.progressPercentage) percent")
-    }
-
-    private var displayThemeBinding: Binding<DisplayTheme> {
-        Binding(
-            get: { environment.preferences.displayTheme },
-            set: { environment.preferences.displayTheme = $0 }
-        )
     }
 
     private var accessibilitySummary: String {

@@ -88,16 +88,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B007 — Document-theme selection has an unnecessary submenu
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** Opening the status-bar theme control first shows a “Document Theme”
   submenu, requiring another pointer action before themes appear.
 - **Expected:** Clicking the theme control immediately presents Light, Dark,
   Sci-Fi, Blueprint, and 8-Bit in one menu.
 - **Evidence:** [Nested theme menu](bugs/screenshots/B007-nested-theme-menu.png)
-- **Verification:** Click the status-bar theme control and confirm all five themes
-  are immediately available and selectable.
-- **Fix commit:** Pending
+- **Verification:** The status-bar control now owns five direct theme actions
+  and marks the active theme with a checkmark; it no longer embeds a picker that
+  creates a “Document Theme” submenu.
+- **Fix commit:** `fix: flatten the document theme menu`
 
 ## B008 — Layout control requires a menu and exposes Hide Status Bar
 
