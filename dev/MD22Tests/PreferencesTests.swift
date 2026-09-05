@@ -33,11 +33,9 @@ struct PreferencesTests {
 
         preferences.showsHistory = false
         preferences.showsInspector = false
-        preferences.showsStatusBar = false
         let layoutRestored = PreferencesStore(defaults: defaults)
         #expect(!layoutRestored.showsHistory)
         #expect(!layoutRestored.showsInspector)
-        #expect(!layoutRestored.showsStatusBar)
 
         preferences.exportFormat = .html
         preferences.exportTheme = .sciFi

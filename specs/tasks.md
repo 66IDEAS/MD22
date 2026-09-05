@@ -121,7 +121,7 @@ Requirement IDs use these prefixes:
 - [x] **T080 — Focus and simplify document search** (`B005`): Focus the field when search opens and remove its redundant visible placeholder.
 - [x] **T081 — Add the standard export toolbar icon** (`B006`): Display a recognizable native export symbol on the primary toolbar action.
 - [x] **T082 — Flatten status-bar theme selection** (`B007`): Present all document themes immediately without an intermediate submenu.
-- [ ] **T083 — Make distraction-free reading a direct toolbar toggle** (`B008`): Remove independent status-bar hiding and toggle distraction-free mode with one click.
+- [x] **T083 — Make distraction-free reading a direct toolbar toggle** (`B008`): Remove independent status-bar hiding and toggle distraction-free mode with one click.
 
 ## Phase 2
 

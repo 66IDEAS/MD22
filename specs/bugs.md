@@ -102,7 +102,7 @@ until its fix is committed and the stated verification has passed.
 
 ## B008 — Layout control requires a menu and exposes Hide Status Bar
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** The toolbar layout control opens a menu containing an unwanted
   independent Hide Status Bar command and a second-step distraction-free action.
@@ -110,6 +110,7 @@ until its fix is committed and the stated verification has passed.
   status bar is visible in the normal layout and hidden only as part of
   distraction-free reading.
 - **Evidence:** [Layout menu](bugs/screenshots/B008-layout-menu.png)
-- **Verification:** Toggle distraction-free reading on and off with one click;
-  confirm supporting chrome hides and the normal status bar returns.
-- **Fix commit:** Pending
+- **Verification:** UI coverage activates the direct toolbar control once to
+  hide both panels and the status bar, then activates it again and confirms the
+  prior side-panel layout and normal status bar return.
+- **Fix commit:** `fix: make distraction-free reading a direct toggle`

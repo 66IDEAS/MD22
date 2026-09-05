@@ -9,7 +9,6 @@ extension Notification.Name {
     static let md22AddBookmark = Notification.Name("MD22.addBookmark")
     static let md22ToggleHistory = Notification.Name("MD22.toggleHistory")
     static let md22ToggleInspector = Notification.Name("MD22.toggleInspector")
-    static let md22ToggleStatusBar = Notification.Name("MD22.toggleStatusBar")
     static let md22ToggleDistractionFree = Notification.Name("MD22.toggleDistractionFree")
     static let md22FocusHistory = Notification.Name("MD22.focusHistory")
     static let md22FocusDocument = Notification.Name("MD22.focusDocument")

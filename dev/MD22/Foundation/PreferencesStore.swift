@@ -81,7 +81,6 @@ final class PreferencesStore {
         static let readingSettings = "readingSettings"
         static let showsHistory = "showsHistory"
         static let showsInspector = "showsInspector"
-        static let showsStatusBar = "showsStatusBar"
         static let exportFormat = "exportFormat"
         static let exportTheme = "exportTheme"
     }
@@ -110,9 +109,6 @@ final class PreferencesStore {
     var showsInspector: Bool {
         didSet { defaults.set(showsInspector, forKey: Key.showsInspector) }
     }
-    var showsStatusBar: Bool {
-        didSet { defaults.set(showsStatusBar, forKey: Key.showsStatusBar) }
-    }
 
     var exportFormat: ExportFormat {
         didSet { defaults.set(exportFormat.rawValue, forKey: Key.exportFormat) }
@@ -134,7 +130,6 @@ final class PreferencesStore {
         }
         showsHistory = defaults.object(forKey: Key.showsHistory) as? Bool ?? true
         showsInspector = defaults.object(forKey: Key.showsInspector) as? Bool ?? true
-        showsStatusBar = defaults.object(forKey: Key.showsStatusBar) as? Bool ?? true
         exportFormat = ExportFormat(rawValue: defaults.string(forKey: Key.exportFormat) ?? "") ?? .pdf
         exportTheme = DisplayTheme(rawValue: defaults.string(forKey: Key.exportTheme) ?? "") ?? .light
     }

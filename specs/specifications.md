@@ -234,10 +234,11 @@
 **Acceptance criteria:**
 
 - On first launch, the left history panel, right outline/bookmarks panel, and bottom status bar are visible.
-- The user can show or hide the left panel, right panel, and status bar independently.
-- A distraction-free reading action hides both panels and the status bar.
+- The user can show or hide the left and right panels independently.
+- The status bar remains visible in the normal reading layout and has no independent hide action.
+- A single direct toolbar action enters or exits distraction-free reading and hides both panels and the status bar while active.
 - When supporting interface areas are hidden, the rendered document uses the available space.
-- After the first launch, the application remembers the visibility of each panel and the status bar.
+- After the first launch, the application remembers the visibility of each side panel.
 - On subsequent launches, the application restores the user's last visibility choices.
 
 ### 19. Bookmark Document Locations

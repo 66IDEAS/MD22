@@ -44,6 +44,19 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertFalse(historySidebar.waitForExistence(timeout: 1))
         application.typeKey("1", modifierFlags: [.command, .option])
         XCTAssertTrue(historySidebar.waitForExistence(timeout: 3))
+
+        let inspector = application.descendants(matching: .any)["document.inspector"]
+        let statusBar = application.descendants(matching: .any)["reading.status"]
+        let distractionToggle = application.buttons["distraction.toggle"]
+        XCTAssertTrue(distractionToggle.waitForExistence(timeout: 3))
+        distractionToggle.click()
+        XCTAssertFalse(historySidebar.waitForExistence(timeout: 1))
+        XCTAssertFalse(inspector.waitForExistence(timeout: 1))
+        XCTAssertFalse(statusBar.waitForExistence(timeout: 1))
+        application.buttons["distraction.toggle"].click()
+        XCTAssertTrue(historySidebar.waitForExistence(timeout: 3))
+        XCTAssertTrue(inspector.waitForExistence(timeout: 3))
+        XCTAssertTrue(statusBar.waitForExistence(timeout: 3))
     }
 
     func testSettingsAndAboutAreReachableFromStandardCommands() throws {
@@ -79,8 +92,7 @@ final class MD22LaunchTests: XCTestCase {
         let application = XCUIApplication()
         application.launchArguments = arguments + [
             "-showsHistory", "YES",
-            "-showsInspector", "YES",
-            "-showsStatusBar", "YES"
+            "-showsInspector", "YES"
         ]
         return application
     }

@@ -14,7 +14,7 @@
 
 ## 4. Focused Unified Toolbar
 
-**Description:** The toolbar must remain concise and group controls by purpose. The leading area contains the history-sidebar toggle, backward and forward navigation, and the document title; the center contains the frequently used Open and Export actions; and the trailing area contains document search and the right-inspector toggle. Theme and reading controls belong in the status bar rather than the toolbar. Pinning, revealing, removal, and new-window actions appear contextually. Every toolbar action must also remain discoverable through the macOS menu bar and keyboard interaction.
+**Description:** The toolbar must remain concise and group controls by purpose. The leading area contains the history-sidebar toggle, backward and forward navigation, and the document title; the center contains the frequently used Open and Export actions; and the trailing area contains document search, the right-inspector toggle, and a direct distraction-free reading toggle. Theme and reading controls belong in the status bar rather than the toolbar. Pinning, revealing, removal, and new-window actions appear contextually. Every toolbar action must also remain discoverable through the macOS menu bar and keyboard interaction.
 
 ## 5. Scan-First History Sidebar
 
@@ -62,7 +62,7 @@
 
 ## 16. Responsive Panels and Distraction-Free Reading
 
-**Description:** Both side panels must resize through native dividers within sensible limits. Showing or hiding a panel uses a brief native transition, recenters the document, and preserves reading position. In a narrow window, an opened panel temporarily overlays the document instead of compressing the reading column below a usable width; clicking the document or pressing Escape dismisses that overlay without changing saved preferences. Distraction-free mode hides both panels and the status bar, retains toolbar access, and restores the previous arrangement on exit. Each window preserves its own panel widths and visibility, while full-screen presentation follows standard macOS toolbar-reveal behavior.
+**Description:** Both side panels must resize through native dividers within sensible limits. Showing or hiding a panel uses a brief native transition, recenters the document, and preserves reading position. In a narrow window, an opened panel temporarily overlays the document instead of compressing the reading column below a usable width; clicking the document or pressing Escape dismisses that overlay without changing saved preferences. The status bar remains visible throughout normal reading and has no independent hide control. A single direct toolbar action enters or exits distraction-free mode; it hides both panels and the status bar, retains toolbar access, and restores the previous side-panel arrangement on exit. Each window preserves its own panel widths and visibility, while full-screen presentation follows standard macOS toolbar-reveal behavior.
 
 ## 17. Complete Keyboard and Assistive Access
 

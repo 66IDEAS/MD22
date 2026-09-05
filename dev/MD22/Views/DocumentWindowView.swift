@@ -8,10 +8,8 @@ struct DocumentWindowView: View {
     @State private var renderer: WebDocumentRenderer
     @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var inspectorPresented = true
-    @State private var statusBarPresented = true
     @State private var preferredHistoryVisible = true
     @State private var preferredInspectorVisible = true
-    @State private var preferredStatusBarVisible = true
     @State private var windowWidth: CGFloat = 1_240
     @State private var isDistractionFree = false
     @State private var layoutBeforeDistractionFree: SavedWindowLayout?
@@ -33,10 +31,8 @@ struct DocumentWindowView: View {
         _renderer = State(initialValue: WebDocumentRenderer())
         _columnVisibility = State(initialValue: environment.preferences.showsHistory ? .all : .detailOnly)
         _inspectorPresented = State(initialValue: environment.preferences.showsInspector)
-        _statusBarPresented = State(initialValue: environment.preferences.showsStatusBar)
         _preferredHistoryVisible = State(initialValue: environment.preferences.showsHistory)
         _preferredInspectorVisible = State(initialValue: environment.preferences.showsInspector)
-        _preferredStatusBarVisible = State(initialValue: environment.preferences.showsStatusBar)
     }
 
     var body: some View {
@@ -77,7 +73,7 @@ struct DocumentWindowView: View {
                 .focusSection()
             }
 
-            if statusBarPresented {
+            if !isDistractionFree {
                 Divider()
                 ReadingStatusBar(session: session)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -94,10 +90,8 @@ struct DocumentWindowView: View {
                 inspectorPresented: $inspectorPresented,
                 searchPresented: $searchPresented,
                 searchQuery: $searchQuery,
-                statusBarPresented: $statusBarPresented,
                 isDistractionFree: isDistractionFree,
                 onToggleInspector: toggleInspector,
-                onToggleStatusBar: toggleStatusBar,
                 onToggleDistractionFree: toggleDistractionFree,
                 onOpen: openMarkdown,
                 onNavigateBack: session.navigateBack,
@@ -223,9 +217,6 @@ struct DocumentWindowView: View {
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleInspector)) { _ in
             toggleInspector()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .md22ToggleStatusBar)) { _ in
-            toggleStatusBar()
-        }
         .onReceive(NotificationCenter.default.publisher(for: .md22ToggleDistractionFree)) { _ in
             toggleDistractionFree()
         }
@@ -268,7 +259,7 @@ struct DocumentWindowView: View {
                 focusedRegion = .inspector
             }
             .onReceive(NotificationCenter.default.publisher(for: .md22FocusStatusBar)) { _ in
-                guard statusBarPresented else { return }
+                guard !isDistractionFree else { return }
                 focusedRegion = .statusBar
             }
     }
@@ -470,7 +461,6 @@ struct DocumentWindowView: View {
             find: showSearch,
             toggleHistory: toggleHistory,
             toggleInspector: toggleInspector,
-            toggleStatusBar: toggleStatusBar,
             toggleDistractionFree: toggleDistractionFree,
             focusHistory: { focusedRegion = .history },
             focusDocument: {
@@ -529,20 +519,17 @@ struct DocumentWindowView: View {
                 if let saved = layoutBeforeDistractionFree {
                     columnVisibility = saved.historyVisible ? .all : .detailOnly
                     inspectorPresented = saved.inspectorVisible
-                    statusBarPresented = saved.statusBarVisible
                 }
                 layoutBeforeDistractionFree = nil
                 isDistractionFree = false
             } else {
                 layoutBeforeDistractionFree = SavedWindowLayout(
                     historyVisible: columnVisibility != .detailOnly,
-                    inspectorVisible: inspectorPresented,
-                    statusBarVisible: statusBarPresented
+                    inspectorVisible: inspectorPresented
                 )
                 isDistractionFree = true
                 columnVisibility = .detailOnly
                 inspectorPresented = false
-                statusBarPresented = false
             }
         }
     }
@@ -565,15 +552,6 @@ struct DocumentWindowView: View {
         }
     }
 
-    private func toggleStatusBar() {
-        let visible = !statusBarPresented
-        preferredStatusBarVisible = visible
-        environment.preferences.showsStatusBar = visible
-        withAnimation(layoutAnimation) {
-            statusBarPresented = visible
-        }
-    }
-
     private func dismissTemporaryPanelsIfNeeded() {
         guard windowWidth < Self.overlayThreshold else { return }
         withAnimation(layoutAnimation) {
@@ -587,7 +565,6 @@ struct DocumentWindowView: View {
         withAnimation(layoutAnimation) {
             columnVisibility = preferredHistoryVisible ? .all : .detailOnly
             inspectorPresented = preferredInspectorVisible
-            statusBarPresented = preferredStatusBarVisible
         }
     }
 
@@ -636,7 +613,6 @@ struct DocumentWindowView: View {
 private struct SavedWindowLayout {
     let historyVisible: Bool
     let inspectorVisible: Bool
-    let statusBarVisible: Bool
 }
 
 private enum WindowFocusRegion: Hashable {

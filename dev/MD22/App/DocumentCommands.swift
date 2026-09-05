@@ -12,7 +12,6 @@ struct FocusedDocumentActions {
     let find: () -> Void
     let toggleHistory: () -> Void
     let toggleInspector: () -> Void
-    let toggleStatusBar: () -> Void
     let toggleDistractionFree: () -> Void
     let focusHistory: () -> Void
     let focusDocument: () -> Void
@@ -74,8 +73,6 @@ struct DocumentCommands: Commands {
                 .keyboardShortcut("1", modifiers: [.command, .option])
             Button("Toggle Inspector") { actions?.toggleInspector() }
                 .keyboardShortcut("2", modifiers: [.command, .option])
-            Button("Toggle Status Bar") { actions?.toggleStatusBar() }
-                .keyboardShortcut("3", modifiers: [.command, .option])
             Divider()
             Button("Distraction-Free Reading") { actions?.toggleDistractionFree() }
                 .keyboardShortcut("d", modifiers: [.command, .control])

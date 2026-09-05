@@ -4,10 +4,8 @@ struct ReaderToolbar: ToolbarContent {
     @Binding var inspectorPresented: Bool
     @Binding var searchPresented: Bool
     @Binding var searchQuery: String
-    @Binding var statusBarPresented: Bool
     var isDistractionFree = false
     var onToggleInspector: () -> Void = {}
-    var onToggleStatusBar: () -> Void = {}
     var onToggleDistractionFree: () -> Void = {}
     var onOpen: () -> Void = {}
     var onNavigateBack: () -> Void = {}
@@ -96,17 +94,17 @@ struct ReaderToolbar: ToolbarContent {
             .labelStyle(.iconOnly)
             .help("Show or hide Outline and Bookmarks (Option-Command-2)")
 
-            Menu("Reading Layout", systemImage: "rectangle.3.group") {
-                Button(statusBarPresented ? "Hide Status Bar" : "Show Status Bar") {
-                    onToggleStatusBar()
-                }
-                Divider()
-                Button(isDistractionFree ? "Exit Distraction-Free Reading" : "Distraction-Free Reading") {
-                    onToggleDistractionFree()
-                }
+            Button(
+                isDistractionFree ? "Exit Distraction-Free Reading" : "Enter Distraction-Free Reading",
+                systemImage: isDistractionFree
+                    ? "arrow.down.right.and.arrow.up.left"
+                    : "arrow.up.left.and.arrow.down.right"
+            ) {
+                onToggleDistractionFree()
             }
             .labelStyle(.iconOnly)
-            .help("Reading Layout")
+            .help(isDistractionFree ? "Exit Distraction-Free Reading (Control-Command-D)" : "Enter Distraction-Free Reading (Control-Command-D)")
+            .accessibilityIdentifier("distraction.toggle")
         }
     }
 }
