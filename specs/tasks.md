@@ -117,6 +117,9 @@ Requirement IDs use these prefixes:
 - [x] **T097 — Restore the one-step export shortcut** (`B012`): Assign Command-E to the remembered export action and verify that it creates the selected output format for the active document.
 - [x] **T098 — Restore the document bookmark shortcut** (`B013`): Expose Add Bookmark in the File menu, assign Command-D, and verify confirmation for the active document.
 - [x] **T099 — Use keyboard-layout-independent history navigation** (`B014`): Replace bracket shortcuts with Command-Left Arrow and Command-Right Arrow and verify backward and forward linked-document navigation.
+- [x] **T109 — Adopt the canonical application identity** (`B016`): Change the application, test bundles, logging subsystem, and identity assertion to the `com.66ideas.MD22` namespace.
+- [x] **T110 — Package portable private Mac builds** (`B015`): Add a reproducible private-build script that coherently ad-hoc signs embedded code, applies test-only library-validation policy, validates the arm64 bundle, and creates a metadata-preserving ZIP.
+- [x] **E069 — Align private-build host and framework signing policy**: Diagnose the cross-Mac `dyld` rejection of Sparkle's upstream Team ID and use an explicit private-build entitlement after verifying that matching ad-hoc TeamIdentifier text alone does not satisfy Hardened Runtime library validation.
 - [x] **T076 — Remove the duplicate history-sidebar toggle** (`B001`): Retain one native toolbar control for expanding and collapsing history.
 - [x] **T077 — Prevent duplicate logical bookmarks** (`B002`): Make repeated heading, passage, and position bookmark creation idempotent and verify persistence.
 - [x] **T078 — Add direct filled-star bookmark removal** (`B003`): Use a filled star for inspector bookmark rows and remove the selected bookmark when its star is activated.

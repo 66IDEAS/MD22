@@ -196,3 +196,32 @@ until its fix is committed and the stated verification has passed.
 - **Verification:** UI coverage follows a link to a second Markdown file, uses
   Command-Left Arrow to return, and uses Command-Right Arrow to move forward.
 - **Fix commit:** `fix: restore reliable reader shortcuts`
+
+## B015 — Private test build crashes while loading Sparkle
+
+- **Status:** Fixed
+- **Severity:** Critical
+- **Actual:** A private ad-hoc build terminates in `dyld` before launch because
+  MD22 and the embedded Sparkle framework have different signing identities.
+- **Expected:** A private test build uses a coherent ad-hoc signing policy and
+  launches on another compatible Apple-silicon Mac.
+- **Evidence:** User-provided macOS crash report from 2026-09-05 reports that
+  `@rpath/Sparkle.framework/Versions/B/Sparkle` is rejected because the mapping
+  process and framework have different Team IDs.
+- **Verification:** The private-packaging script re-signs all bundled code,
+  applies a private-build-only library-validation entitlement, verifies the
+  unpacked bundle and arm64 executable, and the resulting executable remains
+  running after direct launch.
+- **Fix commit:** `fix: correct app identity and private packaging`
+
+## B016 — Application uses the wrong bundle identifier
+
+- **Status:** Fixed
+- **Severity:** High
+- **Actual:** The application identifies itself as `com.alexander-ilg.MD22`.
+- **Expected:** The application, its logging subsystem, and its tests use the
+  canonical `com.66ideas.MD22` identity.
+- **Evidence:** User review of the macOS crash report on 2026-09-05.
+- **Verification:** The generated application metadata and foundation test both
+  assert `com.66ideas.MD22`; the unpacked private build reports that identifier.
+- **Fix commit:** `fix: correct app identity and private packaging`

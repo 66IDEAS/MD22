@@ -6,7 +6,7 @@ import Testing
 struct MD22FoundationTests {
     @Test("The app test target loads")
     func testTargetLoads() {
-        #expect(Bundle.main.bundleIdentifier == "com.alexander-ilg.MD22")
+        #expect(Bundle.main.bundleIdentifier == "com.66ideas.MD22")
     }
 
     @Test("The current platform meets the macOS 26 baseline")

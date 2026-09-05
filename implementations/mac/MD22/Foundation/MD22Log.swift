@@ -4,7 +4,7 @@ import OSLog
 /// Privacy boundary for diagnostics. User content and filesystem paths must never be
 /// interpolated into these logs. Error identifiers contain only stable type/domain/code data.
 enum MD22Log {
-    static let subsystem = "com.alexander-ilg.MD22"
+    static let subsystem = "com.66ideas.MD22"
     static let lifecycle = Logger(subsystem: subsystem, category: "lifecycle")
     static let fileAccess = Logger(subsystem: subsystem, category: "file-access")
     static let renderer = Logger(subsystem: subsystem, category: "renderer")
