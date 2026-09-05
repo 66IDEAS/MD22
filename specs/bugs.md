@@ -32,16 +32,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B003 — Bookmark rows use the wrong symbol and cannot toggle directly
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** Bookmark rows use an `Aa`-style symbol and do not expose a direct
   star control for removal.
 - **Expected:** Every bookmark row displays a filled star. Clicking that star
   removes only that bookmark.
 - **Evidence:** [Bookmark row symbols](bugs/screenshots/B002-duplicate-bookmarks.png)
-- **Verification:** Inspect the Bookmarks inspector, activate a row's filled
-  star, and confirm that only the selected record is removed.
-- **Fix commit:** Pending
+- **Verification:** Every row now exposes an independent filled-star remove
+  button with a specific accessibility label and identifier; the text remains
+  the open target and the Debug application build passes.
+- **Fix commit:** `fix: add direct star removal to bookmark rows`
 
 ## B004 — A bookmarked document target does not retain its visible star
 

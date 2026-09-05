@@ -87,17 +87,18 @@ struct DocumentInspectorView: View {
             if records.isEmpty {
                 ContentUnavailableView(
                     "No Bookmarks",
-                    systemImage: "bookmark",
+                    systemImage: "star",
                     description: Text(bookmarkScope == .currentDocument ? "Bookmark a place in this document to return later." : "Bookmarks from every document appear here.")
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 List(records) { record in
-                    Button { onOpenBookmark(record) } label: {
-                        BookmarkRow(record: record, showsFilename: bookmarkScope == .allDocuments)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(!FileManager.default.isReadableFile(atPath: record.canonicalPath))
+                    BookmarkRow(
+                        record: record,
+                        showsFilename: bookmarkScope == .allDocuments,
+                        onOpen: { onOpenBookmark(record) },
+                        onRemove: { perform { try environment.bookmarks.remove(record) } }
+                    )
                     .contextMenu {
                         Button("Open") { onOpenBookmark(record) }
                             .disabled(!FileManager.default.isReadableFile(atPath: record.canonicalPath))
@@ -130,36 +131,40 @@ struct DocumentInspectorView: View {
 private struct BookmarkRow: View {
     let record: BookmarkRecord
     let showsFilename: Bool
+    let onOpen: () -> Void
+    let onRemove: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(systemName: icon)
-                .foregroundStyle(isAvailable ? Color.secondary : Color.red)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(record.title).lineLimit(2)
-                if let excerpt = record.excerpt, excerpt != record.title {
-                    Text(excerpt).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                }
-                if showsFilename || !isAvailable {
-                    Text(isAvailable ? record.fileDisplayName : "Unavailable — \(record.fileDisplayName)")
-                        .font(.caption2)
-                        .foregroundStyle(isAvailable ? Color.secondary : Color.red)
+            Button("Remove Bookmark", systemImage: "star.fill", action: onRemove)
+                .labelStyle(.iconOnly)
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.accentColor)
+                .help("Remove Bookmark")
+                .accessibilityLabel("Remove bookmark \(record.title)")
+                .accessibilityIdentifier("bookmark.remove.\(record.id.uuidString)")
+
+            Button(action: onOpen) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(record.title).lineLimit(2)
+                    if let excerpt = record.excerpt, excerpt != record.title {
+                        Text(excerpt).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                    }
+                    if showsFilename || !isAvailable {
+                        Text(isAvailable ? record.fileDisplayName : "Unavailable — \(record.fileDisplayName)")
+                            .font(.caption2)
+                            .foregroundStyle(isAvailable ? Color.secondary : Color.red)
+                    }
                 }
             }
+            .buttonStyle(.plain)
+            .disabled(!isAvailable)
+            .accessibilityLabel(accessibilityDescription)
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityDescription)
+        .accessibilityElement(children: .contain)
     }
 
     private var isAvailable: Bool { FileManager.default.isReadableFile(atPath: record.canonicalPath) }
-    private var icon: String {
-        switch record.kind {
-        case .heading: "textformat"
-        case .passage: "quote.opening"
-        case .position: "bookmark"
-        }
-    }
-
     private var accessibilityDescription: String {
         let kindDescription: String
         switch record.kind {
