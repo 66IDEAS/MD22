@@ -43,6 +43,7 @@ struct ReaderToolbar: ToolbarContent {
             .disabled(!canNavigateForward)
             .help("Go Forward (Command-])")
         }
+        .sharedBackgroundVisibility(.hidden)
 
         ToolbarItem(placement: .principal) {
             Text(documentTitle ?? "MD22")
@@ -69,6 +70,7 @@ struct ReaderToolbar: ToolbarContent {
             )
             .disabled(!canExport)
         }
+        .sharedBackgroundVisibility(.hidden)
 
         ToolbarItemGroup(placement: .primaryAction) {
             if searchPresented {
@@ -106,5 +108,6 @@ struct ReaderToolbar: ToolbarContent {
             .help(isDistractionFree ? "Exit Distraction-Free Reading (Control-Command-D)" : "Enter Distraction-Free Reading (Control-Command-D)")
             .accessibilityIdentifier("distraction.toggle")
         }
+        .sharedBackgroundVisibility(.hidden)
     }
 }

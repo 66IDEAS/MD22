@@ -14,7 +14,7 @@
 
 ## 4. Focused Unified Toolbar
 
-**Description:** The toolbar must remain concise and group controls by purpose. The leading area contains the history-sidebar toggle, backward and forward navigation, and the document title; the center contains the frequently used Open and Export actions; and the trailing area contains document search, the right-inspector toggle, and a direct distraction-free reading toggle. Theme and reading controls belong in the status bar rather than the toolbar. Pinning, revealing, removal, and new-window actions appear contextually. Every toolbar action must also remain discoverable through the macOS menu bar and keyboard interaction.
+**Description:** The toolbar must remain concise and group controls by purpose. The leading area contains the history-sidebar toggle, backward and forward navigation, and the document title; the center contains the frequently used Open and Export actions; and the trailing area contains document search, the right-inspector toggle, and a direct distraction-free reading toggle. Toolbar icons use an unadorned native presentation without circular or pill-shaped shared control backgrounds. Theme and reading controls belong in the status bar rather than the toolbar. Pinning, revealing, removal, and new-window actions appear contextually. Every toolbar action must also remain discoverable through the macOS menu bar and keyboard interaction.
 
 ## 5. Scan-First History Sidebar
 

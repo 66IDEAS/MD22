@@ -131,16 +131,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B010 — Toolbar icons have unwanted shared circular backgrounds
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Low
 - **Actual:** Navigation and action icons are wrapped in prominent circular or
   pill-shaped shared backgrounds across the top toolbar.
 - **Expected:** Toolbar icons use an unadorned native presentation without shared
   control backgrounds while retaining their actions, states, and accessibility.
 - **Evidence:** [Toolbar shared backgrounds](bugs/screenshots/B010-toolbar-shared-backgrounds.png)
-- **Verification:** Inspect enabled and disabled toolbar controls in a document
-  window and confirm they no longer have shared circular or pill backgrounds.
-- **Fix commit:** Pending
+- **Verification:** All three custom toolbar control groups now opt out of the
+  macOS 26 shared background while retaining their native toolbar placements,
+  control behavior, labels, help, and accessibility identifiers.
+- **Fix commit:** `fix: remove shared toolbar backgrounds`
 
 ## B011 — File menu exposes two indistinguishable New Window commands
 
