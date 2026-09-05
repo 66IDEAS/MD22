@@ -27,6 +27,47 @@ struct RendererIntegrationTests {
         #expect(headings?.first?["title"] as? String == "Rendered")
     }
 
+    @Test("Heading bookmark stars stay filled until removed")
+    func headingBookmarkState() async throws {
+        let snapshot = DocumentSnapshot(
+            url: URL(fileURLWithPath: "/tmp/Bookmarks.md"),
+            markdown: "# First\n\n## Second",
+            modificationDate: nil,
+            fileIdentifier: nil
+        )
+        let renderer = WebDocumentRenderer()
+        try await renderer.render(snapshot: snapshot, themeID: "light")
+        let headings = try #require(
+            try await renderer.page.callJavaScript("return window.MD22.headings()", contentWorld: .page)
+                as? [[String: Any]]
+        )
+        let headingID = try #require(headings.first?["id"] as? String)
+
+        await renderer.applyBookmarkedHeadings([headingID])
+        let bookmarked = try await renderer.page.callJavaScript(
+            """
+            const star = document.querySelector('.bookmark-heading');
+            return {symbol: star.textContent, persistent: star.classList.contains('is-bookmarked'), pressed: star.getAttribute('aria-pressed')};
+            """,
+            contentWorld: .page
+        ) as? [String: Any]
+        #expect(bookmarked?["symbol"] as? String == "★")
+        #expect(bookmarked?["persistent"] as? Bool == true)
+        #expect(bookmarked?["pressed"] as? String == "true")
+
+        await renderer.applyBookmarkedHeadings([])
+        let removed = try await renderer.page.callJavaScript(
+            """
+            const star = document.querySelector('.bookmark-heading');
+            return {symbol: star.textContent, persistent: star.classList.contains('is-bookmarked'), pressed: star.getAttribute('aria-pressed')};
+            """,
+            contentWorld: .page
+        ) as? [String: Any]
+        #expect(removed?["symbol"] as? String == "☆")
+        #expect(removed?["persistent"] as? Bool == false)
+        #expect(removed?["pressed"] as? String == "false")
+    }
+
     @Test("The generated page has a restrictive content policy")
     func restrictivePolicy() throws {
         let snapshot = DocumentSnapshot(

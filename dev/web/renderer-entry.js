@@ -162,8 +162,28 @@ headings.forEach((heading) => {
   action.textContent = "☆";
   action.title = `Bookmark ${heading.textContent}`;
   action.setAttribute("aria-label", `Bookmark heading ${heading.textContent}`);
+  action.setAttribute("aria-pressed", "false");
   heading.append(action);
 });
+
+const setBookmarkedHeadings = (headingIDs) => {
+  const bookmarked = new Set(Array.isArray(headingIDs) ? headingIDs : []);
+  headings.forEach((heading) => {
+    const action = heading.querySelector(":scope > .bookmark-heading");
+    if (!action) return;
+    const isBookmarked = bookmarked.has(heading.id);
+    const title = heading.dataset.title || heading.textContent;
+    action.classList.toggle("is-bookmarked", isBookmarked);
+    action.textContent = isBookmarked ? "★" : "☆";
+    action.title = `${isBookmarked ? "Remove bookmark from" : "Bookmark"} ${title}`;
+    action.setAttribute(
+      "aria-label",
+      `${isBookmarked ? "Remove bookmark from" : "Bookmark"} heading ${title}`
+    );
+    action.setAttribute("aria-pressed", String(isBookmarked));
+  });
+  return bookmarked.size;
+};
 state.wordCount = (root.textContent.match(/[\p{Letter}\p{Number}]+/gu) || []).length;
 
 const updateLocation = () => {
@@ -287,6 +307,7 @@ window.MD22 = Object.freeze({
   clearSearch,
   nextSearch: () => activateSearch(state.activeSearchIndex + 1),
   previousSearch: () => activateSearch(state.activeSearchIndex - 1),
+  setBookmarkedHeadings,
   waitForExportResources: async () => {
     await document.fonts?.ready;
     const pendingImages = [...document.images]

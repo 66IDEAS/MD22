@@ -45,6 +45,7 @@ struct ReadOnlyDocumentView: View {
             do {
                 try await renderer.render(snapshot: snapshot, themeID: environment.preferences.displayTheme.rawValue)
                 await applyReadingSettings()
+                await renderer.applyBookmarkedHeadings(bookmarkedHeadingIDs)
                 await renderer.restore(session.readingLocation)
                 if let headingID = session.navigationTargetHeadingID {
                     await renderer.navigate(to: headingID)
@@ -69,6 +70,9 @@ struct ReadOnlyDocumentView: View {
         .onChange(of: environment.preferences.displayTheme) { _, theme in
             Task { await renderer.applyTheme(theme.rawValue) }
         }
+        .onChange(of: bookmarkedHeadingIDs) { _, headingIDs in
+            Task { await renderer.applyBookmarkedHeadings(headingIDs) }
+        }
         .onChange(of: environment.preferences.readingSettings) { _, _ in
             Task { await applyReadingSettings() }
         }
@@ -88,7 +92,7 @@ struct ReadOnlyDocumentView: View {
                 .disabled(session.readingLocation.headingID == nil)
             Button("Bookmark Reading Position") { addBookmark(.position) }
         } label: {
-            Image(systemName: "bookmark")
+            Image(systemName: "star")
                 .accessibilityLabel("Add Bookmark")
         }
         .menuStyle(.borderlessButton)
@@ -110,6 +114,12 @@ struct ReadOnlyDocumentView: View {
         }
     }
 
+    private var bookmarkedHeadingIDs: [String] {
+        environment.bookmarks.records(for: snapshot.url).compactMap { record in
+            record.kind == .heading ? record.headingID : nil
+        }
+    }
+
     private func applyReadingSettings() async {
         await renderer.applyReadingSettings(
             environment.preferences.readingSettings,
@@ -124,8 +134,8 @@ struct ReadOnlyDocumentView: View {
                 .queryItems?.first(where: { $0.name == "heading" })?.value
             guard let headingID else { return }
             do {
-                _ = try session.bookmarkHeading(headingID)
-                session.showTransientMessage("Bookmark added")
+                let isBookmarked = try session.toggleHeadingBookmark(headingID)
+                session.showTransientMessage(isBookmarked ? "Bookmark added" : "Bookmark removed")
             } catch {
                 session.showTransientMessage(error.localizedDescription)
             }

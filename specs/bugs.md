@@ -46,16 +46,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B004 — A bookmarked document target does not retain its visible star
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** The document bookmark control remains subdued or transient after
   the current target has been bookmarked.
 - **Expected:** The star stays visibly filled while the current document target
   is bookmarked and acts as a direct unbookmark control.
 - **Evidence:** [Document bookmark visibility](bugs/screenshots/B004-bookmark-visibility.png)
-- **Verification:** Bookmark the current target, move the pointer away, verify
-  that the filled star remains visible, then click it and verify removal.
-- **Fix commit:** Pending
+- **Verification:** Renderer integration coverage confirms a saved heading uses
+  a persistent filled star with pressed state and returns to a hollow star when
+  removed; activating the in-document star now toggles the persisted bookmark.
+- **Fix commit:** `fix: persist and toggle heading bookmark stars`
 
 ## B005 — Search repeats “Find” and does not focus its input
 

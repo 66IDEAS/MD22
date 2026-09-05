@@ -164,6 +164,16 @@ final class WebDocumentRenderer: DocumentRendering {
         )
     }
 
+    func applyBookmarkedHeadings(_ headingIDs: [String]) async {
+        guard let data = try? JSONEncoder().encode(headingIDs),
+              let json = String(data: data, encoding: .utf8) else { return }
+        _ = try? await page.callJavaScript(
+            "return window.MD22?.setBookmarkedHeadings(JSON.parse(headingIDs))",
+            arguments: ["headingIDs": json],
+            contentWorld: .page
+        )
+    }
+
     func applyReadingSettings(_ settings: ReadingSettings, systemReduceMotion: Bool, systemHighContrast: Bool) async {
         let normalized = settings.normalized
         _ = try? await page.callJavaScript(

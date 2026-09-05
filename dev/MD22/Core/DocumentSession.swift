@@ -290,6 +290,19 @@ final class DocumentSession {
     }
 
     @discardableResult
+    func toggleHeadingBookmark(_ headingID: String) throws -> Bool {
+        guard let snapshot else { throw MD22Error.unavailableFile }
+        if let existing = bookmarks.records(for: snapshot.url).first(where: {
+            $0.kind == .heading && $0.headingID == headingID
+        }) {
+            try bookmarks.remove(existing)
+            return false
+        }
+        _ = try bookmarkHeading(headingID)
+        return true
+    }
+
+    @discardableResult
     func bookmarkSelection() throws -> BookmarkRecord {
         let excerpt = selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let snapshot, !excerpt.isEmpty else { return try bookmarkCurrentPosition() }
