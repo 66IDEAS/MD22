@@ -111,6 +111,18 @@ Requirement IDs use these prefixes:
 - [x] **T067 — Configure direct signed and notarized distribution** (`ARCH-5`): Enable Developer ID signing and Hardened Runtime, omit App Sandbox, notarize releases, and verify expected adjacent-file access.
 - [x] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
 
+## Phase 1 Stabilization
+
+- [x] **T075 — Create the Phase 1 bug tracker**: Record user-reported defects with portable screenshot evidence, expected behavior, status, verification, and fix commits in `specs/bugs.md`.
+- [ ] **T076 — Remove the duplicate history-sidebar toggle** (`B001`): Retain one native toolbar control for expanding and collapsing history.
+- [ ] **T077 — Prevent duplicate logical bookmarks** (`B002`): Make repeated heading, passage, and position bookmark creation idempotent and verify persistence.
+- [ ] **T078 — Add direct filled-star bookmark removal** (`B003`): Use a filled star for inspector bookmark rows and remove the selected bookmark when its star is activated.
+- [ ] **T079 — Persist the visible bookmarked state in the reader** (`B004`): Keep the current target's filled star visible and make it toggle bookmark removal.
+- [ ] **T080 — Focus and simplify document search** (`B005`): Focus the field when search opens and remove its redundant visible placeholder.
+- [ ] **T081 — Add the standard export toolbar icon** (`B006`): Display a recognizable native export symbol on the primary toolbar action.
+- [ ] **T082 — Flatten status-bar theme selection** (`B007`): Present all document themes immediately without an intermediate submenu.
+- [ ] **T083 — Make distraction-free reading a direct toolbar toggle** (`B008`): Remove independent status-bar hiding and toggle distraction-free mode with one click.
+
 ## Phase 2
 
 - [ ] **T069 — Add full-screen document presentation** (`FR-23`): Present ordinary Markdown full-screen, hide application chrome, navigate headings, use the display theme, and preserve read-only source behavior.
