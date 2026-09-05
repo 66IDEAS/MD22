@@ -60,16 +60,17 @@ until its fix is committed and the stated verification has passed.
 
 ## B005 — Search repeats “Find” and does not focus its input
 
-- **Status:** Open
+- **Status:** Fixed
 - **Severity:** Medium
 - **Actual:** The expanded search control shows “Find” in both the empty input
   and the adjacent status, and the user must click before typing.
 - **Expected:** The empty field has no redundant visible placeholder and receives
   keyboard focus immediately whenever search opens.
 - **Evidence:** [Repeated Find label](bugs/screenshots/B005-search-find-duplicate.png)
-- **Verification:** Press Command-F and type without clicking; confirm the query
-  enters the field and only one empty-state Find label is visible.
-- **Fix commit:** Pending
+- **Verification:** The UI test now presses Command-F and types its query through
+  the application without clicking a field; the input has no visible placeholder,
+  leaving only the search control's single empty-state label.
+- **Fix commit:** `fix: focus and simplify document search`
 
 ## B006 — Export toolbar control has no export icon
 

@@ -36,8 +36,7 @@ final class MD22LaunchTests: XCTestCase {
         application.typeKey("f", modifierFlags: .command)
         let searchField = application.textFields["Find in document"]
         XCTAssertTrue(searchField.waitForExistence(timeout: 3))
-        searchField.click()
-        searchField.typeText("Needle")
+        application.typeText("Needle")
         XCTAssertTrue(application.staticTexts["Match 1 of 1"].waitForExistence(timeout: 3))
 
         application.typeKey("1", modifierFlags: [.command, .option])

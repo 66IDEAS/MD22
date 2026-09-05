@@ -118,7 +118,7 @@ Requirement IDs use these prefixes:
 - [x] **T077 — Prevent duplicate logical bookmarks** (`B002`): Make repeated heading, passage, and position bookmark creation idempotent and verify persistence.
 - [x] **T078 — Add direct filled-star bookmark removal** (`B003`): Use a filled star for inspector bookmark rows and remove the selected bookmark when its star is activated.
 - [x] **T079 — Persist the visible bookmarked state in the reader** (`B004`): Keep the current target's filled star visible and make it toggle bookmark removal.
-- [ ] **T080 — Focus and simplify document search** (`B005`): Focus the field when search opens and remove its redundant visible placeholder.
+- [x] **T080 — Focus and simplify document search** (`B005`): Focus the field when search opens and remove its redundant visible placeholder.
 - [ ] **T081 — Add the standard export toolbar icon** (`B006`): Display a recognizable native export symbol on the primary toolbar action.
 - [ ] **T082 — Flatten status-bar theme selection** (`B007`): Present all document themes immediately without an intermediate submenu.
 - [ ] **T083 — Make distraction-free reading a direct toolbar toggle** (`B008`): Remove independent status-bar hiding and toggle distraction-free mode with one click.
