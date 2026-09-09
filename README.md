@@ -1,4 +1,15 @@
-# MD22
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="implementations/mac/MD22/Resources/Brand/md22-dark.svg">
+    <img src="implementations/mac/MD22/Resources/Brand/md22-light.svg" alt="MD22" width="380">
+  </picture>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2E62E8" alt="MIT license"></a>
+  <a href="specs/specifications.md"><img src="https://img.shields.io/badge/spec-complete-2E62E8" alt="Specification complete"></a>
+  <a href="https://66ideas.com"><img src="https://img.shields.io/badge/by-66IDEAS-16181D" alt="By 66IDEAS"></a>
+</p>
 
 MD22 is a native, read-only Markdown reader for macOS 26 and Apple silicon. It
 is designed for quickly opening project Markdown files outside a knowledge-base
