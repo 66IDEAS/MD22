@@ -41,6 +41,14 @@ and test. In your pull request:
 Document checks you could not run instead of claiming they passed. Do not commit
 application bundles, build caches, private documents, or credentials.
 
+Keep document processing local; do not add telemetry or accounts. Keep rendering
+dependencies pinned and bundled, and update third-party notices when dependencies
+change. Follow native macOS conventions and validate keyboard and VoiceOver
+behavior. Run the complete command-line test suite for behavior changes.
+
+The generated Xcode project is intentionally ignored. Edit
+`implementations/mac/project.yml` and regenerate it using the command-line tools.
+
 ## Add another implementation
 
 Use `implementations/<name>/` without replacing an existing implementation.
