@@ -225,3 +225,18 @@ until its fix is committed and the stated verification has passed.
 - **Verification:** The generated application metadata and foundation test both
   assert `com.66ideas.MD22`; the unpacked private build reports that identifier.
 - **Fix commit:** `fix: correct app identity and private packaging`
+
+## B017 — PDF export produces one excessively long page
+
+- **Status:** Fixed
+- **Severity:** High
+- **Actual:** Whole-content PDF capture creates a single document-height page.
+- **Expected:** Portrait DIN A4 pages (210 × 297 mm) with consistent margins and
+  automatic pagination, preserving content and the selected publication theme.
+- **Evidence:** User report on 2026-09-09.
+- **Verification:** Targeted `MD22Tests/ExportTests` passed on 2026-09-09. PDFKit
+  checks short (one-page) and long (multi-page, light and dark) exports, A4 media
+  boxes on every page, nonempty pages, retained paragraphs/code/table content,
+  unchanged Markdown sources, and collision-safe output names. HTML export also
+  passes its existing regression check.
+- **Fix commit:** `fix: paginate PDF exports on A4 paper`

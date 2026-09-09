@@ -29,8 +29,10 @@ final class DocumentExportService {
         let exportRenderer = WebDocumentRenderer()
         try await exportRenderer.render(snapshot: snapshot, themeID: themeID)
         try await exportRenderer.prepareForExport(themeID: themeID)
-        let data = try await exportRenderer.page.exported(
-            as: .pdf(region: .contents, allowTransparentBackground: false)
+        let html = try await exportRenderer.exportHTML(themeID: themeID)
+        let data = try await PaginatedPDFExporter().export(
+            html: html,
+            baseURL: snapshot.url.deletingLastPathComponent()
         )
         guard data.starts(with: Data("%PDF".utf8)) else { throw MD22Error.exportFailed }
         let url = try await writer.write(data, beside: snapshot.url, pathExtension: "pdf")

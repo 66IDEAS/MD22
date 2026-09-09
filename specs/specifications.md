@@ -75,6 +75,10 @@
 - The user can initiate PDF conversion for the displayed Markdown file.
 - The PDF output is saved immediately beside the source file without a Save As dialog.
 - The output uses the source file's base name with a `.pdf` extension.
+- PDF output uses portrait DIN A4 pages (210 × 297 mm), with 16 mm side margins, an 18 mm top margin, and a 20 mm bottom margin.
+- Long documents flow automatically across as many A4 pages as necessary rather than producing one document-height page. Short documents use a single A4 page.
+- Pagination preserves readable text, images, code, tables, and the chosen export theme. Headings stay with following content where possible; blocks larger than a page may continue across pages without losing content.
+- Pagination does not add a print dialog, page numbers, headers, footers, or other generated document content.
 - If that filename already exists, the application creates the next available numbered copy rather than overwriting it.
 - The export preserves the source document's structure and does not add a generated table of contents, search, bookmarks, or other navigation content.
 - The application communicates whether conversion succeeded or failed and identifies the created file after success.
