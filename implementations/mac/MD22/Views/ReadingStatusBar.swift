@@ -39,6 +39,7 @@ struct ReadingStatusBar: View {
                         Text(message)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
+                            .accessibilityLabel(message)
                         if let url = session.transientActionURL {
                             Button("Reveal in Finder") {
                                 environment.platform.revealInFinder(url)

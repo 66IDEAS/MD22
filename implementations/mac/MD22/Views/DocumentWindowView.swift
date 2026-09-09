@@ -52,6 +52,8 @@ struct DocumentWindowView: View {
                 .focusable()
                 .focused($focusedRegion, equals: .history)
                 .focusSection()
+                .frame(minWidth: 240, idealWidth: 280, maxWidth: 360)
+                .navigationSplitViewColumnWidth(min: 240, ideal: 280, max: 360)
             } detail: {
                 documentContent
                     .contentShape(Rectangle())

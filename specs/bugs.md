@@ -3,6 +3,34 @@
 This file tracks defects found while exercising Phase 1. Each bug remains open
 until its fix is committed and the stated verification has passed.
 
+## B018 — Export action is hidden and completion is easily missed
+
+- **Status:** Fixed
+- **Actual:** The compact toolbar control group collapses the export action into
+  a nearly blank menu row. Success feedback disappears after three seconds.
+- **Diagnosis:** App logs confirm successful exports; the reported source folder
+  contains three PDFs created at the reported times. PDFKit confirms 19 A4 pages
+  in the first PDF. The defect is the toolbar presentation and feedback.
+- **Expected:** A directly accessible export icon beside a separate options menu,
+  with a ten-second confirmation and Reveal in Finder action.
+- **Evidence:** User screenshots and local export logs, 2026-09-09.
+- **Verification:** Targeted XCUI test passed on 2026-09-09: the primary toolbar
+  button is directly hittable, one click creates the PDF beside its source, and
+  the success message and Reveal in Finder link are accessible.
+- **Fix commit:** `fix: restore direct export and readable sidebar sizing`
+
+## B019 — History sidebar opens too narrow
+
+- **Status:** Fixed
+- **Actual:** The history column opens at roughly 140 points despite the nested
+  list's width preference, truncating filenames to a few characters.
+- **Expected:** An ideal startup width of 280 points, resizable from 240 to 360
+  points, with constraints on the split-view column itself.
+- **Evidence:** User startup screenshot, 2026-09-09.
+- **Verification:** Targeted XCUI startup test passed on 2026-09-09, measuring
+  the visible history column within the 240–360 point limits.
+- **Fix commit:** `fix: restore direct export and readable sidebar sizing`
+
 ## B001 — Duplicate history-sidebar toggle
 
 - **Status:** Fixed

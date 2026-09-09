@@ -2,6 +2,37 @@ import XCTest
 
 @MainActor
 final class MD22LaunchTests: XCTestCase {
+    func testDirectToolbarExportAndStartupSidebarWidth() throws {
+        continueAfterFailure = false
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fixture = directory.appending(path: "Toolbar Export.md")
+        try "# Toolbar Export\n\nA readable publication.".write(to: fixture, atomically: true, encoding: .utf8)
+        let application = makeApplication(arguments: [
+            "--md22-ui-test-document", fixture.path, "-exportFormat", "pdf"
+        ])
+        application.launch()
+        ensureReaderWindow(in: application)
+        let sidebar = application.descendants(matching: .any)["history.sidebar"]
+        XCTAssertTrue(sidebar.waitForExistence(timeout: 5))
+        XCTAssertGreaterThanOrEqual(sidebar.frame.width, 240)
+        XCTAssertLessThanOrEqual(sidebar.frame.width, 360)
+
+        let primary = application.buttons["export.primary"]
+        XCTAssertTrue(primary.waitForExistence(timeout: 8))
+        XCTAssertTrue(primary.isHittable)
+        XCTAssertEqual(primary.label, "Export as PDF")
+        primary.click()
+        let output = directory.appending(path: "Toolbar Export.pdf")
+        let exported = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            FileManager.default.fileExists(atPath: output.path)
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [exported], timeout: 15), .completed)
+        XCTAssertTrue(application.links["Reveal in Finder"].waitForExistence(timeout: 3))
+        XCTAssertTrue(application.staticTexts["Exported Toolbar Export.pdf"].exists)
+    }
+
     func testWelcomeScreenLaunches() throws {
         continueAfterFailure = false
         let application = makeApplication()

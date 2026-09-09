@@ -175,11 +175,11 @@ final class DocumentSession {
         updateReadingLocation(state.location)
     }
 
-    func showTransientMessage(_ message: String, actionURL: URL? = nil) {
+    func showTransientMessage(_ message: String, actionURL: URL? = nil, duration: Duration = .seconds(3)) {
         transientMessage = message
         transientActionURL = actionURL
         Task { [weak self] in
-            try? await Task.sleep(for: .seconds(3))
+            try? await Task.sleep(for: duration)
             guard self?.transientMessage == message else { return }
             self?.transientMessage = nil
             self?.transientActionURL = nil
@@ -194,7 +194,7 @@ final class DocumentSession {
 
     func finishExport(at url: URL) {
         isExporting = false
-        showTransientMessage("Exported \(url.lastPathComponent)", actionURL: url)
+        showTransientMessage("Exported \(url.lastPathComponent)", actionURL: url, duration: .seconds(10))
     }
 
     func failExport() {

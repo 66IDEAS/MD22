@@ -10,7 +10,7 @@ struct ExportToolbarControl: View {
     let onDismissError: () -> Void
 
     var body: some View {
-        ControlGroup {
+        HStack(spacing: 2) {
             Button {
                 onExport(format, theme)
             } label: {
@@ -19,11 +19,12 @@ struct ExportToolbarControl: View {
                         .controlSize(.mini)
                         .accessibilityLabel("Exporting…")
                 } else {
-                    Image(systemName: "square.and.arrow.up")
-                        .imageScale(.medium)
-                        .accessibilityLabel("Export as \(format.title)")
+                    Label("Export as \(format.title)", systemImage: "square.and.arrow.up")
+                        .labelStyle(.iconOnly)
                 }
             }
+            .frame(minWidth: 24, minHeight: 24)
+            .accessibilityLabel("Export as \(format.title)")
             .accessibilityIdentifier("export.primary")
 
             Menu {
@@ -49,10 +50,15 @@ struct ExportToolbarControl: View {
                 }
             } label: {
                 Label("Export Options", systemImage: "chevron.down")
+                    .labelStyle(.iconOnly)
             }
+            .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
+            .fixedSize()
+            .accessibilityIdentifier("export.options")
         }
-        .controlGroupStyle(.compactMenu)
+        .buttonStyle(.borderless)
+        .fixedSize()
         .disabled(isExporting)
         .help("Export \(format.title) using the \(theme.title) theme (Command-E)")
         .accessibilityElement(children: .contain)
@@ -78,6 +84,7 @@ struct ExportToolbarControl: View {
     private func selectionLabel(_ title: String, selected: Bool) -> some View {
         if selected {
             Label(title, systemImage: "checkmark")
+                .labelStyle(.titleAndIcon)
         } else {
             Text(title)
         }

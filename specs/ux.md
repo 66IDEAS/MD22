@@ -18,6 +18,8 @@
 
 ## 5. Scan-First History Sidebar
 
+The visible history sidebar starts at an ideal width of 280 points and resizes between 240 and 360 points. Width constraints apply at the split-view column boundary, including launch with an empty history, so filenames are not reduced to a few characters.
+
 **Description:** The history sidebar must separate Pinned and Recent files into clear sections, with compact two-line rows showing the filename prominently and a shortened parent path as secondary context. Selection uses the native macOS treatment without card-like decoration. Pin controls appear persistently for pinned entries and on hover or keyboard focus for recent entries. Unavailable files remain in place and combine a warning symbol, muted styling, and an explicit label so status is never communicated by color alone. Contextual actions provide secondary file operations, pinned rows support direct drag reordering, and Clear History remains in a restrained sidebar menu. Thumbnails and reading statistics must not clutter the list.
 
 ## 6. Theme-Driven Document Canvas
@@ -45,6 +47,8 @@
 **Description:** Bookmark creation must remain anchored to the content and avoid modal interruption. Hovering or keyboard-focusing a heading reveals a bookmark symbol in the outer document margin, with a filled state indicating an existing bookmark. Selecting passage text reveals a compact contextual bookmarking action. A Bookmarks menu in the inspector header provides Bookmark Current Position and exposes its keyboard shortcut. Labels are derived automatically from the relevant content, and creation receives brief confirmation at the bookmarked location and in the status bar without switching inspector tabs. Removing a heading bookmark uses the same direct control; other bookmarks are removed contextually from the inspector.
 
 ## 12. One-Step Contextual Export
+
+The primary export icon must remain a directly clickable toolbar button beside a separate options disclosure, never be collapsed into an unlabeled menu row. Export success and its Reveal in Finder action remain visible for ten seconds; PDF and HTML files are saved beside the source document.
 
 **Description:** Export must use a native split-button interaction. Activating the main Export button immediately uses the most recently selected format and export theme, while its disclosure menu clearly presents the active combination and available alternatives. Selecting another format or theme starts that export immediately and remembers the choice without a separate confirmation step. The initial combination is PDF with the printer-friendly Light theme. Export progress remains restrained and nonblocking. Success appears temporarily in the status bar with the created filename and a Reveal in Finder action; automatically numbered filenames require no interruption. Failure appears in an anchored popover with a concise explanation and retry action while leaving the document undisturbed.
 
