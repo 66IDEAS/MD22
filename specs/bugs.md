@@ -3,6 +3,30 @@
 This file tracks defects found while exercising Phase 1. Each bug remains open
 until its fix is committed and the stated verification has passed.
 
+## B020 — Export menu exposes unnecessary format settings and nesting
+
+- **Status:** Implemented; manual menu verification pending
+- **Expected:** A single menu with Export as HTML, Export as PDF, and Theme.
+  Theme selection saves the preference without creating any output.
+- **Evidence:** User screenshot and revised interaction request, 2026-09-09.
+- **Verification:** Native menu source and Release build checked. Updated XCUI
+  regression covers both format actions and theme-only preference changes, but
+  macOS/Xcode could not activate the test app during this run.
+- **Implementation commit:** `fix: simplify export menu and refine PDF publications`
+
+## B021 — A4 exports have oversized typography and a white frame
+
+- **Status:** Fixed
+- **Actual:** Screen-sized text and heading spacing create sparse pages. Native
+  print margins remain white around colored publication themes.
+- **Expected:** 10.5-point body text, compact headings/spacing, 12 mm content
+  insets, and theme paper extending to every A4 edge (white for Light).
+- **Verification:** Export tests passed for all five themes on 2026-09-09,
+  checking A4 pagination, compact font metrics, colored page edges, retained text
+  and URL annotations, and absence of stray Copy text. Rendered pages were
+  visually reviewed, including final-page code and tables.
+- **Fix commit:** `fix: simplify export menu and refine PDF publications`
+
 ## B018 — Export action is hidden and completion is easily missed
 
 - **Status:** Fixed

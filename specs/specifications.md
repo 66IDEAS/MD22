@@ -75,7 +75,8 @@
 - The user can initiate PDF conversion for the displayed Markdown file.
 - The PDF output is saved immediately beside the source file without a Save As dialog.
 - The output uses the source file's base name with a `.pdf` extension.
-- PDF output uses portrait DIN A4 pages (210 × 297 mm), with 16 mm side margins, an 18 mm top margin, and a 20 mm bottom margin.
+- PDF output uses portrait DIN A4 pages (210 × 297 mm), with 12 mm content margins on every side. The selected theme's paper color extends to all page edges without a contrasting white frame; Light uses white paper for printing.
+- PDF typography is independent of screen reading size: 10.5-point body text with 1.45 line spacing and proportionate 22/15/12-point first-, second-, and third-level headings. Paragraph spacing is compact enough for a publication rather than a screen capture.
 - Long documents flow automatically across as many A4 pages as necessary rather than producing one document-height page. Short documents use a single A4 page.
 - Pagination preserves readable text, images, code, tables, and the chosen export theme. Headings stay with following content where possible; blocks larger than a page may continue across pages without losing content.
 - Pagination does not add a print dialog, page numbers, headers, footers, or other generated document content.
@@ -287,8 +288,8 @@
 
 **Acceptance criteria:**
 
-- The export action lets the user choose HTML or PDF as the output format.
-- The export action lets the user choose an export theme independently of the active display theme.
+- Opening the export menu immediately shows two actions: Export as HTML and Export as PDF. There is no Format setting or intermediate Export Options submenu.
+- Theme is the only export preference in the menu, independent of the active display theme. Selecting a theme saves the preference without exporting; choosing either format action exports immediately with that theme.
 - The initial export-theme default is the printer-friendly light theme.
 - If the user chooses another export theme, the application remembers it for the next export.
 - One remembered export-theme preference is shared by HTML and PDF exports.

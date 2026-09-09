@@ -2,13 +2,16 @@ import XCTest
 
 @MainActor
 final class MD22LaunchTests: XCTestCase {
-    func testDirectToolbarExportAndStartupSidebarWidth() throws {
+    func testExportMenuAndStartupSidebarWidth() throws {
         continueAfterFailure = false
         let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let fixture = directory.appending(path: "Toolbar Export.md")
-        try "# Toolbar Export\n\nA readable publication.".write(to: fixture, atomically: true, encoding: .utf8)
+        let markdown = "# A Well-Proportioned Publication\n\n[Source](https://example.com/reading)\n\n" + (1...15).map {
+            "## Section \($0)\n\nGood typography lets the reader concentrate on the document. A compact page balances useful content with enough breathing room.\n\n> A short quotation should read comfortably at the same scale as the surrounding text.\n\n```swift\nlet section = \($0)\n```"
+        }.joined(separator: "\n\n")
+        try markdown.write(to: fixture, atomically: true, encoding: .utf8)
         let application = makeApplication(arguments: [
             "--md22-ui-test-document", fixture.path, "-exportFormat", "pdf"
         ])
@@ -19,18 +22,42 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(sidebar.frame.width, 240)
         XCTAssertLessThanOrEqual(sidebar.frame.width, 360)
 
-        let primary = application.buttons["export.primary"]
-        XCTAssertTrue(primary.waitForExistence(timeout: 8))
-        XCTAssertTrue(primary.isHittable)
-        XCTAssertEqual(primary.label, "Export as PDF")
-        primary.click()
+        let exportMenu = application.menuButtons["export.menu"]
+        XCTAssertTrue(exportMenu.waitForExistence(timeout: 8))
+        exportMenu.click()
+        XCTAssertTrue(application.menuItems["Export as HTML"].exists)
+        XCTAssertTrue(application.menuItems["Export as PDF"].exists)
+        XCTAssertFalse(application.menuItems["Export Options"].exists)
+        XCTAssertFalse(application.menuItems["Format"].exists)
+        let menuScreenshot = XCTAttachment(screenshot: application.screenshot())
+        menuScreenshot.name = "Simplified export menu"
+        menuScreenshot.lifetime = .keepAlways
+        add(menuScreenshot)
+        application.menuItems["Theme"].click()
+        application.menuItems["Blueprint"].click()
         let output = directory.appending(path: "Toolbar Export.pdf")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: output.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: directory.appending(path: "Toolbar Export.html").path))
+        exportMenu.click()
+        application.menuItems["Export as PDF"].click()
         let exported = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
             FileManager.default.fileExists(atPath: output.path)
         }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [exported], timeout: 15), .completed)
         XCTAssertTrue(application.links["Reveal in Finder"].waitForExistence(timeout: 3))
         XCTAssertTrue(application.staticTexts["Exported Toolbar Export.pdf"].exists)
+        let publication = XCTAttachment(contentsOfFile: output)
+        publication.name = "Blueprint publication.pdf"
+        publication.lifetime = .keepAlways
+        add(publication)
+        exportMenu.click()
+        application.menuItems["Export as HTML"].click()
+        let html = directory.appending(path: "Toolbar Export.html")
+        let htmlExported = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            FileManager.default.fileExists(atPath: html.path)
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [htmlExported], timeout: 15), .completed)
+        XCTAssertTrue(try String(contentsOf: html, encoding: .utf8).contains("data-theme=\"blueprint\""))
     }
 
     func testWelcomeScreenLaunches() throws {

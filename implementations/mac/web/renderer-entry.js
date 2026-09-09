@@ -33,7 +33,7 @@ const md = new MarkdownIt({
     const valid = language && hljs.getLanguage(language);
     const highlighted = valid ? hljs.highlight(code, { language }).value : hljs.highlightAuto(code).value;
     const label = valid ? language : "code";
-    return `<pre class="code-block"><span class="code-language">${escapeHTML(label)}</span><button class="copy-code" type="button">Copy</button><code class="hljs language-${escapeHTML(label)}">${highlighted}</code></pre>`;
+    return `<pre class="code-block"><span class="code-language">${escapeHTML(label)}</span><code class="hljs language-${escapeHTML(label)}">${highlighted}</code></pre>`;
   }
 });
 

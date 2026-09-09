@@ -1,67 +1,41 @@
 import SwiftUI
 
 struct ExportToolbarControl: View {
-    let format: ExportFormat
     let theme: DisplayTheme
     let isExporting: Bool
     let errorMessage: String?
     let onExport: (ExportFormat, DisplayTheme) -> Void
+    let onSelectTheme: (DisplayTheme) -> Void
     let onRetry: () -> Void
     let onDismissError: () -> Void
 
     var body: some View {
-        HStack(spacing: 2) {
-            Button {
-                onExport(format, theme)
-            } label: {
-                if isExporting {
-                    ProgressView()
-                        .controlSize(.mini)
-                        .accessibilityLabel("Exporting…")
-                } else {
-                    Label("Export as \(format.title)", systemImage: "square.and.arrow.up")
-                        .labelStyle(.iconOnly)
-                }
+        Menu {
+            Button("Export as HTML") {
+                onExport(.html, theme)
             }
-            .frame(minWidth: 24, minHeight: 24)
-            .accessibilityLabel("Export as \(format.title)")
-            .accessibilityIdentifier("export.primary")
-
-            Menu {
-                Text("Current: \(format.title) · \(theme.title)")
-                Divider()
-                Section("Format") {
-                    ForEach(ExportFormat.allCases) { candidate in
-                        Button {
-                            onExport(candidate, theme)
-                        } label: {
-                            selectionLabel(candidate.title, selected: candidate == format)
-                        }
+            Button("Export as PDF") {
+                onExport(.pdf, theme)
+            }
+            Divider()
+            Menu("Theme") {
+                ForEach(DisplayTheme.allCases) { candidate in
+                    Button {
+                        onSelectTheme(candidate)
+                    } label: {
+                        selectionLabel(candidate.title, selected: candidate == theme)
                     }
                 }
-                Section("Theme") {
-                    ForEach(DisplayTheme.allCases) { candidate in
-                        Button {
-                            onExport(format, candidate)
-                        } label: {
-                            selectionLabel(candidate.title, selected: candidate == theme)
-                        }
-                    }
-                }
-            } label: {
-                Label("Export Options", systemImage: "chevron.down")
-                    .labelStyle(.iconOnly)
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
-            .accessibilityIdentifier("export.options")
+        } label: {
+            Label(isExporting ? "Exporting…" : "Export", systemImage: "square.and.arrow.up")
+                .labelStyle(.iconOnly)
         }
-        .buttonStyle(.borderless)
+        .menuStyle(.borderlessButton)
         .fixedSize()
         .disabled(isExporting)
-        .help("Export \(format.title) using the \(theme.title) theme (Command-E)")
-        .accessibilityElement(children: .contain)
+        .help("Export as HTML or PDF · \(theme.title) theme (Command-E repeats the last export)")
+        .accessibilityIdentifier("export.menu")
         .popover(isPresented: errorPresented, arrowEdge: .bottom) {
             VStack(alignment: .leading, spacing: 12) {
                 Label("Export Failed", systemImage: "exclamationmark.triangle")

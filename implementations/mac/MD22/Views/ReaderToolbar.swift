@@ -19,11 +19,11 @@ struct ReaderToolbar: ToolbarContent {
     var canNavigateBack = false
     var canNavigateForward = false
     var canExport = false
-    var exportFormat = ExportFormat.pdf
     var exportTheme = DisplayTheme.light
     var isExporting = false
     var exportError: String?
     var onExport: (ExportFormat, DisplayTheme) -> Void = { _, _ in }
+    var onSelectExportTheme: (DisplayTheme) -> Void = { _ in }
     var onRetryExport: () -> Void = {}
     var onDismissExportError: () -> Void = {}
 
@@ -60,11 +60,11 @@ struct ReaderToolbar: ToolbarContent {
             .help("Open Markdown…")
 
             ExportToolbarControl(
-                format: exportFormat,
                 theme: exportTheme,
                 isExporting: isExporting,
                 errorMessage: exportError,
                 onExport: onExport,
+                onSelectTheme: onSelectExportTheme,
                 onRetry: onRetryExport,
                 onDismissError: onDismissExportError
             )

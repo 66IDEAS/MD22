@@ -54,6 +54,8 @@
 
 PDF output must pass the canonical rendered HTML through WebKit's native print operation using portrait DIN A4 paper and explicit margins. Whole-content PDF capture is unsuitable because it produces one document-height page. A dedicated offscreen print adapter may use WKWebView while the reader continues to use WebPage; printing must save locally without showing a print panel or requiring a configured printer.
 
+Publication-specific print CSS sets typography independently from the screen. A Core Graphics PDF pass paints the theme's paper color beneath each vector page to cover otherwise unpainted print margins. PDFKit retains link annotations and remaps internal destinations when assembling the final document; text must remain selectable and searchable.
+
 ## 14. Coordinated File Access and Monitoring
 
 **Description:** Source documents and project-relative resources must be accessed through coordinated Foundation file APIs, using `NSFileCoordinator` and `NSFilePresenter` where applicable. Reads and change monitoring must run asynchronously, coalesce bursts of filesystem events, and produce an immutable document snapshot before parsing begins. Generation identifiers or equivalent sequencing must prevent an older asynchronous render from replacing newer content. The file subsystem must remain read-only with respect to Markdown source files.

@@ -40,6 +40,24 @@ final class PaginatedPDFExporter: NSObject, WKNavigationDelegate {
             ]);
             """, arguments: [:], in: nil, contentWorld: .page)
 
+        let rgba = try await webView.evaluateJavaScript("""
+            (() => {
+                const root = document.documentElement;
+                const canvas = document.createElement('canvas');
+                canvas.width = canvas.height = 1;
+                const context = canvas.getContext('2d');
+                context.fillStyle = root.dataset.theme === 'light' ? '#fff'
+                    : getComputedStyle(root).getPropertyValue('--page').trim();
+                context.fillRect(0, 0, 1, 1);
+                return Array.from(context.getImageData(0, 0, 1, 1).data).map(value => value / 255);
+            })()
+            """) as? [Double]
+        guard let rgba, rgba.count == 4 else { throw MD22Error.exportFailed }
+        guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB),
+              let background = CGColor(colorSpace: colorSpace, components: rgba.map { CGFloat($0) }) else {
+            throw MD22Error.exportFailed
+        }
+
         let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -47,10 +65,10 @@ final class PaginatedPDFExporter: NSObject, WKNavigationDelegate {
         let info = NSPrintInfo(dictionary: [:])
         info.paperSize = paperSize
         info.orientation = .portrait
-        info.leftMargin = 16 * pointsPerMillimetre
-        info.rightMargin = 16 * pointsPerMillimetre
-        info.topMargin = 18 * pointsPerMillimetre
-        info.bottomMargin = 20 * pointsPerMillimetre
+        info.leftMargin = 12 * pointsPerMillimetre
+        info.rightMargin = 12 * pointsPerMillimetre
+        info.topMargin = 12 * pointsPerMillimetre
+        info.bottomMargin = 12 * pointsPerMillimetre
         info.horizontalPagination = .fit
         info.verticalPagination = .automatic
         info.isHorizontallyCentered = false
@@ -83,7 +101,7 @@ final class PaginatedPDFExporter: NSObject, WKNavigationDelegate {
             )
         }
         try Task.checkCancellation()
-        return try Data(contentsOf: destination)
+        return try PDFPublicationBackground.apply(to: Data(contentsOf: destination), color: background)
     }
 
     @objc nonisolated private func printOperationDidRun(_ operation: NSPrintOperation, success: Bool, contextInfo: UnsafeMutableRawPointer?) {

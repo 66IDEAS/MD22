@@ -107,11 +107,11 @@ struct DocumentWindowView: View {
                 canNavigateBack: session.canNavigateBack,
                 canNavigateForward: session.canNavigateForward,
                 canExport: session.snapshot != nil,
-                exportFormat: environment.preferences.exportFormat,
                 exportTheme: environment.preferences.exportTheme,
                 isExporting: session.isExporting,
                 exportError: exportError,
                 onExport: exportDocument,
+                onSelectExportTheme: { environment.preferences.exportTheme = $0 },
                 onRetryExport: retryExport,
                 onDismissExportError: { exportError = nil }
             )

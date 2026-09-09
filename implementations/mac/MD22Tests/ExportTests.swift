@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import PDFKit
 import Testing
 @testable import MD22
@@ -56,7 +56,7 @@ struct ExportTests {
         #expect(try String(contentsOf: directory.appending(path: "Guide.html"), encoding: .utf8) == "existing")
     }
 
-    @Test("PDF export paginates long publications on A4", arguments: ["light", "dark"])
+    @Test("PDF export paginates long publications on A4", arguments: ["light", "dark", "blueprint", "sci-fi", "8-bit"])
     func pdfExport(themeID: String) async throws {
         let directory = FileManager.default.temporaryDirectory
             .appending(path: UUID().uuidString, directoryHint: .isDirectory)
@@ -65,7 +65,7 @@ struct ExportTests {
         let source = directory.appending(path: "Publication.md")
         let markdown = "# Publication\n\n" + (1...80).map {
             "Paragraph\($0) has readable text that must survive pagination."
-        }.joined(separator: "\n\n") + "\n\n```swift\nlet finalCodeMarker = 42\n```\n\n| Column | Value |\n| --- | --- |\n| FinalTableMarker | 123 |"
+        }.joined(separator: "\n\n") + "\n\n[Website](https://example.com/reading)\n\n```swift\nlet finalCodeMarker = 42\n```\n\n| Column | Value |\n| --- | --- |\n| FinalTableMarker | 123 |"
         try markdown.write(to: source, atomically: true, encoding: .utf8)
         let snapshot = DocumentSnapshot(
             url: source,
@@ -80,15 +80,36 @@ struct ExportTests {
         )
         let document = try #require(PDFDocument(url: output))
 
+        Attachment.record(try Data(contentsOf: output), named: "publication-\(themeID).pdf")
+
         #expect(output.lastPathComponent == "Publication.pdf")
         #expect(document.pageCount > 1)
         try assertA4Pages(document)
-        #expect(document.string?.contains("Publication") == true)
+        #expect(document.string?.localizedCaseInsensitiveContains("Publication") == true)
         for index in 1...80 {
             #expect(document.string?.contains("Paragraph\(index) ") == true)
         }
         #expect(document.string?.contains("finalCodeMarker") == true)
+        #expect(document.string?.contains("\nCopy\n") == false)
         #expect(document.string?.contains("FinalTableMarker") == true)
+        let firstPage = try #require(document.page(at: 0))
+        let attributed = try #require(firstPage.attributedString)
+        let bodyRange = (attributed.string as NSString).range(of: "Paragraph1")
+        #expect(bodyRange.location != NSNotFound)
+        let font = try #require(attributed.attribute(.font, at: bodyRange.location, effectiveRange: nil) as? NSFont)
+        // WebKit's native print shrink factor slightly adjusts CSS point sizes.
+        #expect(abs(font.pointSize - 10.5) < 1)
+        let links = (0..<document.pageCount).flatMap { document.page(at: $0)?.annotations ?? [] }
+        #expect(links.contains { ($0.action as? PDFActionURL)?.url?.absoluteString == "https://example.com/reading" })
+        let preview = firstPage.thumbnail(of: NSSize(width: 300, height: 425), for: .mediaBox)
+        let tiff = try #require(preview.tiffRepresentation)
+        let bitmap = try #require(NSBitmapImageRep(data: tiff))
+        let corner = try #require(bitmap.colorAt(x: 2, y: 2)?.usingColorSpace(.sRGB))
+        if themeID == "light" {
+            #expect(corner.redComponent > 0.95 && corner.greenComponent > 0.95 && corner.blueComponent > 0.95)
+        } else {
+            #expect(corner.redComponent < 0.25 && corner.greenComponent < 0.4)
+        }
         #expect(try String(contentsOf: source, encoding: .utf8) == markdown)
     }
 
