@@ -120,6 +120,8 @@
 - The application provides an action for opening a Markdown file directly.
 - When supported by the environment, a Markdown file associated with the application can be opened by double-clicking it.
 - When supported by the environment, the application is available through the file browser's Open With action.
+- The macOS implementation registers `.md`, `.markdown`, `.mdown`, `.mkd`, and `.mkdn` as viewable Markdown files without replacing the user's chosen default application.
+- An explicitly opened file takes precedence over restoring the previous document during application launch.
 - Opening a file displays it and adds it to history without requiring an import process.
 - Keyboard shortcuts are available for frequently used viewing actions, including opening a file.
 

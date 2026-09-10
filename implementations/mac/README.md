@@ -51,6 +51,24 @@ MD22_BUILD_NUMBER=2 implementations/mac/scripts/package-private-test.zsh
 An optional first argument chooses another output directory. Markdown documents,
 history, and preferences are not part of the generated archive.
 
+## Open Markdown from Finder
+
+After installing and launching MD22, right-click a Markdown file and choose
+**Open With → MD22**. Supported extensions are `.md`, `.markdown`, `.mdown`,
+`.mkd`, and `.mkdn`. MD22 does not replace your existing default application.
+To use MD22 for double-click opening, select a Markdown file in Finder, choose
+**Get Info → Open with → MD22 → Change All…**, and confirm your choice.
+
+For a developer-installed build, refresh its Launch Services registration if
+Finder has cached the previous bundle, then verify discovery from the repo root:
+
+```sh
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MD22.app
+xcrun swift implementations/mac/scripts/verify-file-associations.swift
+```
+
+These commands do not change the default application or require notarization.
+
 ## Development build
 
 For compilation and development work, from this directory:

@@ -59,13 +59,35 @@ targets:
             CFBundleTypeRole: Viewer
             LSHandlerRank: Alternate
             LSItemContentTypes:
-              - public.markdown
+              - net.daringfireball.markdown
             CFBundleTypeExtensions:
               - md
               - markdown
               - mdown
               - mkd
               - mkdn
+          # macOS can prefer another app's imported Markdown declaration, whose
+          # tags omit these aliases. Keep an extension-only fallback for them.
+          - CFBundleTypeName: Markdown Alternate Extensions
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            CFBundleTypeExtensions:
+              - mdown
+              - mkd
+              - mkdn
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: net.daringfireball.markdown
+            UTTypeDescription: Markdown Document
+            UTTypeConformsTo:
+              - public.utf8-plain-text
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - md
+                - markdown
+                - mdown
+                - mkd
+                - mkdn
+              public.mime-type: text/markdown
     entitlements:
       path: MD22/MD22.entitlements
     dependencies:

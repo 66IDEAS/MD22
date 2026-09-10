@@ -3,6 +3,29 @@
 This file tracks defects found while exercising Phase 1. Each bug remains open
 until its fix is committed and the stated verification has passed.
 
+## B022 — Finder does not offer MD22 for Markdown files
+
+- **Status:** Fixed
+- **Severity:** High
+- **Actual:** The bundle lists the unsupported `public.markdown` identifier;
+  Launch Services does not offer the installed MD22 in Markdown file handlers.
+- **Expected:** Finder offers MD22 through Open With for every supported
+  Markdown extension; the user can choose it as the default for double-click.
+  Installation does not replace an existing default application.
+- **Evidence:** User report on 2026-09-10; pre-fix Launch Services query resolves
+  `.md` to `net.daringfireball.markdown` but returns no MD22 handler.
+- **Fix:** Use `net.daringfireball.markdown` and import its extension/MIME tags
+  with UTF-8 plain-text conformance; preserve the Viewer role and Alternate rank.
+  Add an extension-only fallback for uncommon suffixes when another imported
+  declaration takes precedence. Route external events into the reader scene and
+  prevent asynchronous last-document restoration from overriding a Finder open.
+- **Verification:** Six targeted foundation/routing/drop tests pass. Build 9
+  passes signature and arm64 validation; installed Launch Services checks pass
+  for all five extensions. A cold Finder-style open loads the requested README
+  (confirmed by lifecycle events and remembered document), not the previous file.
+  The existing Xcode default handler is preserved.
+- **Fix commit:** `fix: register Markdown files and honor Finder opening`
+
 ## B020 — Export menu exposes unnecessary format settings and nesting
 
 - **Status:** Implemented; manual menu verification pending

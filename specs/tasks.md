@@ -29,6 +29,7 @@ Requirement IDs use these prefixes:
 
 ### Application Shell and File Opening
 
+- [x] **T115 — Repair Finder Markdown registration** (`FR-9`, `ARCH-21`): Declare the standard imported Markdown UTI and all supported extensions, add bundle regression coverage, rebuild and register the installed app, and verify Launch Services discovery without changing the user's default application. Six targeted tests and all five installed extension checks pass; build 9 opens the requested file on cold launch.
 - [x] **T015 — Build the focused unified toolbar** (`UX-4`): Implement the approved leading navigation, central Open and Export, trailing search and inspector, contextual actions, menus, and keyboard discoverability.
 - [x] **T016 — Centralize native file and window routing** (`ARCH-21`): Route UTType registration, Finder and Open With events, drops, commands, links, history, bookmarks, new windows, Finder reveal, and external URLs through shared services.
 - [x] **T017 — Support direct Markdown opening** (`FR-9`): Implement Open, file association, double-click, Open With, history insertion, and standard keyboard access without importing files.
@@ -158,6 +159,8 @@ Requirement IDs use these prefixes:
 
 ## Resolved Implementation Issues
 
+- [x] **E069 — Check real files when verifying Launch Services**: Use disposable Markdown fixtures because NSWorkspace does not enumerate handlers for nonexistent file URLs. Provide an extension-only fallback for uncommon Markdown suffixes when macOS selects another imported declaration that omits those tags.
+- [x] **E070 — Give explicit Finder requests precedence over restoration**: Register external-event routing on the reader scene and recheck explicit-open state after the asynchronous last-document availability check, so startup cannot replace the file requested by the user.
 - [x] **E001 — Resolve generated test-module collisions**: Assign explicit, distinct product and module names to the unit-test and UI-test bundles so Xcode can build both in one scheme.
 - [x] **E002 — Enable app-module testability in Debug builds**: Explicitly enable testability and unoptimized Swift compilation for Debug because generated target settings did not inherit those flags.
 - [x] **E003 — Preserve testable app symbols**: Disable dead-code stripping for Debug app builds so hosted tests can link internal symbols that are intentionally not referenced by the executable.

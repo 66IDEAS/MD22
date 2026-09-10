@@ -22,6 +22,7 @@ struct DocumentWindowView: View {
     @State private var isDropTargeted = false
     @State private var historySelection: String?
     @State private var didAttemptRestoration = false
+    @State private var didReceiveExplicitOpen = false
     @FocusState private var focusedRegion: WindowFocusRegion?
 
     init(environment: AppEnvironment, initialRequest: DocumentWindowRequest? = nil) {
@@ -144,8 +145,12 @@ struct DocumentWindowView: View {
                 openRequest(initialRequest)
                 return
             }
-            guard let url = environment.history.lastDocumentURL else { return }
-            if await environment.fileAccess.isAvailable(url) {
+            guard !didReceiveExplicitOpen, let url = environment.history.lastDocumentURL else { return }
+            let isAvailable = await environment.fileAccess.isAvailable(url)
+            // Finder may deliver its file while the asynchronous availability
+            // check is in flight. Never replace that explicit user choice.
+            guard !didReceiveExplicitOpen else { return }
+            if isAvailable {
                 openCurrent(url, source: .restoration)
             } else {
                 try? environment.history.markUnavailable(path: url.standardizedFileURL.path)
@@ -371,6 +376,8 @@ struct DocumentWindowView: View {
         usesFragment: Bool = true
     ) {
         do {
+            if source != .restoration { didReceiveExplicitOpen = true }
+            MD22Log.lifecycle.notice("Document route source: \(source.rawValue, privacy: .public)")
             var destination = url
             if !usesFragment, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
                 components.fragment = nil

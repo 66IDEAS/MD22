@@ -8,9 +8,11 @@ struct MD22App: App {
         WindowGroup(id: "reader") {
             ContentView()
                 .environment(environment)
+                .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
         }
         .defaultSize(width: 1_240, height: 800)
         .defaultLaunchBehavior(.presented)
+        .handlesExternalEvents(matching: ["*"])
         .commands {
             DocumentCommands()
             AboutCommands()
@@ -20,8 +22,10 @@ struct MD22App: App {
         WindowGroup("Markdown Document", for: DocumentWindowRequest.self) { request in
             ContentView(initialRequest: request.wrappedValue)
                 .environment(environment)
+                .handlesExternalEvents(preferring: [], allowing: [])
         }
         .defaultSize(width: 1_240, height: 800)
+        .handlesExternalEvents(matching: [])
 
         Settings {
             GeneralSettingsView(environment: environment)
