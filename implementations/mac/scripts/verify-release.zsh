@@ -21,7 +21,7 @@ codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 
 SIGNATURE_DESCRIPTION=$(codesign -dvv "$APP_PATH" 2>&1)
 print -r -- "$SIGNATURE_DESCRIPTION" | rg -q '^Authority=Developer ID Application:'
-print -r -- "$SIGNATURE_DESCRIPTION" | rg -q '^flags=.*runtime'
+print -r -- "$SIGNATURE_DESCRIPTION" | rg -q '^CodeDirectory .*flags=.*runtime'
 
 ENTITLEMENTS_FILE=$(mktemp /tmp/md22-entitlements.XXXXXX)
 cleanup() {
