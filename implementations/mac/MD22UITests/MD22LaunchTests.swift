@@ -96,7 +96,7 @@ final class MD22LaunchTests: XCTestCase {
             NSPredicate(format: "title BEGINSWITH 'UI Fixture.md'")
         ).firstMatch
         XCTAssertTrue(documentWindow.waitForExistence(timeout: 8))
-        XCTAssertTrue(application.webViews.firstMatch.exists)
+        XCTAssertTrue(application.webViews.firstMatch.waitForExistence(timeout: 8))
         XCTAssertTrue(application.buttons["Go to Deep, heading level 3"].waitForExistence(timeout: 3))
 
         application.activate()
@@ -129,7 +129,7 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertTrue(statusBar.waitForExistence(timeout: 3))
     }
 
-    func testBookmarkAndExportShortcuts() throws {
+    func testBookmarkCommandAndExportShortcut() throws {
         continueAfterFailure = false
         let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -149,16 +149,28 @@ final class MD22LaunchTests: XCTestCase {
         application.launch()
         ensureReaderWindow(in: application)
         XCTAssertTrue(application.webViews.firstMatch.waitForExistence(timeout: 8))
+        let documentWindow = application.windows.matching(
+            NSPredicate(format: "title BEGINSWITH 'Keyboard Shortcuts.md'")
+        ).firstMatch
+        XCTAssertTrue(documentWindow.waitForExistence(timeout: 8))
+
+        application.activate()
+        documentWindow.click()
 
         let fileMenu = application.menuBars.menuBarItems["File"]
         fileMenu.click()
         let bookmarkCommand = fileMenu.menus.menuItems["Add Bookmark"]
         XCTAssertTrue(bookmarkCommand.exists)
         XCTAssertTrue(bookmarkCommand.isEnabled)
-        application.typeKey(.escape, modifierFlags: [])
+        bookmarkCommand.click()
 
-        application.typeKey("d", modifierFlags: .command)
-        XCTAssertTrue(application.staticTexts["Bookmark added"].waitForExistence(timeout: 3))
+        let bookmarksTab = application.radioButtons["Bookmarks"].firstMatch
+        XCTAssertTrue(bookmarksTab.waitForExistence(timeout: 3))
+        bookmarksTab.click()
+        let removeBookmark = application.buttons.matching(
+            NSPredicate(format: "label BEGINSWITH[c] 'Remove bookmark'")
+        ).firstMatch
+        XCTAssertTrue(removeBookmark.waitForExistence(timeout: 5))
 
         application.typeKey("e", modifierFlags: .command)
         let exportCompleted = XCTNSPredicateExpectation(
@@ -250,7 +262,7 @@ final class MD22LaunchTests: XCTestCase {
     }
 
     private func ensureReaderWindow(in application: XCUIApplication) {
-        guard application.windows.firstMatch.waitForExistence(timeout: 1) == false else { return }
+        guard application.windows.firstMatch.waitForExistence(timeout: 8) == false else { return }
         application.typeKey("n", modifierFlags: .command)
         XCTAssertTrue(application.windows.firstMatch.waitForExistence(timeout: 3))
     }

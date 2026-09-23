@@ -113,6 +113,7 @@ Requirement IDs use these prefixes:
 - [x] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
 - [x] **E080 — Resolve appcast inputs before changing directories**: Accept valid relative release and key paths when generating the signed update feed; the packaging script previously lost the ZIP after switching to the Xcode project directory.
 - [x] **E081 — Preserve clickable links in paginated PDFs**: Copy URL actions explicitly when recoloring A4 page backgrounds so exported links remain interactive; verify all five publication themes.
+- [x] **E082 — Stabilize the bookmark and export UI smoke test**: Wait for document WebKit readiness, target the named reader window, and verify bookmark creation through the File command when Xcode's synthetic Command-D event is unreliable; separately confirm the keyboard shortcut in the running app.
 
 ## Phase 1 Stabilization
 
