@@ -20,13 +20,16 @@ fi
 typeset -a NOTARY_AUTHENTICATION
 if [[ -n ${MD22_NOTARY_KEYCHAIN_PROFILE:-} ]]; then
     NOTARY_AUTHENTICATION=(--keychain-profile "$MD22_NOTARY_KEYCHAIN_PROFILE")
+    if [[ -n ${MD22_NOTARY_KEYCHAIN_PATH:-} ]]; then
+        NOTARY_AUTHENTICATION+=(--keychain "$MD22_NOTARY_KEYCHAIN_PATH")
+    fi
 elif [[ -n ${MD22_NOTARY_KEY_PATH:-} && -n ${MD22_NOTARY_KEY_ID:-} ]]; then
     NOTARY_AUTHENTICATION=(--key "$MD22_NOTARY_KEY_PATH" --key-id "$MD22_NOTARY_KEY_ID")
     if [[ -n ${MD22_NOTARY_ISSUER_ID:-} ]]; then
         NOTARY_AUTHENTICATION+=(--issuer "$MD22_NOTARY_ISSUER_ID")
     fi
 else
-    print -u2 "Set MD22_NOTARY_KEYCHAIN_PROFILE, or provide MD22_NOTARY_KEY_PATH and MD22_NOTARY_KEY_ID (plus MD22_NOTARY_ISSUER_ID for a team API key)."
+    print -u2 "Set MD22_NOTARY_KEYCHAIN_PROFILE (and optionally MD22_NOTARY_KEYCHAIN_PATH), or provide MD22_NOTARY_KEY_PATH and MD22_NOTARY_KEY_ID (plus MD22_NOTARY_ISSUER_ID for a team API key)."
     exit 64
 fi
 

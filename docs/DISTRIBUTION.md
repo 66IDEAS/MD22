@@ -38,7 +38,8 @@ For a local release, first store credentials in the Keychain with Apple's
 `notarytool store-credentials` command, then run:
 
 ```sh
-export MD22_NOTARY_KEYCHAIN_PROFILE='MD22-notary'
+export MD22_NOTARY_KEYCHAIN_PROFILE='MD22'
+export MD22_NOTARY_KEYCHAIN_PATH="$HOME/Library/Keychains/login.keychain-db"
 implementations/mac/scripts/notarize-release.zsh \
   implementations/mac/build/release/MD22-1.0.0-1/MD22.app
 ```

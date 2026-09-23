@@ -10,8 +10,7 @@ struct UpdateConfigurationTests {
         let feed = try #require(info?["SUFeedURL"] as? String)
         let publicKey = try #require(info?["SUPublicEDKey"] as? String)
 
-        #expect(feed.hasPrefix("https://"))
-        #expect(URL(string: feed)?.host == "github.com")
+        #expect(feed == "https://github.com/66IDEAS/MD22/releases/latest/download/appcast.xml")
         #expect(Data(base64Encoded: publicKey)?.count == 32)
         #expect(info?["SUVerifyUpdateBeforeExtraction"] as? Bool == true)
         #expect(info?["SURequireSignedFeed"] as? Bool == true)

@@ -1,6 +1,6 @@
 name: MD22
 options:
-  bundleIdPrefix: com.alexander-ilg
+  bundleIdPrefix: com.66ideas
   deploymentTarget:
     macOS: "26.0"
   createIntermediateGroups: true
@@ -47,7 +47,7 @@ targets:
         NSHighResolutionCapable: true
         NSSupportsAutomaticGraphicsSwitching: true
         NSHumanReadableCopyright: Copyright © 2026 Alexander Ilg. Released under the MIT License.
-        SUFeedURL: https://github.com/alexanderilg/MD22/releases/latest/download/appcast.xml
+        SUFeedURL: https://github.com/66IDEAS/MD22/releases/latest/download/appcast.xml
         SUPublicEDKey: 1QOZ3YyOnlurRuF++s3TVDzHf80ghJUcRMHRAto1dV8=
         SUEnableAutomaticChecks: true
         SUAutomaticallyUpdate: false

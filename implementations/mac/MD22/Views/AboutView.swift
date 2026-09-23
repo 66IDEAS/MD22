@@ -59,7 +59,7 @@ struct AboutView: View {
     private var aboutPage: some View {
         VStack(spacing: 14) {
             Spacer()
-            Link(destination: URL(string: "https://github.com/alexanderilg/MD22")!) {
+            Link(destination: URL(string: "https://github.com/66IDEAS/MD22")!) {
                 Label("MD22 on GitHub", systemImage: "link")
             }
             .accessibilityIdentifier("about.github")

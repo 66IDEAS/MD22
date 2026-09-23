@@ -22,7 +22,7 @@ const swiftResolution = JSON.parse(
   await readFile(path.join(projectDirectory, "Package.resolved"), "utf8"),
 );
 
-const repository = process.env.GITHUB_REPOSITORY ?? "alexanderilg/MD22";
+const repository = process.env.GITHUB_REPOSITORY ?? "66IDEAS/MD22";
 const revision = process.env.GITHUB_SHA ?? "source";
 const timestamp = process.env.SOURCE_DATE_EPOCH
   ? new Date(Number(process.env.SOURCE_DATE_EPOCH) * 1000).toISOString()
