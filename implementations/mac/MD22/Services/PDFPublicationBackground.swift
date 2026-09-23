@@ -37,6 +37,8 @@ enum PDFPublicationBackground {
             }
             for annotation in source.annotations {
                 guard let copy = annotation.copy() as? PDFAnnotation else { continue }
+                copy.action = annotation.action
+                copy.url = annotation.url
                 if let destination = annotation.destination, let sourcePage = destination.page,
                    let targetPage = result.page(at: original.index(for: sourcePage)) {
                     let mapped = PDFDestination(page: targetPage, at: destination.point)

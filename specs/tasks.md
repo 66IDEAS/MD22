@@ -112,6 +112,7 @@ Requirement IDs use these prefixes:
 - [x] **T067 — Configure direct signed and notarized distribution** (`ARCH-5`): Enable Developer ID signing and Hardened Runtime, omit App Sandbox, notarize releases, and verify expected adjacent-file access.
 - [x] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
 - [x] **E080 — Resolve appcast inputs before changing directories**: Accept valid relative release and key paths when generating the signed update feed; the packaging script previously lost the ZIP after switching to the Xcode project directory.
+- [x] **E081 — Preserve clickable links in paginated PDFs**: Copy URL actions explicitly when recoloring A4 page backgrounds so exported links remain interactive; verify all five publication themes.
 
 ## Phase 1 Stabilization
 
