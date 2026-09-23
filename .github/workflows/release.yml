@@ -37,13 +37,17 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: implementations/mac/package-lock.json
-      - name: Install the project generator
+      - name: Install the project tools
         shell: zsh {0}
         run: |
           if ! command -v xcodegen >/dev/null; then
             brew install xcodegen
           fi
+          if ! command -v rg >/dev/null; then
+            brew install ripgrep
+          fi
           xcodegen version
+          rg --version
       - name: Run the complete Phase 1 verification suite
         run: implementations/mac/scripts/ci.zsh
 
@@ -75,13 +79,17 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: implementations/mac/package-lock.json
-      - name: Install the project generator
+      - name: Install the project tools
         shell: zsh {0}
         run: |
           if ! command -v xcodegen >/dev/null; then
             brew install xcodegen
           fi
+          if ! command -v rg >/dev/null; then
+            brew install ripgrep
+          fi
           xcodegen version
+          rg --version
       - name: Require release immutability and a new release
         env:
           GH_TOKEN: ${{ secrets.MD22_RELEASE_ADMIN_READ_TOKEN }}

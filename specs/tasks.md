@@ -114,6 +114,7 @@ Requirement IDs use these prefixes:
 - [x] **E080 — Resolve appcast inputs before changing directories**: Accept valid relative release and key paths when generating the signed update feed; the packaging script previously lost the ZIP after switching to the Xcode project directory.
 - [x] **E081 — Preserve clickable links in paginated PDFs**: Copy URL actions explicitly when recoloring A4 page backgrounds so exported links remain interactive; verify all five publication themes.
 - [x] **E082 — Stabilize the bookmark and export UI smoke test**: Wait for document WebKit readiness, target the named reader window, and verify bookmark creation through the File command when Xcode's synthetic Command-D event is unreliable; separately confirm the keyboard shortcut in the running app.
+- [x] **E083 — Provision ripgrep on GitHub macOS runners**: Install the search tool required by the repository's verification and release scripts before running CI; the tag-triggered release check otherwise exits before testing.
 
 ## Phase 1 Stabilization
 
