@@ -14,7 +14,7 @@ if [[ -z $SIGNING_IDENTITY || -z $TEAM_ID ]]; then
     exit 64
 fi
 
-if ! security find-identity -v -p codesigning | rg -Fq \"$SIGNING_IDENTITY\"; then
+if ! security find-identity -v -p codesigning | rg -Fq "$SIGNING_IDENTITY"; then
     print -u2 "The requested signing identity is not available in the current keychain: $SIGNING_IDENTITY"
     exit 65
 fi
