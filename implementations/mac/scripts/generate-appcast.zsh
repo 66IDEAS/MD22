@@ -15,6 +15,8 @@ if [[ ! -d $RELEASE_DIRECTORY || ! -f $PRIVATE_KEY_FILE ]]; then
     print -u2 "The release directory and Sparkle private key file must exist."
     exit 66
 fi
+RELEASE_DIRECTORY=${RELEASE_DIRECTORY:A}
+PRIVATE_KEY_FILE=${PRIVATE_KEY_FILE:A}
 if [[ $TAG != v<->.<->.<-> ]]; then
     print -u2 "The release tag must use the form vMAJOR.MINOR.PATCH: $TAG"
     exit 64

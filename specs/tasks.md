@@ -111,6 +111,7 @@ Requirement IDs use these prefixes:
 - [x] **T066 — Build the layered automated test suite** (`ARCH-16`): Cover units, integrations, UI flows, fixtures, conformance, semantic output, theme and export regression, migrations, lifecycle, multiwindow, accessibility, and performance.
 - [x] **T067 — Configure direct signed and notarized distribution** (`ARCH-5`): Enable Developer ID signing and Hardened Runtime, omit App Sandbox, notarize releases, and verify expected adjacent-file access.
 - [x] **T068 — Automate GitHub builds and releases** (`ARCH-15`): Run protected CI and create signed, notarized arm64 DMGs, immutable GitHub releases, and signed Sparkle appcasts with protected secrets.
+- [x] **E080 — Resolve appcast inputs before changing directories**: Accept valid relative release and key paths when generating the signed update feed; the packaging script previously lost the ZIP after switching to the Xcode project directory.
 
 ## Phase 1 Stabilization
 
