@@ -55,7 +55,8 @@ SUBMISSION_ARCHIVE="$TEMPORARY_ROOT/MD22-notarization.zip"
 DMG_STAGING="$TEMPORARY_ROOT/dmg"
 ditto "$SOURCE_APP" "$WORKING_APP"
 "$SCRIPT_DIR/verify-release.zsh" "$WORKING_APP"
-if ! codesign -dvv "$WORKING_APP" 2>&1 | rg -Fq "Authority=$SIGNING_IDENTITY"; then
+SIGNATURE_DESCRIPTION=$(codesign -dvv "$WORKING_APP" 2>&1)
+if ! rg -Fxq "Authority=$SIGNING_IDENTITY" <<< "$SIGNATURE_DESCRIPTION"; then
     print -u2 "The application and DMG signing identities must match: $SIGNING_IDENTITY"
     exit 65
 fi
