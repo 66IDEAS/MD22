@@ -47,10 +47,10 @@ source, manage a knowledge-base vault, or require an account.
 Requires **macOS 26 or later on an Apple-silicon Mac**. Intel Macs, Windows,
 and Linux do not have a published implementation in this repository yet.
 
-Check [GitHub Releases](https://github.com/66IDEAS/MD22/releases) for packaged
-downloads. As of September 9, 2026, no public signed and notarized installer
-has been published. Version 1 is available as source; you can build a private
-local copy using the instructions below.
+Download the signed and notarized installer from the
+[latest GitHub Release](https://github.com/66IDEAS/MD22/releases/latest).
+Open the DMG and drag MD22 into Applications. Source-build instructions are
+below for contributors and anyone who prefers a private local build.
 
 Once installed, open a Markdown file or drop it into the window. Use the history
 on the left to revisit documents and the outline or bookmarks on the right to
