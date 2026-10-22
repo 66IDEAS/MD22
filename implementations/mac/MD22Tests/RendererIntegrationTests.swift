@@ -68,6 +68,75 @@ struct RendererIntegrationTests {
         #expect(removed?["pressed"] as? String == "false")
     }
 
+    @Test("Mermaid flowcharts retain readable SVG styling")
+    func mermaidFlowchartStyling() async throws {
+        let snapshot = DocumentSnapshot(
+            url: URL(fileURLWithPath: "/tmp/Diagram.md"),
+            markdown: """
+            ```mermaid
+            flowchart TD
+              A[Where is the backend?] -->|Publicly reachable, for example a cloud OData service| D[Direct]
+              A -->|Behind a firewall| B{Backend APIs already exposed through MuleSoft or SAP Integration Suite?}
+              B -->|Yes| I[Through the integration platform]
+              B -->|No| C{SAP with a public SAProuter you already run?}
+              C -->|Yes| R[SAProuter]
+              C -->|No| E{Production, a high-availability endpoint, or a backend other than SAP RFC, SAP HANA, MS SQL Server, OData or CSV?}
+              E -->|Yes| V[Site-to-site VPN]
+              E -->|No: trial or complex network| S[Secure Agent]
+            ```
+            """,
+            modificationDate: nil,
+            fileIdentifier: nil
+        )
+        let renderer = WebDocumentRenderer()
+        try await renderer.render(snapshot: snapshot, themeID: "light")
+
+        var diagram: [String: Any]?
+        for _ in 0..<100 {
+            diagram = try await renderer.page.callJavaScript(
+                """
+                const shape = document.querySelector('.mermaid[data-style-ready="true"] svg .node rect');
+                if (!shape) return null;
+                const svg = shape.ownerSVGElement;
+                const label = document.querySelector('.mermaid svg .nodeLabel');
+                const labelContainer = label.closest('foreignObject').firstElementChild;
+                const lane = svg.closest('.wide-lane');
+                lane.scrollLeft = 100;
+                return {
+                  fill: getComputedStyle(shape).fill,
+                  text: getComputedStyle(label).color,
+                  styles: document.querySelectorAll('.mermaid svg style').length,
+                  nonce: document.querySelector('.mermaid svg style')?.nonce || '',
+                  renderedWidth: svg.getBoundingClientRect().width,
+                  viewBoxWidth: svg.viewBox.baseVal.width,
+                  laneWidth: lane.clientWidth,
+                  laneContentWidth: lane.scrollWidth,
+                  laneScrollLeft: lane.scrollLeft,
+                  labelWhiteSpace: getComputedStyle(labelContainer).whiteSpace,
+                  labelDisplay: getComputedStyle(labelContainer).display,
+                  labelFits: labelContainer.scrollHeight <= label.closest('foreignObject').getBoundingClientRect().height + 1
+                };
+                """,
+                contentWorld: .page
+            ) as? [String: Any]
+            if diagram != nil { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        let result = try #require(diagram)
+        #expect((result["styles"] as? Int ?? 0) > 0)
+        #expect(result["fill"] as? String != "rgb(0, 0, 0)", "Mermaid styling: \(result)")
+        #expect((result["renderedWidth"] as? Double ?? 0) >= (result["viewBoxWidth"] as? Double ?? 0) * 0.995, "Mermaid sizing: \(result)")
+        #expect((result["laneContentWidth"] as? Int ?? 0) > (result["laneWidth"] as? Int ?? 0), "Mermaid horizontal overflow: \(result)")
+        #expect((result["laneScrollLeft"] as? Int ?? 0) > 0, "Mermaid horizontal scrolling: \(result)")
+        #expect(result["labelWhiteSpace"] as? String == "break-spaces", "Mermaid label wrapping: \(result)")
+        #expect(result["labelDisplay"] as? String == "table", "Mermaid label layout: \(result)")
+        #expect(result["labelFits"] as? Bool == true, "Mermaid label clipping: \(result)")
+        let exported = try await renderer.exportHTML(themeID: "light")
+        #expect(exported.contains("<svg"))
+        #expect(exported.contains("data-md22-inline-style"))
+        #expect(exported.contains("white-space: break-spaces"))
+    }
+
     @Test("The generated page has a restrictive content policy")
     func restrictivePolicy() throws {
         let snapshot = DocumentSnapshot(

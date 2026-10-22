@@ -199,6 +199,7 @@ document.addEventListener("selectionchange", () => {
 });
 updateLocation();
 
+let mermaidReady = Promise.resolve();
 if (window.mermaid && root.querySelector(".mermaid")) {
   window.mermaid.initialize({
     startOnLoad: false,
@@ -206,7 +207,45 @@ if (window.mermaid && root.querySelector(".mermaid")) {
     theme: bootstrap.mermaidTheme || "neutral",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   });
-  window.mermaid.run({ nodes: root.querySelectorAll(".mermaid"), suppressErrors: true }).catch(() => {
+  mermaidReady = window.mermaid.run({ nodes: root.querySelectorAll(".mermaid"), suppressErrors: true }).then(() => {
+    const nonce = document.querySelector("head > style[nonce]")?.nonce;
+    if (!nonce) return;
+    const inlineStyles = document.createElement("style");
+    inlineStyles.nonce = nonce;
+    document.head.append(inlineStyles);
+    let inlineStyleIndex = 0;
+    root.querySelectorAll(".mermaid svg style").forEach((style) => {
+      const replacement = document.createElementNS(style.namespaceURI, "style");
+      replacement.setAttribute("nonce", nonce);
+      replacement.textContent = style.textContent;
+      style.replaceWith(replacement);
+    });
+    root.querySelectorAll(".mermaid svg").forEach((svg) => {
+      [svg, ...svg.querySelectorAll("[style]")].forEach((element) => {
+        const declarations = element.getAttribute("style")?.trim();
+        if (!declarations) return;
+        const index = String(inlineStyleIndex++);
+        element.dataset.md22InlineStyle = index;
+        try {
+          inlineStyles.sheet.insertRule(
+            `.mermaid [data-md22-inline-style="${index}"] { ${declarations} }`,
+            inlineStyles.sheet.cssRules.length
+          );
+          element.removeAttribute("style");
+        } catch {
+          element.removeAttribute("data-md22-inline-style");
+        }
+      });
+      const naturalWidth = svg.viewBox.baseVal.width;
+      if (Number.isFinite(naturalWidth) && naturalWidth > 0) {
+        svg.setAttribute("width", String(Math.ceil(naturalWidth)));
+      }
+      svg.parentElement.dataset.styleReady = "true";
+    });
+    inlineStyles.textContent = [...inlineStyles.sheet.cssRules]
+      .map((rule) => rule.cssText)
+      .join("\n");
+  }).catch(() => {
     root.querySelectorAll(".mermaid[data-processed]:empty").forEach((node) => {
       node.textContent = "Diagram could not be rendered.";
       node.classList.add("rich-error");
@@ -309,6 +348,7 @@ window.MD22 = Object.freeze({
   previousSearch: () => activateSearch(state.activeSearchIndex - 1),
   setBookmarkedHeadings,
   waitForExportResources: async () => {
+    await mermaidReady;
     await document.fonts?.ready;
     const pendingImages = [...document.images]
       .filter((image) => !image.complete)

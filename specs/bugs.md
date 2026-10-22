@@ -3,6 +3,17 @@
 This file tracks defects found while exercising Phase 1. Each bug remains open
 until its fix is committed and the stated verification has passed.
 
+## B023 — Mermaid diagrams have black shapes and unreadable labels
+
+- **Status:** Fixed
+- **Severity:** High
+- **Actual:** Diagram nodes and connectors render black on light paper, with low-contrast text; long flowcharts shrink into tiny, clipped labels.
+- **Expected:** Nodes, connectors, and labels use the chosen diagram theme with readable contrast and wrapping. Wide diagrams retain legible size and can scroll horizontally.
+- **Evidence:** User screenshot dated 2026-10-21, reproduced with `landscape-options.md`.
+- **Cause:** The content security policy blocked Mermaid's dynamically inserted SVG stylesheet and inline label styles; the global SVG width rule then shrank large flowcharts to the reading-pane width.
+- **Verification:** Renderer integration test checks the affected flowchart's fill, label wrapping, full-width layout, horizontal scrolling, and HTML export; the repaired chart was visually checked in the macOS app.
+- **Fix commit:** `fix: restore readable Mermaid diagrams`
+
 ## B022 — Finder does not offer MD22 for Markdown files
 
 - **Status:** Fixed

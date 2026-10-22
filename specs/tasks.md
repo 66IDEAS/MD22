@@ -115,6 +115,7 @@ Requirement IDs use these prefixes:
 - [x] **E081 — Preserve clickable links in paginated PDFs**: Copy URL actions explicitly when recoloring A4 page backgrounds so exported links remain interactive; verify all five publication themes.
 - [x] **E082 — Stabilize the bookmark and export UI smoke test**: Wait for document WebKit readiness, target the named reader window, and verify bookmark creation through the File command when Xcode's synthetic Command-D event is unreliable; separately confirm the keyboard shortcut in the running app.
 - [x] **E083 — Provision ripgrep on GitHub macOS runners**: Install the search tool required by the repository's verification and release scripts before running CI; the tag-triggered release check otherwise exits before testing.
+- [x] **E084 — Restore readable Mermaid diagrams** (`B023`): Permit generated SVG and label styles through the existing nonce-based policy, preserve full-size diagrams with horizontal overflow, and verify the affected flowchart in the app and renderer tests.
 
 ## Phase 1 Stabilization
 
