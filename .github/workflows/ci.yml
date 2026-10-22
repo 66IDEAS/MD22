@@ -59,3 +59,16 @@ jobs:
           rg --version
       - name: Run the complete Phase 1 verification suite
         run: implementations/mac/scripts/ci.zsh
+        env:
+          MD22_UI_DERIVED_DATA: ${{ runner.temp }}/md22-ui-tests
+          MD22_KEEP_UI_DERIVED_DATA: '1'
+      - name: Preserve UI-test diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: md22-ui-test-diagnostics
+          path: |
+            ${{ runner.temp }}/md22-ui-tests/Logs/Test/*.xcresult
+            ~/Library/Logs/DiagnosticReports/MD22-*.ips
+          if-no-files-found: warn
+          retention-days: 7
