@@ -232,7 +232,7 @@ struct DocumentWindowView: View {
     private var windowInteractionView: some View {
         focusCommandView
         .focusedSceneValue(\.md22DocumentActions, focusedDocumentActions)
-        .background(BookmarkShortcutMonitor(onAddBookmark: addBookmark))
+        .background(BookmarkShortcutMonitor(onAddBookmark: addBookmark, onFind: showSearch))
         .onOpenURL { url in
             openCurrent(url, source: .finder)
         }
