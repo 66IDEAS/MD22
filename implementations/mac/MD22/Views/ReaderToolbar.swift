@@ -2,8 +2,6 @@ import SwiftUI
 
 struct ReaderToolbar: ToolbarContent {
     @Binding var inspectorPresented: Bool
-    @Binding var searchPresented: Bool
-    @Binding var searchQuery: String
     var isDistractionFree = false
     var onToggleInspector: () -> Void = {}
     var onToggleDistractionFree: () -> Void = {}
@@ -11,10 +9,6 @@ struct ReaderToolbar: ToolbarContent {
     var onNavigateBack: () -> Void = {}
     var onNavigateForward: () -> Void = {}
     var onSearch: () -> Void = {}
-    var searchState = DocumentSearchState()
-    var onPreviousSearchResult: () -> Void = {}
-    var onNextSearchResult: () -> Void = {}
-    var onCloseSearch: () -> Void = {}
     var documentTitle: String?
     var canNavigateBack = false
     var canNavigateForward = false
@@ -73,22 +67,12 @@ struct ReaderToolbar: ToolbarContent {
         .sharedBackgroundVisibility(.hidden)
 
         ToolbarItemGroup(placement: .primaryAction) {
-            if searchPresented {
-                SearchToolbarView(
-                    query: $searchQuery,
-                    state: searchState,
-                    onPrevious: onPreviousSearchResult,
-                    onNext: onNextSearchResult,
-                    onClose: onCloseSearch
-                )
-            } else {
-                Button("Search", systemImage: "magnifyingglass") {
-                    onSearch()
-                }
-                .labelStyle(.iconOnly)
-                .keyboardShortcut("f", modifiers: .command)
-                .help("Find in Document (Command-F)")
+            Button("Search", systemImage: "magnifyingglass") {
+                onSearch()
             }
+            .labelStyle(.iconOnly)
+            .keyboardShortcut("f", modifiers: .command)
+            .help("Find in Document (Command-F)")
 
             Button("Toggle Inspector", systemImage: "sidebar.right") {
                 onToggleInspector()

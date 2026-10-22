@@ -14,6 +14,7 @@ struct DocumentWindowView: View {
     @State private var isDistractionFree = false
     @State private var layoutBeforeDistractionFree: SavedWindowLayout?
     @State private var searchPresented = false
+    @State private var searchFocusID = 0
     @State private var searchQuery = ""
     @State private var searchState = DocumentSearchState()
     @State private var searchTask: Task<Void, Never>?
@@ -91,8 +92,6 @@ struct DocumentWindowView: View {
         .toolbar {
             ReaderToolbar(
                 inspectorPresented: $inspectorPresented,
-                searchPresented: $searchPresented,
-                searchQuery: $searchQuery,
                 isDistractionFree: isDistractionFree,
                 onToggleInspector: toggleInspector,
                 onToggleDistractionFree: toggleDistractionFree,
@@ -100,10 +99,6 @@ struct DocumentWindowView: View {
                 onNavigateBack: session.navigateBack,
                 onNavigateForward: session.navigateForward,
                 onSearch: showSearch,
-                searchState: searchState,
-                onPreviousSearchResult: previousSearchResult,
-                onNextSearchResult: nextSearchResult,
-                onCloseSearch: closeSearch,
                 documentTitle: session.title,
                 canNavigateBack: session.canNavigateBack,
                 canNavigateForward: session.canNavigateForward,
@@ -442,6 +437,7 @@ struct DocumentWindowView: View {
 
     private func showSearch() {
         guard session.snapshot != nil else { return }
+        searchFocusID += 1
         searchPresented = true
     }
 
@@ -591,6 +587,19 @@ struct DocumentWindowView: View {
                 .overlay(alignment: .top) {
                     if session.showsLoadingIndicator {
                         loadingIndicator
+                    }
+                }
+                .overlay(alignment: .topTrailing) {
+                    if searchPresented {
+                        SearchToolbarView(
+                            query: $searchQuery,
+                            state: searchState,
+                            onPrevious: previousSearchResult,
+                            onNext: nextSearchResult,
+                            onClose: closeSearch
+                        )
+                        .id(searchFocusID)
+                        .padding(12)
                     }
                 }
         } else if let errorMessage = session.errorMessage {
