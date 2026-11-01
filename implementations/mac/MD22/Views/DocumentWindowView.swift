@@ -11,6 +11,7 @@ struct DocumentWindowView: View {
     @State private var preferredHistoryVisible = true
     @State private var preferredInspectorVisible = true
     @State private var windowWidth: CGFloat = 1_240
+    @State private var didMeasureWindowWidth = false
     @State private var isDistractionFree = false
     @State private var layoutBeforeDistractionFree: SavedWindowLayout?
     @State private var searchPresented = false
@@ -32,7 +33,14 @@ struct DocumentWindowView: View {
         _session = State(initialValue: DocumentSession(environment: environment))
         _renderer = State(initialValue: WebDocumentRenderer())
         _columnVisibility = State(initialValue: environment.preferences.showsHistory ? .all : .detailOnly)
-        _inspectorPresented = State(initialValue: environment.preferences.showsInspector)
+        if #available(macOS 27.0, *) {
+            // The restored window width is unknown until the first layout pass.
+            // Start with one pane so a narrow saved frame cannot trigger the
+            // macOS 27 three-pane constraint loop before geometry is measured.
+            _inspectorPresented = State(initialValue: false)
+        } else {
+            _inspectorPresented = State(initialValue: environment.preferences.showsInspector)
+        }
         _preferredHistoryVisible = State(initialValue: environment.preferences.showsHistory)
         _preferredInspectorVisible = State(initialValue: environment.preferences.showsInspector)
     }
@@ -54,27 +62,32 @@ struct DocumentWindowView: View {
                 .focusable()
                 .focused($focusedRegion, equals: .history)
                 .focusSection()
+                .toolbar(removing: .sidebarToggle)
                 .frame(minWidth: 240, idealWidth: 280, maxWidth: 360)
                 .navigationSplitViewColumnWidth(min: 240, ideal: 280, max: 360)
             } detail: {
-                documentContent
-                    .contentShape(Rectangle())
-                    .simultaneousGesture(
-                        TapGesture().onEnded { dismissTemporaryPanelsIfNeeded() }
-                    )
-                    .onExitCommand(perform: dismissTemporaryPanelsIfNeeded)
-                    .focusSection()
+                HStack(spacing: 0) {
+                    documentContent
+                        .contentShape(Rectangle())
+                        .simultaneousGesture(
+                            TapGesture().onEnded { dismissTemporaryPanelsIfNeeded() }
+                        )
+                        .onExitCommand(perform: dismissTemporaryPanelsIfNeeded)
+                        .focusSection()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                    if Self.usesCompactPanelLayout(at: windowWidth) && inspectorPresented {
+                        Divider()
+                        inspectorContent
+                            .frame(width: 246)
+                    }
+                }
             }
-            .inspector(isPresented: $inspectorPresented) {
-                DocumentInspectorView(
-                    session: session,
-                    renderer: renderer,
-                    onOpenBookmark: openBookmark,
-                    onOpenBookmarkInNewWindow: openBookmarkInNewWindow
-                )
-                .focusable()
-                .focused($focusedRegion, equals: .inspector)
-                .focusSection()
+            .inspector(isPresented: Binding(
+                get: { !Self.usesCompactPanelLayout(at: windowWidth) && inspectorPresented },
+                set: { inspectorPresented = $0 }
+            )) {
+                inspectorContent
             }
 
             if !isDistractionFree {
@@ -86,13 +99,15 @@ struct DocumentWindowView: View {
                     .focusSection()
             }
         }
-        .frame(minWidth: Self.minimumWindowWidth, minHeight: 520)
+        .frame(minWidth: 760, minHeight: 520)
         .navigationTitle(session.windowTitle)
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
         .toolbar {
             ReaderToolbar(
+                historyVisible: columnVisibility != .detailOnly,
                 inspectorPresented: $inspectorPresented,
                 isDistractionFree: isDistractionFree,
+                onToggleHistory: toggleHistory,
                 onToggleInspector: toggleInspector,
                 onToggleDistractionFree: toggleDistractionFree,
                 onOpen: openMarkdown,
@@ -115,8 +130,12 @@ struct DocumentWindowView: View {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { oldWidth, newWidth in
+            let firstMeasurement = !didMeasureWindowWidth
+            didMeasureWindowWidth = true
             windowWidth = newWidth
-            if oldWidth < Self.overlayThreshold, newWidth >= Self.overlayThreshold {
+            if firstMeasurement
+                || Self.usesCompactPanelLayout(at: oldWidth) != Self.usesCompactPanelLayout(at: newWidth)
+                || (oldWidth < Self.overlayThreshold && newWidth >= Self.overlayThreshold) {
                 restorePreferredPanelVisibility()
             }
         }
@@ -525,6 +544,7 @@ struct DocumentWindowView: View {
                 if let saved = layoutBeforeDistractionFree {
                     columnVisibility = saved.historyVisible ? .all : .detailOnly
                     inspectorPresented = saved.inspectorVisible
+                        && !(Self.usesCompactPanelLayout(at: windowWidth) && saved.historyVisible)
                 }
                 layoutBeforeDistractionFree = nil
                 isDistractionFree = false
@@ -546,6 +566,13 @@ struct DocumentWindowView: View {
         environment.preferences.showsHistory = visible
         withAnimation(layoutAnimation) {
             columnVisibility = visible ? .all : .detailOnly
+            if Self.usesCompactPanelLayout(at: windowWidth) {
+                if visible {
+                    inspectorPresented = false
+                } else if preferredInspectorVisible {
+                    inspectorPresented = true
+                }
+            }
         }
     }
 
@@ -555,6 +582,13 @@ struct DocumentWindowView: View {
         environment.preferences.showsInspector = visible
         withAnimation(layoutAnimation) {
             inspectorPresented = visible
+            if Self.usesCompactPanelLayout(at: windowWidth) {
+                if visible {
+                    columnVisibility = .detailOnly
+                } else if preferredHistoryVisible {
+                    columnVisibility = .all
+                }
+            }
         }
     }
 
@@ -569,8 +603,15 @@ struct DocumentWindowView: View {
     private func restorePreferredPanelVisibility() {
         guard !isDistractionFree else { return }
         withAnimation(layoutAnimation) {
-            columnVisibility = preferredHistoryVisible ? .all : .detailOnly
-            inspectorPresented = preferredInspectorVisible
+            if Self.usesCompactPanelLayout(at: windowWidth)
+                && preferredHistoryVisible && preferredInspectorVisible {
+                let inspectorWasActive = inspectorPresented && columnVisibility == .detailOnly
+                columnVisibility = inspectorWasActive ? .detailOnly : .all
+                inspectorPresented = inspectorWasActive
+            } else {
+                columnVisibility = preferredHistoryVisible ? .all : .detailOnly
+                inspectorPresented = preferredInspectorVisible
+            }
         }
     }
 
@@ -580,12 +621,25 @@ struct DocumentWindowView: View {
 
     private static let overlayThreshold: CGFloat = 960
 
-    private static var minimumWindowWidth: CGFloat {
+    private static let compactPanelThreshold: CGFloat = 1_180
+
+    private static func usesCompactPanelLayout(at width: CGFloat) -> Bool {
         if #available(macOS 27.0, *) {
-            // AppKit repeatedly invalidates three-pane constraints below this width on macOS 27.
-            return 1_100
+            return width < compactPanelThreshold
         }
-        return 760
+        return false
+    }
+
+    private var inspectorContent: some View {
+        DocumentInspectorView(
+            session: session,
+            renderer: renderer,
+            onOpenBookmark: openBookmark,
+            onOpenBookmarkInNewWindow: openBookmarkInNewWindow
+        )
+        .focusable()
+        .focused($focusedRegion, equals: .inspector)
+        .focusSection()
     }
 
     @ViewBuilder

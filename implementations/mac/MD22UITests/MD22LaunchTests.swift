@@ -70,10 +70,12 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertTrue(application.descendants(matching: .any)["document.inspector"].exists)
         XCTAssertTrue(application.descendants(matching: .any)["reading.status"].exists)
         XCTAssertTrue(application.buttons["Open Markdown…"].isEnabled)
-        if #available(macOS 27.0, *) {
-            XCTAssertGreaterThanOrEqual(application.windows.firstMatch.frame.width, 1_100)
-        }
-
+        let historyToggle = application.buttons["history.toggle"]
+        XCTAssertTrue(historyToggle.exists)
+        historyToggle.click()
+        XCTAssertFalse(application.descendants(matching: .any)["history.sidebar"].exists)
+        historyToggle.click()
+        XCTAssertTrue(application.descendants(matching: .any)["history.sidebar"].exists)
         let fileMenu = application.menuBars.menuBarItems["File"]
         fileMenu.click()
         XCTAssertTrue(fileMenu.menus.menuItems["New Window"].exists)

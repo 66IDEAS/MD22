@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct ReaderToolbar: ToolbarContent {
+    var historyVisible = true
     @Binding var inspectorPresented: Bool
     var isDistractionFree = false
+    var onToggleHistory: () -> Void = {}
     var onToggleInspector: () -> Void = {}
     var onToggleDistractionFree: () -> Void = {}
     var onOpen: () -> Void = {}
@@ -23,6 +25,16 @@ struct ReaderToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .navigation) {
+            Button(
+                historyVisible ? "Hide Sidebar" : "Show Sidebar",
+                systemImage: "sidebar.left"
+            ) {
+                onToggleHistory()
+            }
+            .labelStyle(.iconOnly)
+            .help("Show or hide History (Option-Command-1)")
+            .accessibilityIdentifier("history.toggle")
+
             Button("Back", systemImage: "chevron.left") {
                 onNavigateBack()
             }
@@ -46,26 +58,20 @@ struct ReaderToolbar: ToolbarContent {
                 .accessibilityLabel(documentTitle.map { "Current document: \($0)" } ?? "MD22")
         }
 
-        ToolbarItemGroup(placement: .automatic) {
-            Button("Open", systemImage: "folder") {
-                onOpen()
-            }
-            .keyboardShortcut("o", modifiers: .command)
-            .help("Open Markdown…")
-
-            ExportToolbarControl(
-                theme: exportTheme,
-                isExporting: isExporting,
-                errorMessage: exportError,
-                onExport: onExport,
-                onSelectTheme: onSelectExportTheme,
-                onRetry: onRetryExport,
-                onDismissError: onDismissExportError
-            )
-            .disabled(!canExport)
+        if #available(macOS 26.1, *) {
+            exportToolbarGroup.visibilityPriority(.low)
+        } else {
+            exportToolbarGroup
         }
-        .sharedBackgroundVisibility(.hidden)
 
+        if #available(macOS 26.1, *) {
+            primaryToolbarGroup.visibilityPriority(.low)
+        } else {
+            primaryToolbarGroup
+        }
+    }
+
+    private var primaryToolbarGroup: some ToolbarContent {
         ToolbarItemGroup(placement: .primaryAction) {
             Button("Search", systemImage: "magnifyingglass") {
                 onSearch()
@@ -91,6 +97,28 @@ struct ReaderToolbar: ToolbarContent {
             .labelStyle(.iconOnly)
             .help(isDistractionFree ? "Exit Distraction-Free Reading (Control-Command-D)" : "Enter Distraction-Free Reading (Control-Command-D)")
             .accessibilityIdentifier("distraction.toggle")
+        }
+        .sharedBackgroundVisibility(.hidden)
+    }
+
+    private var exportToolbarGroup: some ToolbarContent {
+        ToolbarItemGroup(placement: .automatic) {
+            Button("Open", systemImage: "folder") {
+                onOpen()
+            }
+            .keyboardShortcut("o", modifiers: .command)
+            .help("Open Markdown…")
+
+            ExportToolbarControl(
+                theme: exportTheme,
+                isExporting: isExporting,
+                errorMessage: exportError,
+                onExport: onExport,
+                onSelectTheme: onSelectExportTheme,
+                onRetry: onRetryExport,
+                onDismissError: onDismissExportError
+            )
+            .disabled(!canExport)
         }
         .sharedBackgroundVisibility(.hidden)
     }

@@ -327,7 +327,7 @@ until its fix is committed and the stated verification has passed.
   passes its existing regression check.
 - **Fix commit:** `fix: paginate PDF exports on A4 paper`
 
-## B018 — Reader crashes at startup on macOS 27
+## B022 — Reader crashes at startup on macOS 27
 
 - **Status:** Fixed
 - **Severity:** Critical
@@ -339,8 +339,26 @@ until its fix is committed and the stated verification has passed.
   27.0.1 with both panels visible and a 1,024-point window.
 - **Verification:** A patched build launched with both panels and with a copy
   of the user's saved preferences, then restored the recent document without
-  crashing. The welcome-screen UI test now asserts the safe window width on
-  macOS 27; its local run was blocked because Xcode timed out enabling UI
-  automation before the test could start.
-- **Fix:** Use a 1,100-point minimum reader width on macOS 27 while preserving
-  the existing minimum on macOS 26.
+  crashing. The welcome-screen UI test covers panel visibility; its local run
+  was blocked because Xcode timed out enabling UI automation before the test
+  could start.
+- **Fix:** Start with one panel until the restored window width is measured on
+  macOS 27, then show both panels when there is enough room.
+
+## B023 — macOS 27 reader window cannot shrink below 1,100 points
+
+- **Status:** Fixed
+- **Severity:** Medium
+- **Actual:** The startup-crash workaround sets the entire reader's minimum
+  width to 1,100 points, preventing a narrower reading window.
+- **Expected:** The window can shrink to its earlier 760-point minimum. At
+  compact widths, the user can switch between history and inspector while the
+  document remains visible.
+- **Evidence:** User report after installing MD22 1.0.2 on 2026-11-01.
+- **Verification:** A local macOS 27 build opened with a restored 760-point
+  window. At that width, History was visible, the toolbar exposed its overflow
+  menu, and switching to Inspector replaced History without a crash. The
+  temporary test apps were closed after verification.
+- **Fix:** Keep the reader's 760-point minimum, move lower-priority toolbar
+  controls into the system overflow menu, and render Inspector within the
+  detail column at compact widths to avoid the macOS 27 three-pane crash.
