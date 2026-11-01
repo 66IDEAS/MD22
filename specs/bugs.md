@@ -326,3 +326,21 @@ until its fix is committed and the stated verification has passed.
   unchanged Markdown sources, and collision-safe output names. HTML export also
   passes its existing regression check.
 - **Fix commit:** `fix: paginate PDF exports on A4 paper`
+
+## B018 — Reader crashes at startup on macOS 27
+
+- **Status:** Fixed
+- **Severity:** Critical
+- **Actual:** A three-pane reader window with a narrow restored frame aborts during
+  AppKit's constraint update cycle before the document can be read.
+- **Expected:** MD22 opens with its history and inspector panels visible, even
+  when the saved window frame is narrower than the layout can accommodate.
+- **Evidence:** User-provided crash report on 2026-11-01, reproduced on macOS
+  27.0.1 with both panels visible and a 1,024-point window.
+- **Verification:** A patched build launched with both panels and with a copy
+  of the user's saved preferences, then restored the recent document without
+  crashing. The welcome-screen UI test now asserts the safe window width on
+  macOS 27; its local run was blocked because Xcode timed out enabling UI
+  automation before the test could start.
+- **Fix:** Use a 1,100-point minimum reader width on macOS 27 while preserving
+  the existing minimum on macOS 26.

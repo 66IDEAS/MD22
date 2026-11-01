@@ -70,6 +70,9 @@ final class MD22LaunchTests: XCTestCase {
         XCTAssertTrue(application.descendants(matching: .any)["document.inspector"].exists)
         XCTAssertTrue(application.descendants(matching: .any)["reading.status"].exists)
         XCTAssertTrue(application.buttons["Open Markdown…"].isEnabled)
+        if #available(macOS 27.0, *) {
+            XCTAssertGreaterThanOrEqual(application.windows.firstMatch.frame.width, 1_100)
+        }
 
         let fileMenu = application.menuBars.menuBarItems["File"]
         fileMenu.click()

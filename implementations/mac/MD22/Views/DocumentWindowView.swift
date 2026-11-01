@@ -86,7 +86,7 @@ struct DocumentWindowView: View {
                     .focusSection()
             }
         }
-        .frame(minWidth: 760, minHeight: 520)
+        .frame(minWidth: Self.minimumWindowWidth, minHeight: 520)
         .navigationTitle(session.windowTitle)
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
         .toolbar {
@@ -579,6 +579,14 @@ struct DocumentWindowView: View {
     }
 
     private static let overlayThreshold: CGFloat = 960
+
+    private static var minimumWindowWidth: CGFloat {
+        if #available(macOS 27.0, *) {
+            // AppKit repeatedly invalidates three-pane constraints below this width on macOS 27.
+            return 1_100
+        }
+        return 760
+    }
 
     @ViewBuilder
     private var documentContent: some View {
