@@ -12,6 +12,8 @@ struct DocumentWindowView: View {
     @State private var preferredInspectorVisible = true
     @State private var windowWidth: CGFloat = 1_240
     @State private var didMeasureWindowWidth = false
+    @State private var isRendererReady = false
+    @State private var compactPanel: CompactPanel?
     @State private var isDistractionFree = false
     @State private var layoutBeforeDistractionFree: SavedWindowLayout?
     @State private var searchPresented = false
@@ -34,9 +36,8 @@ struct DocumentWindowView: View {
         _renderer = State(initialValue: WebDocumentRenderer())
         _columnVisibility = State(initialValue: environment.preferences.showsHistory ? .all : .detailOnly)
         if #available(macOS 27.0, *) {
-            // The restored window width is unknown until the first layout pass.
-            // Start with one pane so a narrow saved frame cannot trigger the
-            // macOS 27 three-pane constraint loop before geometry is measured.
+            // The restored width is unknown until the first layout pass.
+            // Show the inspector after measuring the available reader width.
             _inspectorPresented = State(initialValue: false)
         } else {
             _inspectorPresented = State(initialValue: environment.preferences.showsInspector)
@@ -47,95 +48,65 @@ struct DocumentWindowView: View {
 
     var body: some View {
         windowInteractionView
+            .background(ReaderWindowSizingHook())
     }
 
     private var windowChromeView: some View {
-        VStack(spacing: 0) {
-            NavigationSplitView(columnVisibility: $columnVisibility) {
-                HistorySidebarView(
-                    history: environment.history,
-                    selection: $historySelection,
-                    onOpen: openHistoryRecord,
-                    onOpenInNewWindow: openHistoryRecordInNewWindow,
-                    onReveal: revealHistoryRecord
-                )
-                .focusable()
-                .focused($focusedRegion, equals: .history)
-                .focusSection()
-                .toolbar(removing: .sidebarToggle)
-                .frame(minWidth: 240, idealWidth: 280, maxWidth: 360)
-                .navigationSplitViewColumnWidth(min: 240, ideal: 280, max: 360)
-            } detail: {
-                HStack(spacing: 0) {
-                    documentContent
-                        .contentShape(Rectangle())
-                        .simultaneousGesture(
-                            TapGesture().onEnded { dismissTemporaryPanelsIfNeeded() }
-                        )
-                        .onExitCommand(perform: dismissTemporaryPanelsIfNeeded)
-                        .focusSection()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                    if Self.usesCompactPanelLayout(at: windowWidth) && inspectorPresented {
-                        Divider()
-                        inspectorContent
-                            .frame(width: 246)
+        GeometryReader { geometry in
+            let isTiny = Self.usesTinyLayout(at: geometry.size.width)
+            VStack(spacing: 0) {
+                if !isTiny {
+                    compactHeader
+                    Divider()
+                }
+                GeometryReader { contentGeometry in
+                    readerPane(size: contentGeometry.size, isTiny: isTiny)
+                }
+                if isTiny {
+                    Divider()
+                    HStack(spacing: 4) {
+                        Text(session.windowTitle)
+                            .font(.caption)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer(minLength: 0)
+                        tinyActionMenu
                     }
+                    .padding(.horizontal, 6)
+                    .frame(height: 28)
+                } else if !isDistractionFree {
+                    Divider()
+                    ReadingStatusBar(session: session)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .focusable()
+                        .focused($focusedRegion, equals: .statusBar)
+                        .focusSection()
                 }
             }
-            .inspector(isPresented: Binding(
-                get: { !Self.usesCompactPanelLayout(at: windowWidth) && inspectorPresented },
-                set: { inspectorPresented = $0 }
-            )) {
-                inspectorContent
-            }
-
-            if !isDistractionFree {
-                Divider()
-                ReadingStatusBar(session: session)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .focusable()
-                    .focused($focusedRegion, equals: .statusBar)
-                    .focusSection()
-            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
-        .frame(minWidth: 760, minHeight: 520)
-        .navigationTitle(session.windowTitle)
+        .frame(minWidth: 200, minHeight: 200)
+        .navigationTitle(usesTinyLayout ? "" : session.windowTitle)
         .preferredColorScheme(environment.preferences.appAppearance.colorScheme)
-        .toolbar {
-            ReaderToolbar(
-                historyVisible: columnVisibility != .detailOnly,
-                inspectorPresented: $inspectorPresented,
-                isDistractionFree: isDistractionFree,
-                onToggleHistory: toggleHistory,
-                onToggleInspector: toggleInspector,
-                onToggleDistractionFree: toggleDistractionFree,
-                onOpen: openMarkdown,
-                onNavigateBack: session.navigateBack,
-                onNavigateForward: session.navigateForward,
-                onSearch: showSearch,
-                documentTitle: session.title,
-                canNavigateBack: session.canNavigateBack,
-                canNavigateForward: session.canNavigateForward,
-                canExport: session.snapshot != nil,
-                exportTheme: environment.preferences.exportTheme,
-                isExporting: session.isExporting,
-                exportError: exportError,
-                onExport: exportDocument,
-                onSelectExportTheme: { environment.preferences.exportTheme = $0 },
-                onRetryExport: retryExport,
-                onDismissExportError: { exportError = nil }
-            )
-        }
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { oldWidth, newWidth in
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { oldSize, newSize in
             let firstMeasurement = !didMeasureWindowWidth
+            let changedLayout = Self.usesTinyLayout(at: oldSize.width) != Self.usesTinyLayout(at: newSize.width)
+            if firstMeasurement {
+                isRendererReady = false
+                Task { @MainActor in
+                    await Task.yield()
+                    isRendererReady = true
+                }
+            }
             didMeasureWindowWidth = true
-            windowWidth = newWidth
+            windowWidth = newSize.width
             if firstMeasurement
-                || Self.usesCompactPanelLayout(at: oldWidth) != Self.usesCompactPanelLayout(at: newWidth)
-                || (oldWidth < Self.overlayThreshold && newWidth >= Self.overlayThreshold) {
+                || changedLayout
+                || Self.usesCompactPanelLayout(at: oldSize.width) != Self.usesCompactPanelLayout(at: newSize.width)
+                || (oldSize.width < Self.overlayThreshold && newSize.width >= Self.overlayThreshold) {
+                if !usesTinyLayout { compactPanel = nil }
                 restorePreferredPanelVisibility()
             }
         }
@@ -411,6 +382,7 @@ struct DocumentWindowView: View {
     }
 
     private func openRequest(_ request: DocumentWindowRequest) {
+        compactPanel = nil
         session.open(
             request.url,
             targetHeadingID: request.headingID,
@@ -420,6 +392,7 @@ struct DocumentWindowView: View {
     }
 
     private func openRoute(_ route: DocumentRoute) {
+        compactPanel = nil
         session.open(
             route.url,
             targetHeadingID: route.headingID,
@@ -456,6 +429,7 @@ struct DocumentWindowView: View {
 
     private func showSearch() {
         guard session.snapshot != nil else { return }
+        compactPanel = nil
         searchFocusID += 1
         searchPresented = true
     }
@@ -561,6 +535,12 @@ struct DocumentWindowView: View {
     }
 
     private func toggleHistory() {
+        if usesTinyLayout {
+            focusedRegion = nil
+            compactPanel = compactPanel == .history ? nil : .history
+            return
+        }
+        focusedRegion = nil
         let visible = columnVisibility == .detailOnly
         preferredHistoryVisible = visible
         environment.preferences.showsHistory = visible
@@ -577,6 +557,12 @@ struct DocumentWindowView: View {
     }
 
     private func toggleInspector() {
+        if usesTinyLayout {
+            focusedRegion = nil
+            compactPanel = compactPanel == .inspector ? nil : .inspector
+            return
+        }
+        focusedRegion = nil
         let visible = !inspectorPresented
         preferredInspectorVisible = visible
         environment.preferences.showsInspector = visible
@@ -595,6 +581,7 @@ struct DocumentWindowView: View {
     private func dismissTemporaryPanelsIfNeeded() {
         guard windowWidth < Self.overlayThreshold else { return }
         withAnimation(layoutAnimation) {
+            compactPanel = nil
             columnVisibility = .detailOnly
             inspectorPresented = false
         }
@@ -602,16 +589,17 @@ struct DocumentWindowView: View {
 
     private func restorePreferredPanelVisibility() {
         guard !isDistractionFree else { return }
-        withAnimation(layoutAnimation) {
-            if Self.usesCompactPanelLayout(at: windowWidth)
-                && preferredHistoryVisible && preferredInspectorVisible {
-                let inspectorWasActive = inspectorPresented && columnVisibility == .detailOnly
-                columnVisibility = inspectorWasActive ? .detailOnly : .all
-                inspectorPresented = inspectorWasActive
-            } else {
-                columnVisibility = preferredHistoryVisible ? .all : .detailOnly
-                inspectorPresented = preferredInspectorVisible
-            }
+        if usesTinyLayout {
+            columnVisibility = .detailOnly
+            inspectorPresented = false
+        } else if Self.usesCompactPanelLayout(at: windowWidth)
+            && preferredHistoryVisible && preferredInspectorVisible {
+            let inspectorWasActive = inspectorPresented && columnVisibility == .detailOnly
+            columnVisibility = inspectorWasActive ? .detailOnly : .all
+            inspectorPresented = inspectorWasActive
+        } else {
+            columnVisibility = preferredHistoryVisible ? .all : .detailOnly
+            inspectorPresented = preferredInspectorVisible
         }
     }
 
@@ -620,6 +608,15 @@ struct DocumentWindowView: View {
     }
 
     private static let overlayThreshold: CGFloat = 960
+
+    private static let tinyLayoutThreshold: CGFloat = 700
+    private var usesTinyLayout: Bool {
+        Self.usesTinyLayout(at: windowWidth)
+    }
+
+    private static func usesTinyLayout(at width: CGFloat) -> Bool {
+        width < tinyLayoutThreshold
+    }
 
     private static let compactPanelThreshold: CGFloat = 1_180
 
@@ -642,9 +639,149 @@ struct DocumentWindowView: View {
         .focusSection()
     }
 
+    private var compactHeader: some View {
+        HStack(spacing: 10) {
+            Button(action: toggleHistory) {
+                Image(systemName: "sidebar.left")
+            }
+            .buttonStyle(.borderless)
+            .help("Show or hide History")
+            Button(action: session.navigateBack) {
+                Image(systemName: "chevron.left")
+            }
+            .buttonStyle(.borderless)
+            .disabled(!session.canNavigateBack)
+            .help("Go Back")
+            Button(action: session.navigateForward) {
+                Image(systemName: "chevron.right")
+            }
+            .buttonStyle(.borderless)
+            .disabled(!session.canNavigateForward)
+            .help("Go Forward")
+            Text(session.windowTitle)
+                .font(.headline)
+                .lineLimit(1)
+                .truncationMode(.middle)
+            Spacer(minLength: 0)
+            Button(action: openMarkdown) {
+                Image(systemName: "folder")
+            }
+            .buttonStyle(.borderless)
+            .help("Open Markdown…")
+            ExportToolbarControl(
+                theme: environment.preferences.exportTheme,
+                isExporting: session.isExporting,
+                errorMessage: exportError,
+                onExport: exportDocument,
+                onSelectTheme: { environment.preferences.exportTheme = $0 },
+                onRetry: retryExport,
+                onDismissError: { exportError = nil }
+            )
+            .disabled(session.snapshot == nil)
+            Button(action: showSearch) {
+                Image(systemName: "magnifyingglass")
+            }
+            .buttonStyle(.borderless)
+            .disabled(session.snapshot == nil)
+            .help("Find in Document")
+            Button(action: toggleInspector) {
+                Image(systemName: "sidebar.right")
+            }
+            .buttonStyle(.borderless)
+            .help("Show or hide Outline and Bookmarks")
+            Button(action: toggleDistractionFree) {
+                Image(systemName: isDistractionFree
+                    ? "arrow.down.right.and.arrow.up.left"
+                    : "arrow.up.left.and.arrow.down.right")
+            }
+            .buttonStyle(.borderless)
+            .help(isDistractionFree ? "Exit Distraction-Free Reading" : "Enter Distraction-Free Reading")
+            tinyActionMenu
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 36)
+        .background(.bar)
+    }
+
+    private func readerPane(size: CGSize, isTiny: Bool) -> some View {
+        let historyWidth: CGFloat = !isTiny && columnVisibility != .detailOnly ? 280 : 0
+        let inspectorWidth: CGFloat = !isTiny && inspectorPresented ? 246 : 0
+        return ZStack(alignment: .topLeading) {
+            // Keep one WebView mounted while panels and the window change size.
+            documentContent
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded { dismissTemporaryPanelsIfNeeded() })
+                .onExitCommand(perform: dismissTemporaryPanelsIfNeeded)
+                .focusSection()
+                .frame(width: max(1, size.width - historyWidth - inspectorWidth), height: size.height)
+                .offset(x: historyWidth)
+                .allowsHitTesting(!isTiny || compactPanel == nil)
+
+            if historyWidth > 0 || (isTiny && compactPanel == .history) {
+                HistorySidebarView(
+                history: environment.history,
+                selection: $historySelection,
+                onOpen: openHistoryRecord,
+                onOpenInNewWindow: openHistoryRecordInNewWindow,
+                onReveal: revealHistoryRecord
+                )
+                .focusable()
+                .focused($focusedRegion, equals: .history)
+                .focusSection()
+                .frame(width: isTiny ? size.width : historyWidth, height: size.height)
+            }
+            if inspectorWidth > 0 || (isTiny && compactPanel == .inspector) {
+                inspectorContent
+                    .frame(width: isTiny ? size.width : inspectorWidth, height: size.height)
+                    .offset(x: isTiny ? 0 : size.width - inspectorWidth)
+            }
+        }
+        .frame(width: size.width, height: size.height, alignment: .topLeading)
+        .clipped()
+    }
+
+    private var tinyActionMenu: some View {
+        Menu {
+            Button("Document") { compactPanel = nil }
+            Button("History") { toggleHistory() }
+            Button("Outline and Bookmarks") { toggleInspector() }
+            Divider()
+            Button("Open Markdown…", action: openMarkdown)
+            Button("Back", action: session.navigateBack)
+                .disabled(!session.canNavigateBack)
+            Button("Forward", action: session.navigateForward)
+                .disabled(!session.canNavigateForward)
+            Button("Find in Document", action: showSearch)
+                .disabled(session.snapshot == nil)
+            Menu("Export") {
+                Button("HTML") { exportDocument(format: .html, theme: environment.preferences.exportTheme) }
+                Button("PDF") { exportDocument(format: .pdf, theme: environment.preferences.exportTheme) }
+                Menu("Theme") {
+                    ForEach(DisplayTheme.allCases) { theme in
+                        Button(theme.title) { environment.preferences.exportTheme = theme }
+                    }
+                }
+            }
+            .disabled(session.snapshot == nil || session.isExporting)
+            Menu("Document Theme") {
+                ForEach(DisplayTheme.allCases) { theme in
+                    Button(theme.title) { environment.preferences.displayTheme = theme }
+                }
+            }
+            Divider()
+            Button(isDistractionFree ? "Exit Distraction-Free Reading" : "Enter Distraction-Free Reading",
+                   action: toggleDistractionFree)
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .accessibilityLabel("Reader actions")
+        }
+        .menuStyle(.borderlessButton)
+        .accessibilityIdentifier("reader.actions")
+    }
+
     @ViewBuilder
     private var documentContent: some View {
-        if let snapshot = session.snapshot {
+        if let snapshot = session.snapshot, isRendererReady {
             ReadOnlyDocumentView(snapshot: snapshot, session: session, renderer: renderer)
                 .overlay(alignment: .top) {
                     if session.showsLoadingIndicator {
@@ -700,4 +837,29 @@ private enum WindowFocusRegion: Hashable {
     case history
     case inspector
     case statusBar
+}
+
+private enum CompactPanel {
+    case history
+    case inspector
+}
+
+private struct ReaderWindowSizingHook: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView { WindowAttachmentView() }
+    func updateNSView(_ nsView: NSView, context: Context) {
+        (nsView as? WindowAttachmentView)?.allowCompactSize()
+    }
+
+    private final class WindowAttachmentView: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            allowCompactSize()
+        }
+
+        func allowCompactSize() {
+            guard let window else { return }
+            window.contentMinSize = NSSize(width: 200, height: 200)
+            window.minSize = NSSize(width: 200, height: 200)
+        }
+    }
 }

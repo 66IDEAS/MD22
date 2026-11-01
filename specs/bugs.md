@@ -362,3 +362,22 @@ until its fix is committed and the stated verification has passed.
 - **Fix:** Keep the reader's 760-point minimum, move lower-priority toolbar
   controls into the system overflow menu, and render Inspector within the
   detail column at compact widths to avoid the macOS 27 three-pane crash.
+
+## B024 — Reader cannot reach a 200-point width safely
+
+- **Status:** Fixed locally
+- **Severity:** High
+- **Actual:** The native split view and toolbar constrain the reader to several
+  hundred points. Forcing the full layout narrower can abort inside SwiftUI or
+  WebKit, especially while a Markdown document is open.
+- **Expected:** The window can be resized to 200 points wide without a crash.
+  The document remains readable and scrollable; History and Outline remain
+  accessible one at a time at narrow widths.
+- **Evidence:** User report on 2026-11-01 and local macOS 27.0.1 reproductions.
+- **Verification:** An isolated build rendered an open Markdown document at a
+  sustained 200-point width. History and Outline each opened at that width,
+  and the same process remained alive. The replacement header also opened a
+  document and switched to Outline at ordinary width.
+- **Fix:** Keep a single document WebView mounted while the side panels adapt
+  to available width. Use compact controls at narrow widths and set the reader
+  window's minimum to 200 × 200 points.

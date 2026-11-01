@@ -11,6 +11,7 @@ struct MD22App: App {
                 .handlesExternalEvents(preferring: ["*"], allowing: ["*"])
         }
         .defaultSize(width: 1_240, height: 800)
+        .windowResizability(.contentMinSize)
         .defaultLaunchBehavior(.presented)
         .handlesExternalEvents(matching: ["*"])
         .commands {
@@ -25,6 +26,7 @@ struct MD22App: App {
                 .handlesExternalEvents(preferring: [], allowing: [])
         }
         .defaultSize(width: 1_240, height: 800)
+        .windowResizability(.contentMinSize)
         .handlesExternalEvents(matching: [])
 
         Settings {
