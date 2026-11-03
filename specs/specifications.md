@@ -104,12 +104,18 @@
 
 **Acceptance criteria:**
 
-- Version 1 includes light, dark, sci-fi, blueprint, and 8-bit themes.
+- Version 1 includes light, dark, sci-fi, blueprint, 8-bit, and Raw Markdown themes.
 - The user can switch the display theme at any time using a compact control in the status bar.
 - A theme may style typography, spacing, headings, code, tables, diagrams, backgrounds, interface elements, and subtle motion.
 - Each theme has a distinct visual identity rather than acting only as a color variation.
 - All document content remains legible and understandable in every theme.
 - Changing the display theme does not change the source Markdown file or the selected export theme.
+- Raw Markdown displays the file's literal Markdown source, including syntax,
+  whitespace, and line breaks, as selectable black monospace text on a white
+  canvas. It is read-only; Markdown is not rendered in this theme.
+- Search operates on source text in Raw Markdown. Outline navigation and
+  bookmarks remain available, and switching back to a rendered theme does not
+  change the file.
 
 ### 9. Open Markdown Files Directly
 
@@ -295,6 +301,9 @@
 - The initial export-theme default is the printer-friendly light theme.
 - If the user chooses another export theme, the application remembers it for the next export.
 - One remembered export-theme preference is shared by HTML and PDF exports.
+- Selecting Raw Markdown as the export theme produces HTML or PDF that visibly
+  contains the literal Markdown source in black monospace on white, without
+  changing the current reading theme.
 - Exporting does not change the active display theme.
 - Export begins immediately after the user makes the export choices, without a preview or Save As step.
 - The selected publication style is applied consistently throughout the exported document.

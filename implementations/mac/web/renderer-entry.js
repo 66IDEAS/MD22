@@ -78,7 +78,9 @@ const state = {
 };
 
 const root = document.querySelector("#document-root");
+const sourceRoot = document.querySelector("#source-root");
 const bootstrap = window.__MD22_BOOTSTRAP__;
+const isRawTheme = () => document.documentElement.dataset.theme === "raw";
 const normalizeCallouts = (markdown) => markdown.replace(
   /^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*([^\n]*)\n((?:>[^\n]*(?:\n|$))*)/gim,
   (_, rawKind, title, body) => {
@@ -166,6 +168,27 @@ headings.forEach((heading) => {
   heading.append(action);
 });
 
+// Keep the literal source in text nodes. No Markdown or author HTML is
+// interpreted here; line spans only give the outline stable scroll targets.
+const headingIDByLine = new Map();
+const sourceHeadingTokens = md.parse(bootstrap.markdown, {}).filter((token) => token.type === "heading_open");
+sourceHeadingTokens
+  .forEach((token, index) => {
+    if (token.map && headings[index]) headingIDByLine.set(token.map[0], headings[index].id);
+  });
+const sourceHeadings = [];
+const sourceLines = bootstrap.markdown.split("\n");
+sourceLines.forEach((line, index) => {
+  const span = document.createElement("span");
+  span.textContent = line + (index < sourceLines.length - 1 ? "\n" : "");
+  const headingID = headingIDByLine.get(index);
+  if (headingID) {
+    span.dataset.headingId = headingID;
+    sourceHeadings.push({ id: headingID, element: span });
+  }
+  sourceRoot.append(span);
+});
+
 const setBookmarkedHeadings = (headingIDs) => {
   const bookmarked = new Set(Array.isArray(headingIDs) ? headingIDs : []);
   headings.forEach((heading) => {
@@ -191,7 +214,9 @@ const updateLocation = () => {
   state.verticalOffset = window.scrollY;
   state.progress = Math.max(0, Math.min(1, window.scrollY / maximum));
   const marker = window.scrollY + Math.min(160, window.innerHeight * 0.25);
-  state.headingID = headings.filter((heading) => heading.offsetTop <= marker).at(-1)?.id || null;
+  state.headingID = isRawTheme()
+    ? sourceHeadings.filter(({ element }) => element.getBoundingClientRect().top + window.scrollY <= marker).at(-1)?.id || null
+    : headings.filter((heading) => heading.offsetTop <= marker).at(-1)?.id || null;
 };
 document.addEventListener("scroll", updateLocation, { passive: true });
 document.addEventListener("selectionchange", () => {
@@ -257,6 +282,7 @@ let marks = [];
 const clearSearch = () => {
   for (const mark of marks) mark.replaceWith(document.createTextNode(mark.textContent));
   root.normalize();
+  sourceRoot.normalize();
   marks = [];
   state.activeSearchIndex = -1;
   state.searchCount = 0;
@@ -266,7 +292,7 @@ const clearSearch = () => {
 const search = (query) => {
   clearSearch();
   if (!query) return state;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+  const walker = document.createTreeWalker(isRawTheme() ? sourceRoot : root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       return node.parentElement?.closest("script, style, mark, .copy-code") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
     }
@@ -305,19 +331,44 @@ const activateSearch = (index) => {
   const mark = marks[state.activeSearchIndex];
   mark.classList.add("active");
   mark.scrollIntoView({ block: "center", behavior: bootstrap.reduceMotion ? "instant" : "smooth" });
-  state.activeSearchSection = headings.filter((heading) => heading.offsetTop <= mark.offsetTop).at(-1)?.dataset.title || "";
+  const sourceHeadingID = sourceHeadings
+    .filter(({ element }) => element.getBoundingClientRect().top <= mark.getBoundingClientRect().top)
+    .at(-1)?.id;
+  state.activeSearchSection = isRawTheme()
+    ? headings.find((heading) => heading.id === sourceHeadingID)?.dataset.title || ""
+    : headings.filter((heading) => heading.offsetTop <= mark.offsetTop).at(-1)?.dataset.title || "";
   return state;
 };
 
 window.MD22 = Object.freeze({
   state: () => ({ ...state }),
+  setTheme: (themeID) => {
+    const headingID = state.headingID;
+    const progress = state.progress;
+    document.documentElement.dataset.theme = themeID || "light";
+    requestAnimationFrame(() => {
+      const target = isRawTheme()
+        ? sourceHeadings.find((heading) => heading.id === headingID)?.element
+        : (headingID ? document.getElementById(headingID) : null);
+      if (target) {
+        target.scrollIntoView({ block: "start", behavior: "instant" });
+      } else {
+        const maximum = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        window.scrollTo({ top: maximum * progress, behavior: "instant" });
+      }
+      updateLocation();
+    });
+    return true;
+  },
   headings: () => headings.map((heading) => ({
     id: heading.id,
     level: Number(heading.tagName.slice(1)),
     title: heading.dataset.title || heading.textContent
   })),
   navigateTo: (id, emphasize = true) => {
-    const target = document.getElementById(id);
+    const target = isRawTheme()
+      ? sourceHeadings.find((heading) => heading.id === id)?.element
+      : document.getElementById(id);
     if (!target) return false;
     target.scrollIntoView({ block: "start", behavior: bootstrap.reduceMotion ? "instant" : "smooth" });
     if (emphasize) {
@@ -337,7 +388,7 @@ window.MD22 = Object.freeze({
   },
   emphasizeLocation: () => {
     const target = document.elementFromPoint(window.innerWidth / 2, Math.min(180, window.innerHeight / 3))
-      ?.closest("h1, h2, h3, h4, h5, h6, p, li, blockquote, pre, table") || root;
+      ?.closest("h1, h2, h3, h4, h5, h6, p, li, blockquote, pre, table") || (isRawTheme() ? sourceRoot : root);
     target.classList.add("arrival-target");
     setTimeout(() => target.classList.remove("arrival-target"), 1500);
     return true;

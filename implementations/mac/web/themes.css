@@ -92,6 +92,17 @@
 :root[data-theme="8-bit"] a { text-decoration-style: dotted; text-decoration-thickness: 3px; }
 :root[data-theme="8-bit"] #document-root::before { content: "◆ ◆ ◆"; display: block; color: #f067aa; font-family: monospace; letter-spacing: .5em; margin-bottom: 2em; }
 
+:root[data-theme="raw"] {
+  color-scheme: light;
+  --page: #fff;
+  --ink: #000;
+  --muted: #000;
+  --accent: #000;
+  --line: #000;
+  --code: #fff;
+  font-family: "SF Mono", Menlo, ui-monospace, monospace;
+}
+
 @media (prefers-contrast: more) {
   :root { --muted: var(--ink); --line: var(--ink); }
   a { text-decoration-thickness: .14em; }

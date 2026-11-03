@@ -27,6 +27,56 @@ struct RendererIntegrationTests {
         #expect(headings?.first?["title"] as? String == "Rendered")
     }
 
+    @Test("Raw Markdown displays literal source and supports source search")
+    func rawMarkdownTheme() async throws {
+        let markdown = "# Heading\n\n**bold** <img src=x onerror=alert(1)>\n\tindented\n"
+        let snapshot = DocumentSnapshot(
+            url: URL(fileURLWithPath: "/tmp/RawTheme.md"),
+            markdown: markdown,
+            modificationDate: nil,
+            fileIdentifier: nil
+        )
+        let renderer = WebDocumentRenderer()
+        try await renderer.render(snapshot: snapshot, themeID: DisplayTheme.raw.rawValue)
+        let source = try await renderer.page.callJavaScript(
+            """
+            const raw = document.querySelector('#source-root');
+            return {
+              text: raw.textContent,
+              display: getComputedStyle(raw).display,
+              renderedDisplay: getComputedStyle(document.querySelector('#document-root')).display,
+              color: getComputedStyle(raw).color,
+              background: getComputedStyle(raw).backgroundColor,
+              font: getComputedStyle(raw).fontFamily,
+              containsImage: !!raw.querySelector('img'),
+              headingTarget: !!raw.querySelector('[data-heading-id="heading"]')
+            };
+            """,
+            contentWorld: .page
+        ) as? [String: Any]
+        #expect(source?["text"] as? String == markdown)
+        #expect(source?["display"] as? String == "block")
+        #expect(source?["renderedDisplay"] as? String == "none")
+        #expect(source?["color"] as? String == "rgb(0, 0, 0)")
+        #expect(source?["background"] as? String == "rgb(255, 255, 255)")
+        #expect((source?["font"] as? String)?.contains("SF Mono") == true)
+        #expect(source?["containsImage"] as? Bool == false)
+        #expect(source?["headingTarget"] as? Bool == true)
+        #expect(await renderer.search("**bold**").matchCount == 1)
+        let navigated = try await renderer.page.callJavaScript(
+            "return window.MD22.navigateTo('heading')",
+            contentWorld: .page
+        ) as? Bool
+        #expect(navigated == true)
+
+        await renderer.applyTheme(DisplayTheme.light.rawValue)
+        let renderedDisplay = try await renderer.page.callJavaScript(
+            "return getComputedStyle(document.querySelector('#document-root')).display",
+            contentWorld: .page
+        ) as? String
+        #expect(renderedDisplay != "none")
+    }
+
     @Test("Heading bookmark stars stay filled until removed")
     func headingBookmarkState() async throws {
         let snapshot = DocumentSnapshot(

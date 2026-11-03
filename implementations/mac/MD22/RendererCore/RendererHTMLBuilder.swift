@@ -76,6 +76,7 @@ enum RendererHTMLBuilder {
         </head>
         <body>
           <main id="document-root" aria-label="Markdown document"></main>
+          <pre id="source-root" aria-label="Raw Markdown source"></pre>
           <script nonce="\(nonce)">window.__MD22_ERROR__=null;window.addEventListener('error',event=>{window.__MD22_ERROR__=event.message+' @ '+event.filename+':'+event.lineno});window.addEventListener('unhandledrejection',event=>{window.__MD22_ERROR__=String(event.reason)});window.__MD22_BOOTSTRAP__=\(bootstrapJSON);</script>
           <script nonce="\(nonce)">\(mermaidScript)</script>
           <script nonce="\(nonce)">\(script)</script>

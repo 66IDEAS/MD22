@@ -6,7 +6,8 @@ enum BuiltInThemeCatalog {
         manifest("dark", "Dark", page: "#17191d", ink: "#e9e8e3", muted: "#a5a8af", accent: "#7cc6e8", body: "Charter", heading: "Avenir Next", mermaid: "dark"),
         manifest("sci-fi", "Sci-Fi", page: "#07131d", ink: "#d8f2f2", muted: "#82a5aa", accent: "#37e3e0", body: "Avenir Next", heading: "Futura", mermaid: "dark"),
         manifest("blueprint", "Blueprint", page: "#064b94", ink: "#eefaff", muted: "#b9dced", accent: "#8be8ff", body: "SF Mono", heading: "SF Mono", mermaid: "dark"),
-        manifest("8-bit", "8-Bit", page: "#1a1530", ink: "#fff7d6", muted: "#c4b9d9", accent: "#5ce1e6", body: "Avenir Next", heading: "SF Mono", mermaid: "dark")
+        manifest("8-bit", "8-Bit", page: "#1a1530", ink: "#fff7d6", muted: "#c4b9d9", accent: "#5ce1e6", body: "Avenir Next", heading: "SF Mono", mermaid: "dark"),
+        manifest("raw", "Raw Markdown", page: "#ffffff", ink: "#000000", muted: "#000000", accent: "#000000", body: "SF Mono", heading: "SF Mono")
     ]
 
     static func manifest(for id: String) -> ThemeManifest {

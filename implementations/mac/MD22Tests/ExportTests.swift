@@ -56,6 +56,34 @@ struct ExportTests {
         #expect(try String(contentsOf: directory.appending(path: "Guide.html"), encoding: .utf8) == "existing")
     }
 
+    @Test("Raw theme exports Markdown source rather than rendered prose")
+    func rawThemeExport() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let source = directory.appending(path: "Raw.md")
+        let markdown = "# Heading\n\n**bold** and [link](https://example.com)\n"
+        try markdown.write(to: source, atomically: true, encoding: .utf8)
+        let snapshot = DocumentSnapshot(
+            url: source, markdown: markdown, modificationDate: nil, fileIdentifier: nil
+        )
+        let renderer = WebDocumentRenderer()
+        try await renderer.render(snapshot: snapshot, themeID: DisplayTheme.light.rawValue)
+        let service = DocumentExportService()
+
+        let htmlURL = try await service.exportHTML(snapshot: snapshot, renderer: renderer, themeID: "raw")
+        let html = try String(contentsOf: htmlURL, encoding: .utf8)
+        #expect(html.contains("data-theme=\"raw\""))
+        #expect(html.contains("**bold** and [link](https://example.com)"))
+
+        let pdfURL = try await service.exportPDF(snapshot: snapshot, themeID: "raw")
+        let pdf = try #require(PDFDocument(url: pdfURL))
+        try assertA4Pages(pdf)
+        #expect(pdf.string?.contains("# Heading") == true)
+        #expect(pdf.string?.contains("**bold**") == true)
+        #expect(try String(contentsOf: source, encoding: .utf8) == markdown)
+    }
+
     @Test("PDF export paginates long publications on A4", arguments: ["light", "dark", "blueprint", "sci-fi", "8-bit"])
     func pdfExport(themeID: String) async throws {
         let directory = FileManager.default.temporaryDirectory

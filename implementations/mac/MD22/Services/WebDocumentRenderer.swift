@@ -158,7 +158,7 @@ final class WebDocumentRenderer: DocumentRendering {
 
     func applyTheme(_ themeID: String) async {
         _ = try? await page.callJavaScript(
-            "document.documentElement.dataset.theme = themeID",
+            "return window.MD22?.setTheme(themeID)",
             arguments: ["themeID": themeID],
             contentWorld: .page
         )
@@ -221,7 +221,7 @@ final class WebDocumentRenderer: DocumentRendering {
 
     func focusDocument() async {
         _ = try? await page.callJavaScript(
-            "const root=document.querySelector('#document-root'); root.tabIndex=-1; root.focus({preventScroll:true})",
+            "const root=document.querySelector(document.documentElement.dataset.theme === 'raw' ? '#source-root' : '#document-root'); root.tabIndex=-1; root.focus({preventScroll:true})",
             contentWorld: .page
         )
     }

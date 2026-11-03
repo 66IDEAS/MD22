@@ -32,6 +32,7 @@ enum DisplayTheme: String, CaseIterable, Identifiable, Sendable, Codable {
     case sciFi = "sci-fi"
     case blueprint
     case eightBit = "8-bit"
+    case raw = "raw"
 
     var id: String { rawValue }
 
@@ -42,6 +43,7 @@ enum DisplayTheme: String, CaseIterable, Identifiable, Sendable, Codable {
         case .sciFi: "Sci-Fi"
         case .blueprint: "Blueprint"
         case .eightBit: "8-Bit"
+        case .raw: "Raw Markdown"
         }
     }
 }
