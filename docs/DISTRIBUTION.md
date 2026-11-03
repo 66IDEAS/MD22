@@ -89,9 +89,9 @@ Secrets must be base64-encoded as files, not copied as unencoded multiline
 values. Do not make them repository-level secrets: the `release` environment is
 the security boundary that keeps them out of verification and pull-request jobs.
 
-Enable GitHub release immutability and the protected `main` branch as described
-in [Dependency and Release Supply Chain](SUPPLY_CHAIN.md). After CI succeeds,
-create and push a version tag whose commit is on `main`:
+For the optional GitHub-hosted release workflow, enable release immutability as
+described in [Dependency and Release Supply Chain](SUPPLY_CHAIN.md). After local
+verification succeeds, create and push a version tag whose commit is on `main`:
 
 ```sh
 git tag -a v1.0.0 -m 'MD22 1.0.0'

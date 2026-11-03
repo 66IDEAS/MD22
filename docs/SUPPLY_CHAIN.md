@@ -14,24 +14,23 @@ metadata override is tied to the exact `khroma` 2.1.0 package, whose distributed
 license file is MIT even though its package metadata omits the license field.
 A version change invalidates that review.
 
-Dependabot monitors npm, SwiftPM, and GitHub Actions weekly. The pull-request
-dependency-review job independently rejects new high-severity advisories and
-licenses outside the approved policy. Third-party Actions are pinned by complete
-commit SHA and must be updated through reviewed pull requests.
+Dependabot monitors npm, SwiftPM, and GitHub Actions weekly. Run
+`npm run audit:dependencies` locally when dependency changes are reviewed; the
+normal macOS verification script also runs this audit. Third-party Actions are
+pinned by complete commit SHA and must be updated through reviewed pull requests.
 
-## Continuous integration
+## Local verification and optional CI
 
-`.github/workflows/ci.yml` runs on pull requests and the protected `main` branch.
-The Apple-silicon macOS 26 job verifies the Xcode and SDK generation, audits
+Builds and tests for ordinary changes run locally on the maintainer's Mac using
+`implementations/mac/scripts/ci.zsh`. Pushing a commit or opening a pull request
+does not start a GitHub-hosted build. `.github/workflows/ci.yml` is retained as
+an optional manual `workflow_dispatch` check on a macOS 26 runner. It audits
 dependencies, reproduces the bundled renderer, runs native unit and UI tests,
 builds Release without credentials, and verifies the resulting architecture.
-Pull-request workflows receive read-only repository access and never receive
-release credentials.
+The manual workflow has read-only repository access and no release credentials.
 
-Configure `main` as a protected branch that requires both `Dependency review`
-and `Build and test on macOS 26` before merge. Require pull requests, dismiss
-stale approvals when new commits are pushed, require conversation resolution,
-and disallow force pushes and deletion.
+The separate release workflow remains tag-triggered; ordinary `main` pushes do
+not start it.
 
 ## Release integrity
 

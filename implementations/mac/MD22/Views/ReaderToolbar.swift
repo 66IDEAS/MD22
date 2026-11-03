@@ -58,17 +58,8 @@ struct ReaderToolbar: ToolbarContent {
                 .accessibilityLabel(documentTitle.map { "Current document: \($0)" } ?? "MD22")
         }
 
-        if #available(macOS 26.1, *) {
-            exportToolbarGroup.visibilityPriority(.low)
-        } else {
-            exportToolbarGroup
-        }
-
-        if #available(macOS 26.1, *) {
-            primaryToolbarGroup.visibilityPriority(.low)
-        } else {
-            primaryToolbarGroup
-        }
+        exportToolbarGroup
+        primaryToolbarGroup
     }
 
     private var primaryToolbarGroup: some ToolbarContent {
